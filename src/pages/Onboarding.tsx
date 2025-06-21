@@ -1,11 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Progress } from "../components/ui/progress";
 import { Badge } from "../components/ui/badge";
-import { User, Briefcase, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import { User, Briefcase, CheckCircle, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { useOnboarding } from "../hooks/useOnboarding";
 
 // Import onboarding steps
 import UserTypeSelection from "../components/onboarding/UserTypeSelection";
@@ -25,11 +25,42 @@ import OnboardingComplete from "../components/onboarding/OnboardingComplete";
 const Onboarding = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [userType, setUserType] = useState<"freelancer" | "client" | null>(
+  const [localCurrentStep, setLocalCurrentStep] = useState(0);
+  const [localUserType, setLocalUserType] = useState<"freelancer" | "client" | null>(
     (searchParams.get("type") as "freelancer" | "client") || null
   );
-  const [onboardingData, setOnboardingData] = useState<any>({});
+  const [localOnboardingData, setLocalOnboardingData] = useState<any>({});
+
+  // Use the onboarding hook
+  const {
+    data: backendData,
+    loading,
+    error,
+    currentStep: backendCurrentStep,
+    userType: backendUserType,
+    isOnboarded,
+    updateUserType,
+    updateFreelancerBasicInfo,
+    updateFreelancerProfessionalInfo,
+    updateFreelancerSkills,
+    updateFreelancerPortfolio,
+    updateFreelancerRates,
+    updateFreelancerVerification,
+    updateClientBasicInfo,
+    updateClientCompanyInfo,
+    updateClientProjects,
+    updateClientBudget,
+    updateClientVerification,
+    completeOnboarding,
+  } = useOnboarding();
+
+  // Determine if user is authenticated
+  const isAuthenticated = !!localStorage.getItem('token');
+
+  // Use backend data if authenticated, otherwise use local state
+  const currentStep = isAuthenticated ? backendCurrentStep : localCurrentStep;
+  const userType = isAuthenticated ? backendUserType : localUserType;
+  const onboardingData = isAuthenticated ? backendData : localOnboardingData;
 
   const freelancerSteps = [
     { title: "User Type", component: UserTypeSelection },
@@ -55,28 +86,106 @@ const Onboarding = () => {
   const steps = userType === "freelancer" ? freelancerSteps : clientSteps;
   const progress = ((currentStep + 1) / steps.length) * 100;
 
-  const handleNext = (data: any) => {
-    setOnboardingData(prev => ({ ...prev, ...data }));
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+  const handleNext = async (data: any) => {
+    if (isAuthenticated) {
+      // Use backend API calls
+      try {
+        if (currentStep === 0) {
+          await updateUserType(data.userType);
+        } else if (userType === "freelancer") {
+          switch (currentStep) {
+            case 1:
+              await updateFreelancerBasicInfo(data);
+              break;
+            case 2:
+              await updateFreelancerProfessionalInfo(data);
+              break;
+            case 3:
+              await updateFreelancerSkills(data);
+              break;
+            case 4:
+              await updateFreelancerPortfolio(data);
+              break;
+            case 5:
+              await updateFreelancerRates(data);
+              break;
+            case 6:
+              await updateFreelancerVerification();
+              break;
+            case 7:
+              await completeOnboarding();
+              break;
+          }
+        } else if (userType === "client") {
+          switch (currentStep) {
+            case 1:
+              await updateClientBasicInfo(data);
+              break;
+            case 2:
+              await updateClientCompanyInfo(data);
+              break;
+            case 3:
+              await updateClientProjects(data);
+              break;
+            case 4:
+              await updateClientBudget(data);
+              break;
+            case 5:
+              await updateClientVerification();
+              break;
+            case 6:
+              await completeOnboarding();
+              break;
+          }
+        }
+      } catch (error) {
+        console.error('Failed to update onboarding step:', error);
+      }
+    } else {
+      // Use local state for unauthenticated users
+      setLocalOnboardingData(prev => ({ ...prev, ...data }));
+      if (localCurrentStep < steps.length - 1) {
+        setLocalCurrentStep(localCurrentStep + 1);
+      }
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    if (isAuthenticated) {
+      // For authenticated users, we don't allow going back via UI
+      // The backend tracks the current step
+      return;
+    } else {
+      // Use local state for unauthenticated users
+      if (localCurrentStep > 0) {
+        setLocalCurrentStep(localCurrentStep - 1);
+      }
     }
   };
 
-  const handleUserTypeSelect = (type: "freelancer" | "client") => {
-    setUserType(type);
-    setOnboardingData({ userType: type });
-    setCurrentStep(1);
+  const handleUserTypeSelect = async (type: "freelancer" | "client") => {
+    if (isAuthenticated) {
+      await updateUserType(type);
+    } else {
+      setLocalUserType(type);
+      setLocalOnboardingData({ userType: type });
+      setLocalCurrentStep(1);
+    }
   };
 
   const handleComplete = () => {
     console.log("Onboarding completed:", onboardingData);
-    navigate(userType === "freelancer" ? "/dashboard" : "/client-dashboard");
+    if (isAuthenticated) {
+      // The hook will handle navigation
+      completeOnboarding();
+    } else {
+      // For unauthenticated users, redirect to signup with onboarding data
+      navigate('/signup', { 
+        state: { 
+          onboardingData: { ...localOnboardingData, userType: localUserType } 
+        } 
+      });
+    }
   };
 
   const CurrentStepComponent = steps[currentStep]?.component;
@@ -104,9 +213,35 @@ const Onboarding = () => {
       userType: userType,
       onNext: handleNext,
       onBack: handleBack,
-      canGoBack: currentStep > 0
+      canGoBack: currentStep > 0 && !isAuthenticated // Only allow back for unauthenticated users
     };
   };
+
+  // Show loading state for authenticated users
+  if (isAuthenticated && loading && currentStep === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-teal-600" />
+          <p className="text-gray-600">Loading your onboarding progress...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error: {error}</p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -177,7 +312,7 @@ const Onboarding = () => {
         </Card>
 
         {/* Navigation */}
-        {userType && currentStep > 0 && currentStep < steps.length - 1 && (
+        {userType && currentStep > 0 && currentStep < steps.length - 1 && !isAuthenticated && (
           <div className="flex justify-between">
             <Button
               variant="outline"

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -8,13 +7,47 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Checkbox } from "../ui/checkbox";
 import { ArrowRight, Plus, X, Building, GraduationCap } from "lucide-react";
 
+interface WorkExperience {
+  title: string;
+  company: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string;
+}
+
+interface Education {
+  school: string;
+  degree: string;
+  field: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+}
+
+interface Language {
+  language: string;
+  proficiency: string;
+}
+
+interface FreelancerProfessionalInfoData {
+  category?: string;
+  subcategory?: string;
+  experienceLevel?: string;
+  workExperience?: WorkExperience[];
+  education?: Education[];
+  certifications?: string[];
+  languages?: Language[];
+  [key: string]: string | WorkExperience[] | Education[] | string[] | Language[] | undefined;
+}
+
 interface FreelancerProfessionalInfoProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: FreelancerProfessionalInfoData) => void;
+  data: FreelancerProfessionalInfoData;
 }
 
 const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfoProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FreelancerProfessionalInfoData>({
     category: data.category || "",
     subcategory: data.subcategory || "",
     experienceLevel: data.experienceLevel || "",
@@ -25,7 +58,7 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
     ...data
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const categories = {
     "Web Development": ["Frontend Development", "Backend Development", "Full Stack Development", "WordPress Development", "E-commerce Development"],
@@ -135,7 +168,7 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.subcategory) newErrors.subcategory = "Subcategory is required";

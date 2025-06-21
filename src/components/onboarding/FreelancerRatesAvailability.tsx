@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -8,18 +7,44 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Checkbox } from "../ui/checkbox";
 import { ArrowRight, Clock, DollarSign, Calendar, Info } from "lucide-react";
 
+interface ProjectBasedRates {
+  small: string;
+  medium: string;
+  large: string;
+}
+
+interface WorkingHours {
+  start: string;
+  end: string;
+}
+
+interface FreelancerRatesAvailabilityData {
+  hourlyRate?: string;
+  projectBasedRates?: ProjectBasedRates;
+  preferredPaymentType?: string;
+  availability?: string;
+  hoursPerWeek?: string;
+  timezone?: string;
+  workingHours?: WorkingHours;
+  workingDays?: string[];
+  responseTime?: string;
+  minimumProjectBudget?: string;
+  specialRequirements?: string;
+  [key: string]: string | ProjectBasedRates | WorkingHours | string[] | undefined;
+}
+
 interface FreelancerRatesAvailabilityProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: FreelancerRatesAvailabilityData) => void;
+  data: FreelancerRatesAvailabilityData;
 }
 
 const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabilityProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FreelancerRatesAvailabilityData>({
     hourlyRate: data.hourlyRate || "",
     projectBasedRates: data.projectBasedRates || {
-      small: "", // $500-2000
-      medium: "", // $2000-10000  
-      large: "" // $10000+
+      small: "",
+      medium: "",
+      large: ""
     },
     preferredPaymentType: data.preferredPaymentType || "both",
     availability: data.availability || "full-time",
@@ -36,7 +61,7 @@ const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabili
     ...data
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const availabilityOptions = [
     { value: "full-time", label: "Full-time", description: "30+ hours per week" },
@@ -86,7 +111,7 @@ const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabili
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (!formData.hourlyRate && formData.preferredPaymentType !== "fixed") {
       newErrors.hourlyRate = "Hourly rate is required";

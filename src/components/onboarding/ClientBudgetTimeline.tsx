@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -6,13 +5,23 @@ import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ArrowRight, DollarSign, Clock, Info } from "lucide-react";
 
+interface ClientBudgetTimelineData {
+  budgetRange?: string;
+  paymentPreference?: string;
+  projectFrequency?: string;
+  averageProjectDuration?: string;
+  maxHourlyRate?: string;
+  totalMonthlyBudget?: string;
+  [key: string]: string | undefined;
+}
+
 interface ClientBudgetTimelineProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: ClientBudgetTimelineData) => void;
+  data: ClientBudgetTimelineData;
 }
 
 const ClientBudgetTimeline = ({ onNext, data }: ClientBudgetTimelineProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ClientBudgetTimelineData>({
     budgetRange: data.budgetRange || "",
     paymentPreference: data.paymentPreference || "",
     projectFrequency: data.projectFrequency || "",
@@ -22,7 +31,7 @@ const ClientBudgetTimeline = ({ onNext, data }: ClientBudgetTimelineProps) => {
     ...data
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const budgetRanges = [
     { value: "under-500", label: "Under $500", description: "Small tasks and quick projects" },
@@ -53,7 +62,7 @@ const ClientBudgetTimeline = ({ onNext, data }: ClientBudgetTimelineProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (!formData.budgetRange) {
       newErrors.budgetRange = "Please select a budget range";

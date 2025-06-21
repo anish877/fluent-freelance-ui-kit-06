@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -7,13 +6,27 @@ import { Badge } from "../ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ArrowRight, Plus, X, Star, Code, Palette, PenTool, TrendingUp } from "lucide-react";
 
+interface Skill {
+  name: string;
+  category: string;
+  level: string;
+  yearsOfExperience: number;
+}
+
+interface FreelancerSkillsExperienceData {
+  skills?: Skill[];
+  topSkills?: string[];
+  serviceOfferings?: string[];
+  [key: string]: Skill[] | string[] | undefined;
+}
+
 interface FreelancerSkillsExperienceProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: FreelancerSkillsExperienceData) => void;
+  data: FreelancerSkillsExperienceData;
 }
 
 const FreelancerSkillsExperience = ({ onNext, data }: FreelancerSkillsExperienceProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FreelancerSkillsExperienceData>({
     skills: data.skills || [],
     topSkills: data.topSkills || [],
     serviceOfferings: data.serviceOfferings || [],
@@ -22,7 +35,7 @@ const FreelancerSkillsExperience = ({ onNext, data }: FreelancerSkillsExperience
 
   const [skillInput, setSkillInput] = useState("");
   const [serviceInput, setServiceInput] = useState("");
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const skillCategories = {
     "Programming Languages": [
@@ -132,7 +145,7 @@ const FreelancerSkillsExperience = ({ onNext, data }: FreelancerSkillsExperience
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (formData.skills.length === 0) {
       newErrors.skills = "Please add at least one skill";

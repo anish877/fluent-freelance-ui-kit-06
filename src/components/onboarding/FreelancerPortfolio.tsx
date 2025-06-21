@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -7,13 +6,37 @@ import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ArrowRight, Plus, X, Upload, ExternalLink, Image, Video, FileText } from "lucide-react";
 
+interface PortfolioItem {
+  title: string;
+  description: string;
+  category: string;
+  technologies: string[];
+  images: string[];
+  liveUrl: string;
+  sourceUrl: string;
+  completionDate: string;
+  clientFeedback: string;
+  role: string;
+  duration: string;
+}
+
+interface FreelancerPortfolioData {
+  portfolioItems?: PortfolioItem[];
+  githubUrl?: string;
+  linkedinUrl?: string;
+  websiteUrl?: string;
+  behanceUrl?: string;
+  dribbbleUrl?: string;
+  [key: string]: PortfolioItem[] | string | undefined;
+}
+
 interface FreelancerPortfolioProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: FreelancerPortfolioData) => void;
+  data: FreelancerPortfolioData;
 }
 
 const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FreelancerPortfolioData>({
     portfolioItems: data.portfolioItems || [],
     githubUrl: data.githubUrl || "",
     linkedinUrl: data.linkedinUrl || "",
@@ -23,7 +46,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
     ...data
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const addPortfolioItem = () => {
     setFormData({
@@ -108,7 +131,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (formData.portfolioItems.length === 0) {
       newErrors.portfolio = "Please add at least one portfolio item to showcase your work";

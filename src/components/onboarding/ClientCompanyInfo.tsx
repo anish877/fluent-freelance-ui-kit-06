@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -7,13 +6,26 @@ import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ArrowRight, Building, Upload, Globe } from "lucide-react";
 
+interface ClientCompanyInfoData {
+  companyName?: string;
+  industry?: string;
+  companySize?: string;
+  website?: string;
+  linkedinProfile?: string;
+  companyDescription?: string;
+  companyLogo?: string;
+  foundedYear?: string;
+  annualRevenue?: string;
+  [key: string]: string | undefined;
+}
+
 interface ClientCompanyInfoProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: ClientCompanyInfoData) => void;
+  data: ClientCompanyInfoData;
 }
 
 const ClientCompanyInfo = ({ onNext, data }: ClientCompanyInfoProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ClientCompanyInfoData>({
     companyName: data.companyName || "",
     industry: data.industry || "",
     companySize: data.companySize || "",
@@ -26,7 +38,7 @@ const ClientCompanyInfo = ({ onNext, data }: ClientCompanyInfoProps) => {
     ...data
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const industries = [
     "Technology", "Healthcare", "Finance", "E-commerce", "Education", "Marketing & Advertising",
@@ -50,7 +62,7 @@ const ClientCompanyInfo = ({ onNext, data }: ClientCompanyInfoProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (!formData.companyName) newErrors.companyName = "Company name is required";
     if (!formData.industry) newErrors.industry = "Industry is required";

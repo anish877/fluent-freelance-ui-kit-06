@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -7,13 +6,27 @@ import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ArrowRight, Upload, Camera } from "lucide-react";
 
+interface ClientBasicInfoData {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  timezone?: string;
+  profilePhoto?: string;
+  clientType?: string;
+  howDidYouHear?: string;
+  [key: string]: string | undefined;
+}
+
 interface ClientBasicInfoProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: ClientBasicInfoData) => void;
+  data: ClientBasicInfoData;
 }
 
 const ClientBasicInfo = ({ onNext, data }: ClientBasicInfoProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ClientBasicInfoData>({
     firstName: data.firstName || "",
     lastName: data.lastName || "",
     email: data.email || "",
@@ -27,7 +40,7 @@ const ClientBasicInfo = ({ onNext, data }: ClientBasicInfoProps) => {
     ...data
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const countries = [
     "United States", "Canada", "United Kingdom", "Australia", "Germany", 
@@ -51,7 +64,7 @@ const ClientBasicInfo = ({ onNext, data }: ClientBasicInfoProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (!formData.firstName) newErrors.firstName = "First name is required";
     if (!formData.lastName) newErrors.lastName = "Last name is required";

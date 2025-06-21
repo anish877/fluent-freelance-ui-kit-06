@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
@@ -6,13 +5,23 @@ import { Textarea } from "../ui/textarea";
 import { Checkbox } from "../ui/checkbox";
 import { ArrowRight, Target, Code, Palette, PenTool, TrendingUp, Camera } from "lucide-react";
 
+interface ClientProjectNeedsData {
+  interestedCategories?: string[];
+  projectTypes?: string[];
+  urgencyLevel?: string;
+  preferredWorkingStyle?: string;
+  communicationPreference?: string[];
+  projectDescription?: string;
+  [key: string]: string | string[] | undefined;
+}
+
 interface ClientProjectNeedsProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: ClientProjectNeedsData) => void;
+  data: ClientProjectNeedsData;
 }
 
 const ClientProjectNeeds = ({ onNext, data }: ClientProjectNeedsProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ClientProjectNeedsData>({
     interestedCategories: data.interestedCategories || [],
     projectTypes: data.projectTypes || [],
     urgencyLevel: data.urgencyLevel || "",
@@ -22,7 +31,7 @@ const ClientProjectNeeds = ({ onNext, data }: ClientProjectNeedsProps) => {
     ...data
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const categories = [
     { id: "web-dev", label: "Web Development", icon: Code },
@@ -89,7 +98,7 @@ const ClientProjectNeeds = ({ onNext, data }: ClientProjectNeedsProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (formData.interestedCategories.length === 0) {
       newErrors.categories = "Please select at least one category";

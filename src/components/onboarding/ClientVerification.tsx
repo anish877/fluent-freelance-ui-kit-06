@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -6,13 +5,24 @@ import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { ArrowRight, Shield, CreditCard, Phone, CheckCircle } from "lucide-react";
 
+interface ClientVerificationData {
+  phoneNumber?: string;
+  phoneVerified?: boolean;
+  paymentMethodAdded?: boolean;
+  agreedToTerms?: boolean;
+  agreedToPrivacy?: boolean;
+  agreedToFees?: boolean;
+  emailVerified?: boolean;
+  [key: string]: string | boolean | undefined;
+}
+
 interface ClientVerificationProps {
-  onNext: (data: any) => void;
-  data: any;
+  onNext: (data: ClientVerificationData) => void;
+  data: ClientVerificationData;
 }
 
 const ClientVerification = ({ onNext, data }: ClientVerificationProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ClientVerificationData>({
     phoneNumber: data.phoneNumber || "",
     phoneVerified: data.phoneVerified || false,
     paymentMethodAdded: data.paymentMethodAdded || false,
@@ -23,12 +33,12 @@ const ClientVerification = ({ onNext, data }: ClientVerificationProps) => {
     ...data
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newErrors: any = {};
+    const newErrors: Record<string, string> = {};
     
     if (!formData.phoneNumber) {
       newErrors.phoneNumber = "Phone number is required for verification";
