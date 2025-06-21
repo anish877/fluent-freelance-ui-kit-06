@@ -1,4 +1,4 @@
-
+import { useNavigate } from "react-router-dom";
 import { Calendar, Clock, DollarSign, Eye, MessageCircle, Users, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -35,6 +35,8 @@ interface ProposalCardProps {
 }
 
 const ProposalCard = ({ proposal, onViewDetails }: ProposalCardProps) => {
+  const navigate = useNavigate();
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
@@ -77,12 +79,32 @@ const ProposalCard = ({ proposal, onViewDetails }: ProposalCardProps) => {
     });
   };
 
+  const handleMessageClient = () => {
+    // Navigate to messages or open messaging interface
+    console.log("Opening message interface for client:", proposal.client.name);
+    // In a real app, this would navigate to a messaging page or open a modal
+  };
+
+  const handleJoinInterview = () => {
+    // Navigate to interview page or open video call
+    console.log("Joining interview for:", proposal.jobTitle);
+    // In a real app, this would open a video call interface or navigate to interview page
+  };
+
+  const handleViewJobDetails = () => {
+    // Navigate to job details page
+    navigate(`/jobs/${proposal.id}`);
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-4">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2 hover:text-teal-600 cursor-pointer">
+            <h3 
+              className="text-xl font-semibold text-gray-900 mb-2 hover:text-teal-600 cursor-pointer"
+              onClick={handleViewJobDetails}
+            >
               {proposal.jobTitle}
             </h3>
             <div className="flex items-center text-sm text-gray-600 mb-2">
@@ -170,13 +192,22 @@ const ProposalCard = ({ proposal, onViewDetails }: ProposalCardProps) => {
               View Details
             </Button>
             {proposal.status === "pending" && (
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2"
+                onClick={handleMessageClient}
+              >
                 <MessageCircle className="h-4 w-4" />
                 Message Client
               </Button>
             )}
             {proposal.status === "interview" && (
-              <Button size="sm" className="flex items-center gap-2">
+              <Button 
+                size="sm" 
+                className="flex items-center gap-2"
+                onClick={handleJoinInterview}
+              >
                 <Calendar className="h-4 w-4" />
                 Join Interview
               </Button>

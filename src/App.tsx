@@ -14,6 +14,9 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PostJob from "./pages/PostJob";
 import Proposals from "./pages/Proposals";
+import Talent from "./pages/Talent";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +38,9 @@ const App = () => (
           <Route path="/signup" element={<Signup />} />
           <Route path="/post-job" element={<PostJob />} />
           <Route path="/proposals" element={<Proposals />} />
+          <Route path="/talent" element={<Talent />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

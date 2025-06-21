@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, Filter, Eye, MessageCircle, Calendar, DollarSign, Clock, TrendingUp } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
@@ -11,6 +10,7 @@ import { Separator } from "../components/ui/separator";
 import ProposalCard from "../components/cards/ProposalCard";
 import ProposalFilters from "../components/filters/ProposalFilters";
 import ProposalStats from "../components/stats/ProposalStats";
+import ProposalDetailsModal from "../components/modals/ProposalDetailsModal";
 
 interface Proposal {
   id: number;
@@ -41,6 +41,7 @@ const Proposals = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   // Mock data for proposals
   const proposals: Proposal[] = [
@@ -161,6 +162,16 @@ const Proposals = () => {
     rejected: proposals.filter(p => p.status === "rejected").length
   };
 
+  const handleViewDetails = (proposal: Proposal) => {
+    setSelectedProposal(proposal);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedProposal(null);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -246,7 +257,7 @@ const Proposals = () => {
                   <ProposalCard 
                     key={proposal.id} 
                     proposal={proposal}
-                    onViewDetails={setSelectedProposal}
+                    onViewDetails={handleViewDetails}
                   />
                 ))}
               </div>
@@ -271,6 +282,15 @@ const Proposals = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Proposal Details Modal */}
+      {selectedProposal && (
+        <ProposalDetailsModal
+          proposal={selectedProposal}
+          isOpen={showModal}
+          onClose={handleCloseModal}
+        />
+      )}
 
       <Footer />
     </div>
