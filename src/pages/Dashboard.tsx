@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import Button from "../components/ui/Button";
+import { Button } from "../components/ui/button";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
