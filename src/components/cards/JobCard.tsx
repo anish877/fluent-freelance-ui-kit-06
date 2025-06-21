@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { MapPin, Clock, DollarSign, Star, Users } from "lucide-react";
-import Badge from "../ui/Badge";
+import { Badge } from "../ui/badge";
 
 interface Job {
   id: number;

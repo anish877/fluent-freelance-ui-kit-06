@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Bell, User, ChevronDown } from "lucide-react";
-import Button from "../ui/Button";
+import { Button } from "../ui/button";
 import Dropdown from "../ui/Dropdown";
 
 const Navbar = () => {
@@ -110,7 +110,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                  <Button className="w-full">
                     Sign Up
                   </Button>
                 </Link>
