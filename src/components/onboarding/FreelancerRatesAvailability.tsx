@@ -411,7 +411,7 @@ const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabili
                   {option.label}
                 </SelectItem>
               ))}
-            </Select>
+            </SelectContent>
           </Select>
           
           {errors.responseTime && <p className="text-red-500 text-sm mt-1">{errors.responseTime}</p>}
