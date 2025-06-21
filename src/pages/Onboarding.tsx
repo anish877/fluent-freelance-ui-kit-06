@@ -82,11 +82,6 @@ const Onboarding = () => {
   const CurrentStepComponent = steps[currentStep]?.component;
 
   const getComponentProps = () => {
-    const baseProps = {
-      data: onboardingData,
-      userType: userType
-    };
-
     // First step (UserTypeSelection) has different props
     if (currentStep === 0) {
       return {
@@ -97,14 +92,16 @@ const Onboarding = () => {
     // Last step (OnboardingComplete) has different props
     if (currentStep === steps.length - 1) {
       return {
-        ...baseProps,
+        data: onboardingData,
+        userType: userType,
         onComplete: handleComplete
       };
     }
 
     // All other steps have standard props
     return {
-      ...baseProps,
+      data: onboardingData,
+      userType: userType,
       onNext: handleNext,
       onBack: handleBack,
       canGoBack: currentStep > 0
@@ -174,7 +171,7 @@ const Onboarding = () => {
         <Card className="mb-8">
           <CardContent className="p-8">
             {CurrentStepComponent && (
-              <CurrentStepComponent {...getComponentProps()} />
+              <CurrentStepComponent {...(getComponentProps() as any)} />
             )}
           </CardContent>
         </Card>
