@@ -81,6 +81,36 @@ const Onboarding = () => {
 
   const CurrentStepComponent = steps[currentStep]?.component;
 
+  const getComponentProps = () => {
+    const baseProps = {
+      data: onboardingData,
+      userType: userType
+    };
+
+    // First step (UserTypeSelection) has different props
+    if (currentStep === 0) {
+      return {
+        onNext: handleUserTypeSelect
+      };
+    }
+
+    // Last step (OnboardingComplete) has different props
+    if (currentStep === steps.length - 1) {
+      return {
+        ...baseProps,
+        onComplete: handleComplete
+      };
+    }
+
+    // All other steps have standard props
+    return {
+      ...baseProps,
+      onNext: handleNext,
+      onBack: handleBack,
+      canGoBack: currentStep > 0
+    };
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
@@ -144,14 +174,7 @@ const Onboarding = () => {
         <Card className="mb-8">
           <CardContent className="p-8">
             {CurrentStepComponent && (
-              <CurrentStepComponent
-                onNext={currentStep === 0 ? handleUserTypeSelect : handleNext}
-                onBack={handleBack}
-                onComplete={handleComplete}
-                data={onboardingData}
-                canGoBack={currentStep > 0}
-                userType={userType}
-              />
+              <CurrentStepComponent {...getComponentProps()} />
             )}
           </CardContent>
         </Card>
