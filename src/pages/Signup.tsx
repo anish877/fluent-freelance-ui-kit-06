@@ -1,11 +1,12 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<"freelancer" | "client">("freelancer");
   const [formData, setFormData] = useState({
@@ -19,7 +20,9 @@ const Signup = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Signup attempt:", { ...formData, userType });
-    // Handle signup logic here
+    
+    // Redirect to onboarding with user type
+    navigate(`/onboarding?type=${userType}`);
   };
 
   return (
@@ -172,7 +175,7 @@ const Signup = () => {
             </div>
 
             <Button type="submit" className="w-full">
-              Create Account
+              Create Account & Continue Setup
             </Button>
           </form>
         </div>

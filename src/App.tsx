@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Onboarding from "./pages/Onboarding";
 import PostJob from "./pages/PostJob";
 import Proposals from "./pages/Proposals";
 import Talent from "./pages/Talent";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/client-dashboard" element={<ClientDashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/post-job" element={<PostJob />} />
           <Route path="/proposals" element={<Proposals />} />
           <Route path="/talent" element={<Talent />} />
