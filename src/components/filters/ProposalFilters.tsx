@@ -201,7 +201,7 @@ const ProposalFilters = () => {
                 )}
                 {selectedFilters.budgetRange && (
                   <Badge variant="secondary">
-                    Budget: {budgetRanges.find(r => r.value === selectedFilters.budget Range)?.label}
+                    Budget: {budgetRanges.find(r => r.value === selectedFilters.budgetRange)?.label}
                   </Badge>
                 )}
                 {selectedFilters.jobType && (
