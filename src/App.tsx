@@ -18,6 +18,10 @@ import Proposals from "./pages/Proposals";
 import Talent from "./pages/Talent";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Messages from "./pages/Messages";
+import Contracts from "./pages/Contracts";
+import Reports from "./pages/Reports";
+import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +47,10 @@ const App = () => (
           <Route path="/talent" element={<Talent />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/contracts" element={<Contracts />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/help" element={<Help />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
