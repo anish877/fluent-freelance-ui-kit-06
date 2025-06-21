@@ -55,6 +55,16 @@ const Settings = () => {
     // Here you would typically make an API call
   };
 
+  const handleToggleSetting = (section: string, key: string, value: boolean) => {
+    setSettings(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section as keyof typeof prev],
+        [key]: value
+      }
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -246,14 +256,8 @@ const Settings = () => {
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={settings.notifications[item.key as keyof typeof settings.notifications]}
-                          onChange={(e) => setSettings({
-                            ...settings,
-                            notifications: {
-                              ...settings.notifications,
-                              [item.key]: e.target.checked
-                            }
-                          })}
+                          checked={settings.notifications[item.key as keyof typeof settings.notifications] as boolean}
+                          onChange={(e) => handleToggleSetting('notifications', item.key, e.target.checked)}
                           className="sr-only peer"
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
@@ -285,14 +289,8 @@ const Settings = () => {
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={settings.notifications[item.key as keyof typeof settings.notifications]}
-                          onChange={(e) => setSettings({
-                            ...settings,
-                            notifications: {
-                              ...settings.notifications,
-                              [item.key]: e.target.checked
-                            }
-                          })}
+                          checked={settings.notifications[item.key as keyof typeof settings.notifications] as boolean}
+                          onChange={(e) => handleToggleSetting('notifications', item.key, e.target.checked)}
                           className="sr-only peer"
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
@@ -354,14 +352,8 @@ const Settings = () => {
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={settings.privacy[item.key as keyof typeof settings.privacy]}
-                          onChange={(e) => setSettings({
-                            ...settings,
-                            privacy: {
-                              ...settings.privacy,
-                              [item.key]: e.target.checked
-                            }
-                          })}
+                          checked={settings.privacy[item.key as keyof typeof settings.privacy] as boolean}
+                          onChange={(e) => handleToggleSetting('privacy', item.key, e.target.checked)}
                           className="sr-only peer"
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
@@ -422,10 +414,7 @@ const Settings = () => {
                       <input
                         type="checkbox"
                         checked={settings.security.loginAlerts}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          security: { ...settings.security, loginAlerts: e.target.checked }
-                        })}
+                        onChange={(e) => handleToggleSetting('security', 'loginAlerts', e.target.checked)}
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
