@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users, Eye, MessageCircle, Calendar, CheckCircle, AlertCircle } from "lucide-react";
+import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users, Eye, MessageCircle, Calendar, CheckCircle, AlertCircle, BarChart3, FileText, Star, Award, Target, Briefcase, Activity } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Separator } from "../components/ui/separator";
+import { Progress } from "../components/ui/progress";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -17,36 +18,51 @@ const Dashboard = () => {
   const stats = [
     {
       title: "Total Earnings",
-      value: "$12,450",
-      change: "+12%",
+      value: "$24,890",
+      change: "+18%",
+      changeText: "vs last month",
       icon: DollarSign,
       color: "text-green-600",
-      bgColor: "bg-green-100"
+      bgColor: "bg-green-100",
+      trend: "up"
     },
     {
-      title: "Active Jobs",
-      value: "8",
-      change: "+2",
-      icon: Clock,
+      title: "Active Projects",
+      value: "12",
+      change: "+3",
+      changeText: "new this week",
+      icon: Briefcase,
       color: "text-blue-600",
-      bgColor: "bg-blue-100"
+      bgColor: "bg-blue-100",
+      trend: "up"
     },
     {
-      title: "Completed Projects",
-      value: "24",
-      change: "+4",
-      icon: TrendingUp,
+      title: "Completed Jobs",
+      value: "47",
+      change: "+8",
+      changeText: "this month",
+      icon: CheckCircle,
       color: "text-teal-600",
-      bgColor: "bg-teal-100"
+      bgColor: "bg-teal-100",
+      trend: "up"
     },
     {
       title: "Client Rating",
-      value: "4.9",
-      change: "+0.1",
-      icon: Users,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100"
+      value: "4.95",
+      change: "+0.02",
+      changeText: "improvement",
+      icon: Star,
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-100",
+      trend: "up"
     }
+  ];
+
+  const weeklyEarnings = [
+    { week: "Week 1", amount: 2400 },
+    { week: "Week 2", amount: 3200 },
+    { week: "Week 3", amount: 1800 },
+    { week: "Week 4", amount: 4100 }
   ];
 
   const recentJobs = [
@@ -56,9 +72,12 @@ const Dashboard = () => {
       client: "TechCorp Solutions",
       status: "In Progress",
       deadline: "Dec 30, 2024",
-      budget: "$3,500",
-      progress: 65,
-      lastActivity: "2 hours ago"
+      budget: "$4,500",
+      progress: 75,
+      lastActivity: "2 hours ago",
+      priority: "high",
+      timeTracked: "42 hours",
+      clientRating: 4.9
     },
     {
       id: 2,
@@ -66,19 +85,25 @@ const Dashboard = () => {
       client: "StartupHub Inc",
       status: "Review",
       deadline: "Dec 25, 2024",
-      budget: "$2,200",
-      progress: 90,
-      lastActivity: "1 day ago"
+      budget: "$3,200",
+      progress: 95,
+      lastActivity: "5 hours ago",
+      priority: "medium",
+      timeTracked: "28 hours",
+      clientRating: 4.8
     },
     {
       id: 3,
-      title: "Content Writing Project",
-      client: "Digital Media Co",
-      status: "Completed",
-      deadline: "Dec 20, 2024",
-      budget: "$800",
-      progress: 100,
-      lastActivity: "3 days ago"
+      title: "Content Management System",
+      client: "Digital Agency Pro",
+      status: "In Progress",
+      deadline: "Jan 15, 2025",
+      budget: "$5,800",
+      progress: 35,
+      lastActivity: "1 day ago",
+      priority: "low",
+      timeTracked: "18 hours",
+      clientRating: 4.7
     }
   ];
 
@@ -88,24 +113,30 @@ const Dashboard = () => {
       title: "React Dashboard Development",
       client: "FinTech Solutions",
       status: "pending",
-      bidAmount: "$2,800",
-      submittedDate: "Dec 19, 2024"
+      bidAmount: "$3,500",
+      submittedDate: "Dec 19, 2024",
+      connects: 6,
+      competition: "8 proposals"
     },
     {
       id: 2,
       title: "WordPress Theme Customization",
       client: "Creative Agency",
       status: "interview",
-      bidAmount: "$1,200",
-      submittedDate: "Dec 18, 2024"
+      bidAmount: "$1,800",
+      submittedDate: "Dec 18, 2024",
+      connects: 4,
+      competition: "3 proposals"
     },
     {
       id: 3,
       title: "Logo Design Package",
       client: "Startup Inc",
       status: "accepted",
-      bidAmount: "$950",
-      submittedDate: "Dec 17, 2024"
+      bidAmount: "$1,200",
+      submittedDate: "Dec 17, 2024",
+      connects: 2,
+      competition: "15 proposals"
     }
   ];
 
@@ -113,26 +144,59 @@ const Dashboard = () => {
     {
       id: 1,
       from: "Sarah Johnson",
-      subject: "Project Update Required",
-      preview: "Hi, could you please provide an update on the e-commerce project?",
+      fromCompany: "TechCorp Solutions",
+      subject: "Project Milestone Review",
+      preview: "Hi, the latest milestone looks great! Could you provide a detailed walkthrough of the new features?",
       time: "2 hours ago",
-      unread: true
+      unread: true,
+      priority: "high"
     },
     {
       id: 2,
       from: "Mike Chen",
+      fromCompany: "StartupHub Inc",
       subject: "New Project Opportunity",
-      preview: "I have a new React project that might interest you...",
+      preview: "I have an exciting React Native project that would be perfect for your skills...",
       time: "1 day ago",
-      unread: true
+      unread: true,
+      priority: "medium"
     },
     {
       id: 3,
       from: "Anna Williams",
+      fromCompany: "Digital Agency Pro",
       subject: "Payment Confirmation",
-      preview: "Payment for the logo design project has been processed.",
+      preview: "Payment for the logo design project has been processed. Thank you for the excellent work!",
       time: "2 days ago",
-      unread: false
+      unread: false,
+      priority: "low"
+    }
+  ];
+
+  const upcomingMilestones = [
+    {
+      id: 1,
+      title: "E-commerce Frontend Delivery",
+      dueDate: "Dec 22, 2024",
+      project: "TechCorp E-commerce",
+      amount: "$1,500",
+      status: "on-track"
+    },
+    {
+      id: 2,
+      title: "UI Design Final Review",
+      dueDate: "Dec 24, 2024",
+      project: "Mobile App Design",
+      amount: "$800",
+      status: "at-risk"
+    },
+    {
+      id: 3,
+      title: "CMS Backend Integration",
+      dueDate: "Dec 28, 2024",
+      project: "Content Management",
+      amount: "$2,200",
+      status: "on-track"
     }
   ];
 
@@ -144,7 +208,18 @@ const Dashboard = () => {
       case "pending": return "bg-yellow-100 text-yellow-800";
       case "interview": return "bg-blue-100 text-blue-800";
       case "accepted": return "bg-green-100 text-green-800";
+      case "on-track": return "bg-green-100 text-green-800";
+      case "at-risk": return "bg-red-100 text-red-800";
       default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high": return "bg-red-100 text-red-800 border-red-200";
+      case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low": return "bg-green-100 text-green-800 border-green-200";
+      default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -152,7 +227,7 @@ const Dashboard = () => {
     navigate('/jobs');
   };
 
-  const handleViewJob =.id: number) => {
+  const handleViewJob = (id: number) => {
     navigate(`/jobs/${id}`);
   };
 
@@ -162,7 +237,6 @@ const Dashboard = () => {
 
   const handleMessageClick = (messageId: number) => {
     console.log(`Opening message ${messageId}`);
-    // In a real app, this would open a messaging interface
   };
 
   return (
@@ -170,35 +244,39 @@ const Dashboard = () => {
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Enhanced Header */}
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-              <p className="text-gray-600">Welcome back! Here's what's happening with your work.</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, Alex!</h1>
+              <p className="text-gray-600">Here's your freelance business overview for today.</p>
             </div>
             <div className="flex gap-3">
+              <Button onClick={() => navigate('/jobs')} variant="outline" className="flex items-center gap-2">
+                <Search className="h-4 w-4" />
+                Find Jobs
+              </Button>
               <Button onClick={handleNewProposal} className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 New Proposal
-              </Button>
-              <Button variant="outline" onClick={() => navigate('/jobs')}>
-                Browse Jobs
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Stats Grid */}
+        {/* Enhanced Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
+            <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-teal-500">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                    <p className={`text-sm mt-1 ${stat.color}`}>{stat.change} from last month</p>
+                    <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                    <div className="flex items-center mt-2">
+                      <span className={`text-sm font-medium ${stat.color}`}>{stat.change}</span>
+                      <span className="text-xs text-gray-500 ml-1">{stat.changeText}</span>
+                    </div>
                   </div>
                   <div className={`p-3 rounded-full ${stat.bgColor}`}>
                     <stat.icon className={`h-6 w-6 ${stat.color}`} />
@@ -209,15 +287,16 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Tabs */}
-        <Card className="shadow-sm">
+        {/* Main Content Tabs */}
+        <Card className="shadow-lg">
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8 px-6">
               {[
-                { id: "overview", label: "Overview", icon: TrendingUp },
-                { id: "jobs", label: "Active Jobs", icon: Clock },
-                { id: "proposals", label: "Proposals", icon: Users },
-                { id: "messages", label: "Messages", icon: MessageCircle }
+                { id: "overview", label: "Overview", icon: BarChart3 },
+                { id: "projects", label: "Active Projects", icon: Briefcase },
+                { id: "proposals", label: "Proposals", icon: FileText },
+                { id: "messages", label: "Messages", icon: MessageCircle },
+                { id: "milestones", label: "Milestones", icon: Target }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -236,214 +315,324 @@ const Dashboard = () => {
           </div>
 
           <CardContent className="p-6">
-            <TabsContent value="overview" className={activeTab === "overview" ? "block" : "hidden"}>
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-                  <Button variant="outline" size="sm" onClick={() => navigate('/jobs')}>
-                    View All Jobs
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Recent Jobs */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-4">Active Projects</h4>
-                    <div className="space-y-3">
-                      {recentJobs.slice(0, 3).map((job) => (
-                        <Card key={job.id} className="hover:shadow-sm transition-shadow cursor-pointer" onClick={() => handleViewJob(job.id)}>
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <h5 className="font-medium text-gray-900 text-sm">{job.title}</h5>
+            {/* Overview Tab */}
+            <div className={activeTab === "overview" ? "block" : "hidden"}>
+              <div className="grid lg:grid-cols-3 gap-6 mb-8">
+                {/* Recent Activity */}
+                <div className="lg:col-span-2">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                  <div className="space-y-4">
+                    {recentJobs.slice(0, 3).map((job) => (
+                      <Card key={job.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 mb-1">{job.title}</h4>
+                              <p className="text-sm text-gray-600">Client: {job.client}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge className={`${getPriorityColor(job.priority)} text-xs`}>
+                                {job.priority.toUpperCase()}
+                              </Badge>
                               <Badge className={getStatusColor(job.status)}>
                                 {job.status}
                               </Badge>
                             </div>
-                            <p className="text-gray-600 text-xs mb-2">Client: {job.client}</p>
-                            <div className="flex items-center justify-between text-xs text-gray-500">
-                              <span>Due: {job.deadline}</span>
-                              <span>{job.budget}</span>
-                            </div>
-                            <div className="mt-2 bg-gray-200 rounded-full h-1.5">
-                              <div 
-                                className="bg-teal-500 h-1.5 rounded-full" 
-                                style={{ width: `${job.progress}%` }}
-                              ></div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Recent Proposals */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-4">Recent Proposals</h4>
-                    <div className="space-y-3">
-                      {recentProposals.map((proposal) => (
-                        <Card key={proposal.id} className="hover:shadow-sm transition-shadow cursor-pointer" onClick={() => handleViewProposal(proposal.id)}>
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <h5 className="font-medium text-gray-900 text-sm">{proposal.title}</h5>
-                              <Badge className={getStatusColor(proposal.status)}>
-                                {proposal.status}
-                              </Badge>
-                            </div>
-                            <p className="text-gray-600 text-xs mb-2">Client: {proposal.client}</p>
-                            <div className="flex items-center justify-between text-xs text-gray-500">
-                              <span>Bid: {proposal.bidAmount}</span>
-                              <span>{proposal.submittedDate}</span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <div className={activeTab === "jobs" ? "block" : "hidden"}>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-900">Active Jobs</h3>
-                  <Button onClick={() => navigate('/jobs')}>
-                    Browse More Jobs
-                  </Button>
-                </div>
-                
-                <div className="space-y-4">
-                  {recentJobs.map((job) => (
-                    <Card key={job.id} className="hover:shadow-sm transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900 mb-2">{job.title}</h4>
-                            <p className="text-gray-600 text-sm mb-2">Client: {job.client}</p>
-                            <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-                              <span>Deadline: {job.deadline}</span>
-                              <span>Budget: {job.budget}</span>
-                              <span>Last activity: {job.lastActivity}</span>
-                            </div>
-                            <div className="mb-2">
+                          </div>
+                          
+                          <div className="grid grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
+                            <div>Budget: <span className="font-semibold text-gray-900">{job.budget}</span></div>
+                            <div>Due: <span className="font-semibold text-gray-900">{job.deadline}</span></div>
+                            <div>Tracked: <span className="font-semibold text-gray-900">{job.timeTracked}</span></div>
+                          </div>
+                          
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 mr-4">
                               <div className="flex justify-between text-sm mb-1">
                                 <span>Progress</span>
                                 <span>{job.progress}%</span>
                               </div>
-                              <div className="bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-teal-500 h-2 rounded-full transition-all duration-300" 
-                                  style={{ width: `${job.progress}%` }}
-                                ></div>
-                              </div>
+                              <Progress value={job.progress} className="h-2" />
                             </div>
+                            <Button variant="outline" size="sm" onClick={() => handleViewJob(job.id)}>
+                              <Eye className="h-4 w-4 mr-1" />
+                              View
+                            </Button>
                           </div>
-                          <div className="ml-4 flex flex-col items-end gap-2">
-                            <Badge className={getStatusColor(job.status)}>
-                              {job.status}
-                            </Badge>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm" onClick={() => handleViewJob(job.id)}>
-                                <Eye className="h-4 w-4 mr-1" />
-                                View
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <MessageCircle className="h-4 w-4 mr-1" />
-                                Message
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quick Stats & Actions */}
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">This Month</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Proposals Sent</span>
+                        <span className="font-semibold">23</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Interview Rate</span>
+                        <span className="font-semibold text-green-600">34%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Win Rate</span>
+                        <span className="font-semibold text-blue-600">78%</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between items-center text-lg">
+                        <span className="font-medium">Total Earned</span>
+                        <span className="font-bold text-teal-600">$8,440</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Quick Actions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Button className="w-full justify-start" onClick={() => navigate('/jobs')}>
+                        <Search className="h-4 w-4 mr-2" />
+                        Browse New Jobs
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <Clock className="h-4 w-4 mr-2" />
+                        Track Time
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <DollarSign className="h-4 w-4 mr-2" />
+                        Create Invoice
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </div>
 
-            <div className={activeTab === "proposals" ? "block" : "hidden"}>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-900">Your Proposals</h3>
-                  <Button onClick={() => navigate('/proposals')}>
-                    View All Proposals
+            {/* Projects Tab */}
+            <div className={activeTab === "projects" ? "block" : "hidden"}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Active Projects ({recentJobs.length})</h3>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Activity className="h-4 w-4 mr-2" />
+                    Time Tracker
+                  </Button>
+                  <Button onClick={() => navigate('/jobs')}>
+                    Browse More Jobs
                   </Button>
                 </div>
-                
-                <div className="space-y-4">
-                  {recentProposals.map((proposal) => (
-                    <Card key={proposal.id} className="hover:shadow-sm transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900 mb-2">{proposal.title}</h4>
-                            <p className="text-gray-600 text-sm mb-2">Client: {proposal.client}</p>
-                            <div className="flex items-center space-x-4 text-sm text-gray-500">
-                              <span>Bid: {proposal.bidAmount}</span>
-                              <span>Submitted: {proposal.submittedDate}</span>
-                            </div>
-                          </div>
-                          <div className="ml-4 flex flex-col items-end gap-2">
-                            <Badge className={getStatusColor(proposal.status)}>
-                              {proposal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
-                              {proposal.status === "interview" && <Calendar className="h-3 w-3 mr-1" />}
-                              {proposal.status === "accepted" && <CheckCircle className="h-3 w-3 mr-1" />}
-                              <span className="capitalize">{proposal.status}</span>
+              </div>
+              
+              <div className="space-y-4">
+                {recentJobs.map((job) => (
+                  <Card key={job.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-semibold text-gray-900 text-lg">{job.title}</h4>
+                            <Badge className={getPriorityColor(job.priority)}>
+                              {job.priority.toUpperCase()} PRIORITY
                             </Badge>
-                            <Button variant="outline" size="sm" onClick={() => handleViewProposal(proposal.id)}>
-                              <Eye className="h-4 w-4 mr-1" />
-                              View Details
+                          </div>
+                          <p className="text-gray-600 mb-2">Client: {job.client}</p>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span>Deadline: {job.deadline}</span>
+                            <span>•</span>
+                            <span>Budget: {job.budget}</span>
+                            <span>•</span>
+                            <span>Time Tracked: {job.timeTracked}</span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge className={getStatusColor(job.status)}>
+                            {job.status}
+                          </Badge>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                            {job.clientRating}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <div className="flex justify-between text-sm mb-2">
+                          <span>Project Progress</span>
+                          <span className="font-semibold">{job.progress}%</span>
+                        </div>
+                        <Progress value={job.progress} className="h-3" />
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">Last activity: {job.lastActivity}</span>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <MessageCircle className="h-4 w-4 mr-1" />
+                            Message Client
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleViewJob(job.id)}>
+                            <Eye className="h-4 w-4 mr-1" />
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Proposals Tab */}
+            <div className={activeTab === "proposals" ? "block" : "hidden"}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Your Proposals ({recentProposals.length})</h3>
+                <Button onClick={() => navigate('/proposals')}>
+                  View All Proposals
+                </Button>
+              </div>
+              
+              <div className="space-y-4">
+                {recentProposals.map((proposal) => (
+                  <Card key={proposal.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 text-lg mb-2">{proposal.title}</h4>
+                          <p className="text-gray-600 mb-2">Client: {proposal.client}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <span>Bid: <span className="font-semibold text-green-600">{proposal.bidAmount}</span></span>
+                            <span>•</span>
+                            <span>Submitted: {proposal.submittedDate}</span>
+                            <span>•</span>
+                            <span>Connects Used: {proposal.connects}</span>
+                          </div>
+                        </div>
+                        <Badge className={getStatusColor(proposal.status)}>
+                          {proposal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
+                          {proposal.status === "interview" && <Calendar className="h-3 w-3 mr-1" />}
+                          {proposal.status === "accepted" && <CheckCircle className="h-3 w-3 mr-1" />}
+                          <span className="capitalize">{proposal.status}</span>
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <div className="text-sm text-gray-600">
+                          Competition: {proposal.competition}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <MessageCircle className="h-4 w-4 mr-1" />
+                            Follow Up
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleViewProposal(proposal.id)}>
+                            <Eye className="h-4 w-4 mr-1" />
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Messages Tab */}
+            <div className={activeTab === "messages" ? "block" : "hidden"}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Recent Messages</h3>
+                <Button variant="outline">
+                  View All Messages
+                </Button>
+              </div>
+              
+              <div className="space-y-3">
+                {messages.map((message) => (
+                  <Card key={message.id} className={`hover:shadow-md transition-shadow cursor-pointer ${message.unread ? 'bg-blue-50 border-blue-200' : ''}`} onClick={() => handleMessageClick(message.id)}>
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className={`font-medium ${message.unread ? 'text-gray-900' : 'text-gray-700'}`}>
+                              {message.from}
+                            </h4>
+                            <span className="text-sm text-gray-500">from {message.fromCompany}</span>
+                            {message.unread && (
+                              <Badge variant="default" className="text-xs">New</Badge>
+                            )}
+                            <Badge className={getPriorityColor(message.priority)} variant="outline">
+                              {message.priority.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <h5 className={`text-sm mb-2 ${message.unread ? 'font-medium text-gray-900' : 'text-gray-700'}`}>
+                            {message.subject}
+                          </h5>
+                          <p className="text-gray-600 text-sm line-clamp-2">{message.preview}</p>
+                        </div>
+                        <div className="ml-4 text-right">
+                          <span className="text-xs text-gray-500">{message.time}</span>
+                          <div className="mt-2">
+                            <Button variant="ghost" size="sm">
+                              <MessageCircle className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </div>
 
-            <div className={activeTab === "messages" ? "block" : "hidden"}>
+            {/* Milestones Tab */}
+            <div className={activeTab === "milestones" ? "block" : "hidden"}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Upcoming Milestones</h3>
+                <Button variant="outline">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  View Calendar
+                </Button>
+              </div>
+              
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-900">Recent Messages</h3>
-                  <Button variant="outline">
-                    View All Messages
-                  </Button>
-                </div>
-                
-                <div className="space-y-3">
-                  {messages.map((message) => (
-                    <Card key={message.id} className={`hover:shadow-sm transition-shadow cursor-pointer ${message.unread ? 'bg-blue-50 border-blue-200' : ''}`} onClick={() => handleMessageClick(message.id)}>
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className={`font-medium ${message.unread ? 'text-gray-900' : 'text-gray-700'}`}>
-                                {message.from}
-                              </h4>
-                              {message.unread && (
-                                <Badge variant="default" className="text-xs">New</Badge>
-                              )}
-                            </div>
-                            <h5 className={`text-sm mb-1 ${message.unread ? 'font-medium text-gray-900' : 'text-gray-700'}`}>
-                              {message.subject}
-                            </h5>
-                            <p className="text-gray-600 text-sm line-clamp-2">{message.preview}</p>
+                {upcomingMilestones.map((milestone) => (
+                  <Card key={milestone.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-semibold text-gray-900">{milestone.title}</h4>
+                            <Badge className={getStatusColor(milestone.status)}>
+                              {milestone.status === "on-track" ? "On Track" : "At Risk"}
+                            </Badge>
                           </div>
-                          <div className="ml-4 text-right">
-                            <span className="text-xs text-gray-500">{message.time}</span>
-                            <div className="mt-2">
-                              <Button variant="ghost" size="sm">
-                                <MessageCircle className="h-4 w-4" />
-                              </Button>
-                            </div>
+                          <p className="text-gray-600 text-sm mb-2">Project: {milestone.project}</p>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span>Due: {milestone.dueDate}</span>
+                            <span>•</span>
+                            <span>Payment: {milestone.amount}</span>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                          <Button size="sm">
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Complete
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </div>
           </CardContent>
