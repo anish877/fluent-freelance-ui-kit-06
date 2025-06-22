@@ -4,18 +4,25 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Bell, User, ChevronDown } from "lucide-react";
 import { Button } from "../ui/button";
 import Dropdown from "../ui/Dropdown";
+import { useAuth } from "@/hooks/AuthContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { logout } = useAuth()
 
   const isActive = (path: string) => location.pathname === path;
 
+  
+
   const userMenuItems = [
-    { label: "Profile", href: "/profile" },
-    { label: "Settings", href: "/settings" },
-    { label: "Logout", href: "/login" }
-  ];
+  { label: "Profile", href: "/profile" },
+  { label: "Settings", href: "/settings" },
+  { label: "Logout", onClick: async () => {
+    await logout(); // This will now be called
+    // Navigation will happen in your logout function
+  } } 
+];
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">

@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 
 interface DropdownItem {
   label: string;
-  href: string;
+  href?: string;       // optional, for navigation
+  onClick?: () => void; // optional, for actions like logout
 }
 
 interface DropdownProps {
@@ -35,16 +36,29 @@ const Dropdown = ({ trigger, items }: DropdownProps) => {
       
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-          {items.map((item, index) => (
-            <Link
-              key={index}
-              to={item.href}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
+         {items.map((item, index) => (
+      item.href ? (
+        <Link
+          key={index}
+          to={item.href}
+          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+          onClick={() => setIsOpen(false)}
+        >
+          {item.label}
+        </Link>
+      ) : (
+        <button
+          key={index}
+          onClick={() => {
+            item.onClick?.();
+            setIsOpen(false);
+          }}
+          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+        >
+          {item.label}
+        </button>
+      )
+    ))}
         </div>
       )}
     </div>

@@ -9,18 +9,22 @@ export interface AuthRequest extends Request {
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   let token;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    try {
-      // Get token from header
-      token = req.headers.authorization.split(' ')[1];
+  // Get token from cookie instead of header
+  token = req.cookies.token;
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+  if (!token) {
+    res.status(401).json({ message: 'Not authorized, no token' });
+    return;
+  }
 
-      // Get user from the token
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.id },
-        select: {
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+    // Get user from the token
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
           id: true,
           email: true,
           firstName: true,
@@ -56,11 +60,6 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
     }
   }
 
-  if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
-    return;
-  }
-};
 
 export const authorize = (...roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction): void => {

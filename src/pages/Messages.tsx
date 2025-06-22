@@ -1,19 +1,19 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Search, Plus, Send, Paperclip, Smile, MoreVertical, Phone, Video, Archive, Star, Circle } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Separator } from "../components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
+import { useWebSocket } from "@/hooks/socketContext";
 
 const Messages = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>("1");
+  const { connect } = useWebSocket();
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -91,8 +91,7 @@ const Messages = () => {
       senderName: "Sarah Johnson", 
       content: "The homepage layout needs some adjustments, and we need to update the product gallery section.",
       timestamp: "10:35 AM",
-      type: "text", 
-      isOwn: false
+      type: "text"
     },
     {
       id: "4",
@@ -100,8 +99,7 @@ const Messages = () => {
       senderName: "You",
       content: "I can have those changes completed by tomorrow. I'll send you a preview link once they're ready.",
       timestamp: "10:38 AM",
-      type: "text",
-      isOwn: true
+      type: "text"
     },
     {
       id: "5",
@@ -109,8 +107,7 @@ const Messages = () => {
       senderName: "Sarah Johnson",
       content: "Thanks for the quick delivery! The website looks amazing.",
       timestamp: "2 min ago",
-      type: "text",
-      isOwn: false
+      type: "text"
     }
   ];
 
@@ -129,7 +126,7 @@ const Messages = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 py-6">

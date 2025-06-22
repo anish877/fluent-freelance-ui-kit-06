@@ -8,6 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@types/cookie-parser':
+        specifier: ^1.4.9
+        version: 1.4.9(@types/express@4.17.23)
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
+      cookie-parser:
+        specifier: ^1.4.7
+        version: 1.4.7
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -32,10 +41,16 @@ importers:
       morgan:
         specifier: ^1.10.0
         version: 1.10.0
+      uuid:
+        specifier: ^11.1.0
+        version: 11.1.0
+      ws:
+        specifier: ^8.18.2
+        version: 8.18.2
     devDependencies:
       '@prisma/client':
-        specifier: ^5.4.2
-        version: 5.22.0(prisma@5.22.0)
+        specifier: ^6.10.1
+        version: 6.10.1(prisma@6.10.1(typescript@5.8.3))(typescript@5.8.3)
       '@types/cors':
         specifier: ^2.8.15
         version: 2.8.19
@@ -55,8 +70,8 @@ importers:
         specifier: ^3.0.1
         version: 3.1.10
       prisma:
-        specifier: ^5.4.2
-        version: 5.22.0
+        specifier: ^6.10.1
+        version: 6.10.1(typescript@5.8.3)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@20.19.1)(typescript@5.8.3)
@@ -80,29 +95,35 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@prisma/client@5.22.0':
-    resolution: {integrity: sha512-M0SVXfyHnQREBKxCgyo7sffrKttwE6R8PMq330MIUF0pTwjUhLbW84pFDlf06B27XyCR++VtjugEnIHdr07SVA==}
-    engines: {node: '>=16.13'}
+  '@prisma/client@6.10.1':
+    resolution: {integrity: sha512-Re4pMlcUsQsUTAYMK7EJ4Bw2kg3WfZAAlr8GjORJaK4VOP6LxRQUQ1TuLnxcF42XqGkWQ36q5CQF1yVadANQ6w==}
+    engines: {node: '>=18.18'}
     peerDependencies:
       prisma: '*'
+      typescript: '>=5.1.0'
     peerDependenciesMeta:
       prisma:
         optional: true
+      typescript:
+        optional: true
 
-  '@prisma/debug@5.22.0':
-    resolution: {integrity: sha512-AUt44v3YJeggO2ZU5BkXI7M4hu9BF2zzH2iF2V5pyXT/lRTyWiElZ7It+bRH1EshoMRxHgpYg4VB6rCM+mG5jQ==}
+  '@prisma/config@6.10.1':
+    resolution: {integrity: sha512-kz4/bnqrOrzWo8KzYguN0cden4CzLJJ+2VSpKtF8utHS3l1JS0Lhv6BLwpOX6X9yNreTbZQZwewb+/BMPDCIYQ==}
 
-  '@prisma/engines-version@5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2':
-    resolution: {integrity: sha512-2PTmxFR2yHW/eB3uqWtcgRcgAbG1rwG9ZriSvQw+nnb7c4uCr3RAcGMb6/zfE88SKlC1Nj2ziUvc96Z379mHgQ==}
+  '@prisma/debug@6.10.1':
+    resolution: {integrity: sha512-k2YT53cWxv9OLjW4zSYTZ6Z7j0gPfCzcr2Mj99qsuvlxr8WAKSZ2NcSR0zLf/mP4oxnYG842IMj3utTgcd7CaA==}
 
-  '@prisma/engines@5.22.0':
-    resolution: {integrity: sha512-UNjfslWhAt06kVL3CjkuYpHAWSO6L4kDCVPegV6itt7nD1kSJavd3vhgAEhjglLJJKEdJ7oIqDJ+yHk6qO8gPA==}
+  '@prisma/engines-version@6.10.1-1.9b628578b3b7cae625e8c927178f15a170e74a9c':
+    resolution: {integrity: sha512-ZJFTsEqapiTYVzXya6TUKYDFnSWCNegfUiG5ik9fleQva5Sk3DNyyUi7X1+0ZxWFHwHDr6BZV5Vm+iwP+LlciA==}
 
-  '@prisma/fetch-engine@5.22.0':
-    resolution: {integrity: sha512-bkrD/Mc2fSvkQBV5EpoFcZ87AvOgDxbG99488a5cexp5Ccny+UM6MAe/UFkUC0wLYD9+9befNOqGiIJhhq+HbA==}
+  '@prisma/engines@6.10.1':
+    resolution: {integrity: sha512-Q07P5rS2iPwk2IQr/rUQJ42tHjpPyFcbiH7PXZlV81Ryr9NYIgdxcUrwgVOWVm5T7ap02C0dNd1dpnNcSWig8A==}
 
-  '@prisma/get-platform@5.22.0':
-    resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
+  '@prisma/fetch-engine@6.10.1':
+    resolution: {integrity: sha512-clmbG/Jgmrc/n6Y77QcBmAUlq9LrwI9Dbgy4pq5jeEARBpRCWJDJ7PWW1P8p0LfFU0i5fsyO7FqRzRB8mkdS4g==}
+
+  '@prisma/get-platform@6.10.1':
+    resolution: {integrity: sha512-4CY5ndKylcsce9Mv+VWp5obbR2/86SHOLVV053pwIkhVtT9C9A83yqiqI/5kJM9T1v1u1qco/bYjDKycmei9HA==}
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -121,6 +142,11 @@ packages:
 
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
+
+  '@types/cookie-parser@1.4.9':
+    resolution: {integrity: sha512-tGZiZ2Gtc4m3wIdLkZ8mkj1T6CEHb35+VApbL2T14Dew8HA7c+04dmKqsKRNC+8RJPm16JEK0tFSwdZqubfc4g==}
+    peerDependencies:
+      '@types/express': '*'
 
   '@types/cors@2.8.19':
     resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
@@ -160,6 +186,9 @@ packages:
 
   '@types/serve-static@1.15.8':
     resolution: {integrity: sha512-roei0UY3LhpOJvjbIP6ZZFngyLKl5dskOtDhxY5THRSpO+ZI+nzJ+m5yUMzGrp89YRa7lvknKkMYjqQFGwA7Sg==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   accepts@1.3.8:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==}
@@ -236,11 +265,19 @@ packages:
     resolution: {integrity: sha512-nTjqfcBFEipKdXCv4YDQWCfmcLZKm81ldF0pAopTvyrFGVbcR6P/VAAd5G7N+0tTr8QqiU0tFadD6FK4NtJwOA==}
     engines: {node: '>= 0.6'}
 
+  cookie-parser@1.4.7:
+    resolution: {integrity: sha512-nGUvgXnotP3BsjiLX2ypbQnWoGUPIIfHQNZkkC668ntrzGWEZVW70HDEB1qnNGMicPje6EttlIgzo51YSwNQGw==}
+    engines: {node: '>= 0.8.0'}
+
   cookie-signature@1.0.6:
     resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
 
   cookie@0.7.1:
     resolution: {integrity: sha512-6DnInpx7SJ2AK3+CTUE/ZM0vWTUboZCegxhC2xiIydHR9jNuTAASBrfEpHhiGOZw/nX51bHt6YQl8jsGo4y/0w==}
+    engines: {node: '>= 0.6'}
+
+  cookie@0.7.2:
+    resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
 
   cors@2.8.5:
@@ -424,6 +461,10 @@ packages:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
 
+  jiti@2.4.2:
+    resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
+    hasBin: true
+
   jsonwebtoken@9.0.2:
     resolution: {integrity: sha512-PRp66vJ865SSqOlgqS8hujT5U4AOgMfhrwYIuIhfKaoSCZcirrmASQr8CX7cUg+RMih+hgznrjp99o+W4pJLHQ==}
     engines: {node: '>=12', npm: '>=6'}
@@ -546,10 +587,15 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
-  prisma@5.22.0:
-    resolution: {integrity: sha512-vtpjW3XuYCSnMsNVBjLMNkTj6OZbudcPPTPYHqX0CJfpcdWciI1dM8uHETwmDxxiqEwCIE6WvXucWUetJgfu/A==}
-    engines: {node: '>=16.13'}
+  prisma@6.10.1:
+    resolution: {integrity: sha512-khhlC/G49E4+uyA3T3H5PRBut486HD2bDqE2+rvkU0pwk9IAqGFacLFUyIx9Uw+W2eCtf6XGwsp+/strUwMNPw==}
+    engines: {node: '>=18.18'}
     hasBin: true
+    peerDependencies:
+      typescript: '>=5.1.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   proxy-addr@2.0.7:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
@@ -676,6 +722,10 @@ packages:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
 
+  uuid@11.1.0:
+    resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
+    hasBin: true
+
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
@@ -686,6 +736,18 @@ packages:
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
+
+  ws@8.18.2:
+    resolution: {integrity: sha512-DMricUmwGZUVr++AEAe2uiVM7UoO9MAVZMDu05UQOaUII0lp+zOzLLU4Xqh/JvTqklB1T4uELaaPBKyjE1r4fQ==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
 
   yn@3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
@@ -706,30 +768,35 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@prisma/client@5.22.0(prisma@5.22.0)':
+  '@prisma/client@6.10.1(prisma@6.10.1(typescript@5.8.3))(typescript@5.8.3)':
     optionalDependencies:
-      prisma: 5.22.0
+      prisma: 6.10.1(typescript@5.8.3)
+      typescript: 5.8.3
 
-  '@prisma/debug@5.22.0': {}
-
-  '@prisma/engines-version@5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2': {}
-
-  '@prisma/engines@5.22.0':
+  '@prisma/config@6.10.1':
     dependencies:
-      '@prisma/debug': 5.22.0
-      '@prisma/engines-version': 5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2
-      '@prisma/fetch-engine': 5.22.0
-      '@prisma/get-platform': 5.22.0
+      jiti: 2.4.2
 
-  '@prisma/fetch-engine@5.22.0':
-    dependencies:
-      '@prisma/debug': 5.22.0
-      '@prisma/engines-version': 5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2
-      '@prisma/get-platform': 5.22.0
+  '@prisma/debug@6.10.1': {}
 
-  '@prisma/get-platform@5.22.0':
+  '@prisma/engines-version@6.10.1-1.9b628578b3b7cae625e8c927178f15a170e74a9c': {}
+
+  '@prisma/engines@6.10.1':
     dependencies:
-      '@prisma/debug': 5.22.0
+      '@prisma/debug': 6.10.1
+      '@prisma/engines-version': 6.10.1-1.9b628578b3b7cae625e8c927178f15a170e74a9c
+      '@prisma/fetch-engine': 6.10.1
+      '@prisma/get-platform': 6.10.1
+
+  '@prisma/fetch-engine@6.10.1':
+    dependencies:
+      '@prisma/debug': 6.10.1
+      '@prisma/engines-version': 6.10.1-1.9b628578b3b7cae625e8c927178f15a170e74a9c
+      '@prisma/get-platform': 6.10.1
+
+  '@prisma/get-platform@6.10.1':
+    dependencies:
+      '@prisma/debug': 6.10.1
 
   '@tsconfig/node10@1.0.11': {}
 
@@ -747,6 +814,10 @@ snapshots:
   '@types/connect@3.4.38':
     dependencies:
       '@types/node': 20.19.1
+
+  '@types/cookie-parser@1.4.9(@types/express@4.17.23)':
+    dependencies:
+      '@types/express': 4.17.23
 
   '@types/cors@2.8.19':
     dependencies:
@@ -799,6 +870,10 @@ snapshots:
       '@types/http-errors': 2.0.5
       '@types/node': 20.19.1
       '@types/send': 0.17.5
+
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 20.19.1
 
   accepts@1.3.8:
     dependencies:
@@ -888,9 +963,16 @@ snapshots:
 
   content-type@1.0.5: {}
 
+  cookie-parser@1.4.7:
+    dependencies:
+      cookie: 0.7.2
+      cookie-signature: 1.0.6
+
   cookie-signature@1.0.6: {}
 
   cookie@0.7.1: {}
+
+  cookie@0.7.2: {}
 
   cors@2.8.5:
     dependencies:
@@ -1079,6 +1161,8 @@ snapshots:
 
   is-number@7.0.0: {}
 
+  jiti@2.4.2: {}
+
   jsonwebtoken@9.0.2:
     dependencies:
       jws: 3.2.2
@@ -1192,11 +1276,12 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  prisma@5.22.0:
+  prisma@6.10.1(typescript@5.8.3):
     dependencies:
-      '@prisma/engines': 5.22.0
+      '@prisma/config': 6.10.1
+      '@prisma/engines': 6.10.1
     optionalDependencies:
-      fsevents: 2.3.3
+      typescript: 5.8.3
 
   proxy-addr@2.0.7:
     dependencies:
@@ -1338,10 +1423,14 @@ snapshots:
 
   utils-merge@1.0.1: {}
 
+  uuid@11.1.0: {}
+
   v8-compile-cache-lib@3.0.1: {}
 
   validator@13.12.0: {}
 
   vary@1.1.2: {}
+
+  ws@8.18.2: {}
 
   yn@3.1.1: {}

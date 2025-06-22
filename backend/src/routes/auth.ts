@@ -1,9 +1,10 @@
-import express, { Request, Response, NextFunction, Router } from 'express';
+import express, { Request, Response, Router } from 'express';
 import crypto from 'crypto';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, AuthRequest } from '../middleware/auth';
+
 
 const router: Router = express.Router();
 
@@ -28,9 +29,7 @@ const verifyPassword = (password: string, hash: string): Promise<boolean> => {
   });
 };
 
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
+
 router.post('/register', [
   body('email').isEmail().withMessage('Please include a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -101,9 +100,15 @@ router.post('/register', [
       signOptions
     );
 
-    res.status(201).json({
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    }).json({
       success: true,
-      token,
+      status: 200,
       user
     });
   } catch (error) {
@@ -134,7 +139,7 @@ router.post('/login', [
     });
 
     if (!user) {
-      res.status(400).json({ message: 'Invalid credentials' });
+      res.status(404).json({ message: 'User not Found', success: false });
       return;
     }
 
@@ -142,9 +147,10 @@ router.post('/login', [
     const isMatch = await verifyPassword(password, user.password);
 
     if (!isMatch) {
-      res.status(400).json({ message: 'Invalid credentials' });
+      res.status(401).json({ message: 'Invalid credentials', success: false });
       return;
     }
+
 
     // Create token
     const signOptions: SignOptions = { expiresIn: process.env.JWT_EXPIRES_IN as any || '7d' };
@@ -154,32 +160,15 @@ router.post('/login', [
       signOptions
     );
 
-    const userResponse = {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      userType: user.userType,
-      avatar: user.avatar,
-      bio: user.bio,
-      location: user.location,
-      phone: user.phone,
-      skills: user.skills,
-      hourlyRate: user.hourlyRate,
-      portfolio: user.portfolio,
-      experience: user.experience,
-      education: user.education,
-      certifications: user.certifications,
-      companyName: user.companyName,
-      companySize: user.companySize,
-      industry: user.industry,
-      createdAt: user.createdAt
-    };
 
-    res.json({
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    }).status(200).json({
       success: true,
-      token,
-      user: userResponse
+      user
     });
   } catch (error) {
     console.error(error);
@@ -187,10 +176,8 @@ router.post('/login', [
   }
 });
 
-// @desc    Get current user
-// @route   GET /api/auth/me
-// @access  Private
 router.get('/me', protect as any, (async (req: AuthRequest, res: Response) => {
+  console.log("hitted")
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id },
@@ -227,5 +214,12 @@ router.get('/me', protect as any, (async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 }) as any);
+
+router.post('/logout', (req: Request, res: Response) => {
+  res.clearCookie('token').json({
+    success: true,
+    message: 'Logged out successfully'
+  });
+});
 
 export default router; 

@@ -79,23 +79,24 @@ model User {
 }
 
 model Job {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  requirements String[]
-  budget      BudgetType
-  minBudget   Float?
-  maxBudget   Float?
-  hourlyRate  Float?
-  duration    String?
-  skills      String[]
-  category    String
-  location    String?
-  isRemote    Boolean  @default(false)
-  status      JobStatus @default(OPEN)
-  clientId    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  requirements  String[]
+  budget        BudgetType
+  minBudget     Float?
+  maxBudget     Float?
+  hourlyRate    Float?
+  duration      String?
+  skills        String[]
+  category      String
+  location      String?
+  isRemote      Boolean  @default(false)
+  status        JobStatus @default(OPEN)
+  clientId      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  conversation  Conversation[]
 
   // Relations
   client     User        @relation("JobPoster", fields: [clientId], references: [id], onDelete: Cascade)
@@ -142,18 +143,38 @@ model Review {
   @@map("reviews")
 }
 
-model Message {
-  id        String   @id @default(cuid())
-  content   String
-  senderId  String
-  receiverId String
-  jobId     String?
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
+model Conversation {
+  id            String   @id @default(cuid())
+  participants  String[] // Array of user IDs
+  jobId         String?  // Optional: link to specific job
+  projectName   String?
+  isActive      Boolean  @default(true)
+  lastMessageId String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  messages      Message[]
+  lastMessage   Message?  @relation("ConversationLastMessage", fields: [lastMessageId], references: [id])
+  job           Job?      @relation(fields: [jobId], references: [id])
+}
 
+model Message {
+  id             String        @id @default(cuid())
+  content        String
+  senderId       String
+  receiverId     String
+  conversationId String
+  jobId          String?
+  isRead         Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  
   // Relations
-  sender    User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver  User @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender         User          @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver       User          @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  // Reverse relation for last message
+  conversationAsLast Conversation? @relation("ConversationLastMessage")
 
   @@map("messages")
 }
@@ -172,6 +193,7 @@ model Notification {
 
   @@map("notifications")
 }
+
 
 enum UserType {
   FREELANCER
