@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output = "./generated"
 }
 
 datasource db {
@@ -67,13 +68,13 @@ model User {
   howDidYouHear String? // How they heard about the platform
 
   // Relations
-  jobsPosted     Job[]       @relation("JobPoster")
-  proposals      Proposal[]  @relation("ProposalAuthor")
-  reviews        Review[]    @relation("ReviewAuthor")
-  receivedReviews Review[]   @relation("ReviewReceiver")
-  messages       Message[]   @relation("MessageSender")
-  receivedMessages Message[] @relation("MessageReceiver")
-  notifications  Notification[]
+  jobsPosted        Job[]       @relation("JobPoster")
+  proposals         Proposal[]  @relation("ProposalAuthor")
+  reviews           Review[]    @relation("ReviewAuthor")
+  receivedReviews   Review[]   @relation("ReviewReceiver")
+  messages          Message[]   @relation("MessageSender")
+  receivedMessages  Message[] @relation("MessageReceiver")
+  notifications     Notification[]
 
   @@map("users")
 }
@@ -91,17 +92,17 @@ model Job {
   skills        String[]
   category      String
   location      String?
-  isRemote      Boolean  @default(false)
+  isRemote      Boolean   @default(false)
   status        JobStatus @default(OPEN)
   clientId      String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   conversation  Conversation[]
 
   // Relations
-  client     User        @relation("JobPoster", fields: [clientId], references: [id], onDelete: Cascade)
-  proposals  Proposal[]
-  reviews    Review[]
+  client        User         @relation("JobPoster", fields: [clientId], references: [id], onDelete: Cascade)
+  proposals     Proposal[]
+  reviews       Review[]
 
   @@map("jobs")
 }
@@ -152,7 +153,6 @@ model Conversation {
   lastMessageId String?  @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
   messages      Message[]
   lastMessage   Message?  @relation("ConversationLastMessage", fields: [lastMessageId], references: [id])
   job           Job?      @relation(fields: [jobId], references: [id])
@@ -161,16 +161,16 @@ model Conversation {
 model Message {
   id             String        @id @default(cuid())
   content        String
-  senderId       String
-  receiverId     String
+  senderEmail    String
+  receiverEmail  String
   conversationId String
   jobId          String?
   isRead         Boolean       @default(false)
   createdAt      DateTime      @default(now())
   
   // Relations
-  sender         User          @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver       User          @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender         User          @relation("MessageSender", fields: [senderEmail], references: [email], onDelete: Cascade)
+  receiver       User          @relation("MessageReceiver", fields: [receiverEmail], references: [email], onDelete: Cascade)
   conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   
   // Reverse relation for last message

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Plus, Send, Paperclip, Smile, MoreVertical, Phone, Video, Archive, Star, Circle } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
@@ -10,106 +10,115 @@ import { Badge } from "../components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 import { useWebSocket } from "@/hooks/socketContext";
+import axios from "axios";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/AuthContext";
 
 const Messages = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>("1");
-  const { connect } = useWebSocket();
+  const [localConversations, setLocalConversations] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const { user } = useAuth()
+  const [showNewConversation, setShowNewConversation] = useState(false);
+  const [newConversationData, setNewConversationData] = useState({
+    otherUserEmail: '',
+    jobId: '',
+    projectName: ''
+  });
+  const {
+  conversations: wsConversations,
+  messages: wsMessages,
+  currentConversationId,
+  joinConversation,
+  sendMessage,
+  startTyping,
+  stopTyping,
+  typingUsers
+} = useWebSocket();
 
-  // Mock data for conversations
-  const conversations = [
-    {
-      id: "1",
-      name: "Sarah Johnson",
-      avatar: "/placeholder.svg",
-      lastMessage: "Thanks for the quick delivery! The website looks amazing.",
-      timestamp: "2 min ago",
-      unread: 2,
-      online: true,
-      project: "E-commerce Website Development",
-      type: "client"
-    },
-    {
-      id: "2", 
-      name: "Tech Solutions Inc",
-      avatar: "/placeholder.svg",
-      lastMessage: "When can we schedule the next milestone review?",
-      timestamp: "1 hour ago",
-      unread: 0,
-      online: false,
-      project: "Mobile App Development",
-      type: "client"
-    },
-    {
-      id: "3",
-      name: "Mike Chen",
-      avatar: "/placeholder.svg", 
-      lastMessage: "I've submitted the proposal for your review",
-      timestamp: "3 hours ago",
-      unread: 1,
-      online: true,
-      project: "Logo Design Project",
-      type: "freelancer"
-    },
-    {
-      id: "4",
-      name: "DataCorp Analytics",
-      avatar: "/placeholder.svg",
-      lastMessage: "The data analysis report is ready for download",
-      timestamp: "Yesterday",
-      unread: 0,
-      online: false,
-      project: "Market Research Analysis",
-      type: "client"
-    }
-  ];
+const conversations = useMemo(() => {
+  // Merge or prioritize WebSocket conversations over local ones
+  return wsConversations.length > 0 ? wsConversations : localConversations;
+}, [wsConversations, localConversations]);
 
-  // Mock data for messages
-  const messages = [
-    {
-      id: "1",
-      senderId: "sarah",
-      senderName: "Sarah Johnson",
-      content: "Hi! I wanted to discuss the final revisions for the website.",
-      timestamp: "10:30 AM",
-      type: "text",
-      isOwn: false
-    },
-    {
-      id: "2", 
-      senderId: "me",
-      senderName: "You",
-      content: "Sure! I'm available to discuss the changes. What specific areas need revision?",
-      timestamp: "10:32 AM", 
-      type: "text",
-      isOwn: true
-    },
-    {
-      id: "3",
-      senderId: "sarah",
-      senderName: "Sarah Johnson", 
-      content: "The homepage layout needs some adjustments, and we need to update the product gallery section.",
-      timestamp: "10:35 AM",
-      type: "text"
-    },
-    {
-      id: "4",
-      senderId: "me",
-      senderName: "You",
-      content: "I can have those changes completed by tomorrow. I'll send you a preview link once they're ready.",
-      timestamp: "10:38 AM",
-      type: "text"
-    },
-    {
-      id: "5",
-      senderId: "sarah", 
-      senderName: "Sarah Johnson",
-      content: "Thanks for the quick delivery! The website looks amazing.",
-      timestamp: "2 min ago",
-      type: "text"
+  const fetchConversations = async () => {
+    try {
+      const response = await axios.get("/messages/conversations");
+      setLocalConversations(response.data.conversations);
+      // Don't set conversations directly here anymore
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
     }
-  ];
+  };
+  useEffect(() => {
+    fetchConversations()
+  }, [])
+
+  useEffect(() => {
+  if (currentConversationId) {
+    setSelectedConversation(currentConversationId);
+  }
+}, [currentConversationId]);
+
+const handleConversationSelect = (conversationId: string) => {
+  setSelectedConversation(conversationId);
+  joinConversation(conversationId); // This will trigger WebSocket to load messages
+};
+
+  const handleCreateConversation = async () => {
+    try {
+      const payload = {
+        otherUserEmail: newConversationData.otherUserEmail,
+        jobId: newConversationData.jobId || null,
+        projectName: newConversationData.projectName || null
+      };
+      const response = await axios.post('/messages/conversations', payload);
+      const { success, data, message } = response.data;
+      
+      if (!success) {
+        toast.error("Conversation creation Failed: " + message);
+        return;
+      }
+      
+      // Join the new conversation via WebSocket
+      joinConversation(data.id);
+      setShowNewConversation(false);
+      
+      // Refresh local conversations
+      fetchConversations();
+    } catch (error) {
+      console.error('Error creating conversation:', error.response?.data || error.message);
+    }
+  };
+
+  const handleInputChange = (e) => {
+  setMessageText(e.target.value);
+  
+  if (e.target.value.trim() && !isTyping) {
+    startTyping();
+    setIsTyping(true);
+  } else if (!e.target.value.trim() && isTyping) {
+    stopTyping();
+    setIsTyping(false);
+  }
+};;
+
+  const handleInputBlur = () => {
+    stopTyping();
+    setIsTyping(false);
+  };
+
+useEffect(() => {
+
+  const messagesContainer = document.querySelector('.overflow-y-auto');
+  if (messagesContainer) {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+}, [wsMessages]);
+
+  const messages = wsMessages || [];
 
   const selectedConv = conversations.find(conv => conv.id === selectedConversation);
   const filteredConversations = conversations.filter(conv => 
@@ -118,12 +127,26 @@ const Messages = () => {
   );
 
   const handleSendMessage = () => {
-    if (messageText.trim()) {
-      // Here you would typically send the message to your backend
-      console.log("Sending message:", messageText);
-      setMessageText("");
-    }
-  };
+  if (messageText.trim() && selectedConversation) {
+    sendMessage(messageText.trim()); // Use WebSocket sendMessage
+    setMessageText("");
+  }
+};
+
+// // Add this before your return statement:
+// if (!isConnected) {
+//   return (
+//     <div className="min-h-screen bg-gray-50">
+//       <Navbar />
+//       <div className="max-w-7xl mx-auto px-4 py-6">
+//         <div className="text-center">
+//           <p>Connecting to chat server...</p>
+//         </div>
+//       </div>
+//       <Footer />
+//     </div>
+//   );
+// }
 
   return (
       <div className="min-h-screen bg-gray-50">
@@ -141,7 +164,7 @@ const Messages = () => {
             <div className="p-4 border-b">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Conversations</h2>
-                <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
+                <Button size="sm" className="bg-teal-600 hover:bg-teal-700" onClick={() => setShowNewConversation(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   New
                 </Button>
@@ -165,7 +188,7 @@ const Messages = () => {
                   className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors ${
                     selectedConversation === conversation.id ? "bg-teal-50 border-r-4 border-r-teal-600" : ""
                   }`}
-                  onClick={() => setSelectedConversation(conversation.id)}
+                  onClick={() => handleConversationSelect(conversation.id)}
                 >
                   <div className="flex items-start space-x-3">
                     <div className="relative">
@@ -187,7 +210,7 @@ const Messages = () => {
                       <p className="text-sm text-gray-600 mb-1">{conversation.project}</p>
                       
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-500 truncate">{conversation.lastMessage}</p>
+                        <p className="text-sm text-gray-500 truncate">{conversation.lastMessage.content}</p>
                         {conversation.unread > 0 && (
                           <Badge variant="default" className="bg-teal-600 text-xs px-2 py-1">
                             {conversation.unread}
@@ -200,6 +223,39 @@ const Messages = () => {
               ))}
             </div>
           </div>
+
+          {showNewConversation && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg w-96">
+                <h3 className="text-lg font-semibold mb-4">Start New Conversation</h3>
+                <Input
+                  placeholder="Other User Email"
+                  value={newConversationData.otherUserEmail}
+                  onChange={(e) => setNewConversationData({...newConversationData, otherUserEmail: e.target.value})}
+                  className="mb-3"
+                />
+                <Input
+                  placeholder="Job ID (optional)"
+                  value={newConversationData.jobId}
+                  onChange={(e) => setNewConversationData({...newConversationData, jobId: e.target.value})}
+                  className="mb-3"
+                />
+                <Input
+                  placeholder="Project Name (optional)"
+                  value={newConversationData.projectName}
+                  onChange={(e) => setNewConversationData({...newConversationData, projectName: e.target.value})}
+                  className="mb-4"
+                />
+                <div className="flex justify-end space-x-2">
+                  <Button variant="outline" onClick={() => setShowNewConversation(false)}>Cancel</Button>
+                  <Button onClick={()=>{
+                    handleCreateConversation()
+                  }
+                  } className="bg-teal-600 hover:bg-teal-700">Create</Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Messages Area */}
           <div className="col-span-8 bg-white rounded-lg border flex flex-col">
@@ -253,25 +309,33 @@ const Messages = () => {
 
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}
-                    >
-                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.isOwn 
-                          ? "bg-teal-600 text-white" 
-                          : "bg-gray-100 text-gray-900"
+
+                {messages.map((message) => (
+                  <div key={message.id} className={`flex ${message.senderEmail === user.email ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-xs lg:max-md px-4 py-2 rounded-lg ${
+                      message.senderEmail === user.email
+                        ? "bg-teal-600 text-white" 
+                        : "bg-gray-100 text-gray-900"
+                    }`}>
+                      <p className="text-sm">{message.content}</p> 
+                      <p className={`text-xs mt-1 ${
+                        message.senderEmail === user.email ? "text-teal-100" : "text-gray-500"
                       }`}>
-                        <p className="text-sm">{message.content}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.isOwn ? "text-teal-100" : "text-gray-500"
-                        }`}>
-                          {message.timestamp}
-                        </p>
-                      </div>
+                        {new Date(message.timestamp).toLocaleTimeString()} 
+                      </p>
                     </div>
-                  ))}
+                  </div>
+                ))}
+                {typingUsers.length > 0 && (
+                  <div className="flex justify-start">
+                    <div className="bg-gray-100 text-gray-900 px-4 py-2 rounded-lg">
+                      <p className="text-sm">
+                        {typingUsers.map(user => user.userName).join(', ')} 
+                        {typingUsers.length === 1 ? ' is' : ' are'} typing...
+                      </p>
+                    </div>
+                  </div>
+                )}
                 </div>
 
                 {/* Message Input */}
@@ -285,7 +349,8 @@ const Messages = () => {
                       <Textarea
                         placeholder="Type your message..."
                         value={messageText}
-                        onChange={(e) => setMessageText(e.target.value)}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
                         rows={2}
                         className="resize-none"
                         onKeyPress={(e) => {

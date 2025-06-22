@@ -62,7 +62,7 @@ const App = () => {
                 
                 {/* Application features */}
                 <Route path="/proposals" element={<Proposals />} />
-                <Route path="/messages" element={<WebSocketProvider userId={userId}><Messages /></WebSocketProvider>} />
+                <Route path="/messages" element={<WebSocketProvider><Messages /></WebSocketProvider>} />
                 <Route path="/contracts" element={<Contracts />} />
                 <Route path="/reports" element={<Reports />} />
                 

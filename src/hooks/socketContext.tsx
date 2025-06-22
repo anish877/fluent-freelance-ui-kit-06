@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback, ReactNode } from 'react';
+import { useAuth } from './AuthContext';
 
 // Types (matching your server)
 interface User {
@@ -9,15 +10,15 @@ interface User {
 }
 
 interface WSMessage {
-  type: 'register_user' | "error" | "conversations_loaded" | "user_left" | "user_joined" | "user_stop_typing" | "user_typing" | "messages_loaded" | "new_message" | 'authentication_success' | 'connection_established' | 'join_conversation' | 'send_message' | 'typing' | 'stop_typing' | 'user_online' | 'user_offline';
+  type: 'authenticate' | "error" | "user_left" | "user_joined" | "user_stop_typing" | "user_typing" | "messages_loaded" | "new_message" | 'authentication_success' | 'connection_established' | 'join_conversation' | 'send_message' | 'typing' | 'stop_typing' | 'user_online' | 'user_offline';
   payload: any;
 }
 
 interface Message {
   id: string;
   conversationId: string;
-  senderId: string;
-  senderName: string;
+  senderEmail: string;
+  // senderName: string;
   content: string;
   timestamp: string;
   type: 'text' | 'file' | 'image';
@@ -32,7 +33,7 @@ interface Conversation {
 }
 
 interface TypingUser {
-  userId: string;
+  userEmail: string;
   userName: string;
 }
 
@@ -63,22 +64,18 @@ const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 interface WebSocketProviderProps {
   children: ReactNode;
-  userId: string;
-  user: User;
   wsUrl?: string;
   maxRetries?: number;
 }
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ 
   children, 
-  userId, 
-  user,
   wsUrl = 'ws://localhost:8080',
   maxRetries = 5
 }) => {
   // Connection state
-  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const { user } = useAuth()
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -95,6 +92,19 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const retryCountRef = useRef<number>(0);
   const shouldReconnectRef = useRef<boolean>(true);
   const isManualDisconnectRef = useRef<boolean>(false);
+  const connectionStateRef = useRef<'disconnected' | 'connecting' | 'connected'>('disconnected');
+
+  // Clear all timeouts
+  const clearTimeouts = useCallback(() => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+  }, []);
 
   // Message handlers
   const handleMessage = useCallback((event: MessageEvent) => {
@@ -102,28 +112,41 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       const wsMessage: WSMessage = JSON.parse(event.data);
       
       switch (wsMessage.type) {
-        case 'conversations_loaded':
-          setConversations(wsMessage.payload.conversations);
-          break;
           
         case 'messages_loaded':
-          setMessages(wsMessage.payload.messages);
-          setCurrentConversationId(wsMessage.payload.conversationId);
-          break;
-          
-        case 'new_message':
-          setMessages(prev => [...prev, wsMessage.payload]);
-          // Update conversation's last message
-          setConversations(prev => prev.map(conv => 
-            conv.id === wsMessage.payload.conversationId 
-              ? { ...conv, lastMessage: wsMessage.payload }
-              : conv
-          ));
-          break;
+        // Ensure each message has the expected structure
+        console.log(wsMessage)
+        const loadedMessages = wsMessage.payload.messages.map(msg => ({
+          id: msg.id,
+          conversationId: msg.conversationId,
+          senderEmail: msg.senderEmail,
+          // senderName: msg.sender.firstName || "",
+          content: String(msg.content || ''),
+          timestamp: msg.timestamp || msg.createdAt,
+          type: msg.type || 'text'
+        }));
+        setMessages(loadedMessages);
+        setCurrentConversationId(wsMessage.payload.conversationId);
+        break;
+        
+      case 'new_message':
+        // Ensure the new message has the expected structure
+        const newMessage = {
+          id: wsMessage.payload.id,
+          conversationId: wsMessage.payload.conversationId,
+          senderEmail: wsMessage.payload.senderEmail,
+          // senderName: wsMessage.payload.sender.firstName || "",
+          content: String(wsMessage.payload.content || ''),
+          timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
+          type: wsMessage.payload.type || 'text'
+        };
+        setMessages(prev => [...prev, newMessage]);
+
+        break
           
         case 'user_typing':
           setTypingUsers(prev => {
-            const exists = prev.find(u => u.userId === wsMessage.payload.userId);
+            const exists = prev.find(u => u.userEmail === wsMessage.payload.userEmail);
             if (!exists) {
               return [...prev, wsMessage.payload];
             }
@@ -133,47 +156,50 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           
         case 'user_stop_typing':
           setTypingUsers(prev => 
-            prev.filter(u => u.userId !== wsMessage.payload.userId)
+            prev.filter(u => u.userEmail !== wsMessage.payload.userEmail)
           );
           break;
           
         case 'user_joined':
-          console.log(`${wsMessage.payload.userName} joined the conversation`);
+          console.log(`${wsMessage.payload.userEmail} joined the conversation`);
           break;
           
         case 'user_left':
-          console.log(`${wsMessage.payload.userName} left the conversation`);
+          console.log(`${wsMessage.payload.userEmail} left the conversation`);
           // Remove from typing users if they were typing
           setTypingUsers(prev => 
-            prev.filter(u => u.userId !== wsMessage.payload.userId)
+            prev.filter(u => u.userEmail !== wsMessage.payload.userEmail)
           );
           break;
 
         case 'connection_established':
-        console.log('Connected to server, waiting for authentication...');
-        break;
-        
+          console.log('Connected to server, waiting for authentication...');
+
+          break;
+          
         case 'authentication_success':
-        console.log('User authenticated successfully');
-        setIsConnected(true);
-        setIsConnecting(false);
-        setError(null);
-        retryCountRef.current = 0; // Reset retry count on successful auth
-        break;
-        
+          console.log('User authenticated successfully');
+          connectionStateRef.current = 'connected';
+          setIsConnected(true);
+          setIsConnecting(false);
+          setError(null);
+          retryCountRef.current = 0; // Reset retry count on successful auth
+          break;
+          
         case 'error':
-            const errorCode = wsMessage.payload.code;
-            const errorMessage = wsMessage.payload.message;
-        
-        // Don't reconnect on authentication/authorization errors (4000-4999)
-        if (errorCode >= 4000 && errorCode < 5000) {
+          const errorCode = wsMessage.payload.code;
+          const errorMessage = wsMessage.payload.message;
+          
+          // Don't reconnect on authentication/authorization errors (4000-4999)
+          if (errorCode >= 4000 && errorCode < 5000) {
             setError(`Authentication error: ${errorMessage}`);
             setIsConnecting(false);
             shouldReconnectRef.current = false; // Stop reconnection attempts
-        } else {
+            connectionStateRef.current = 'disconnected';
+          } else {
             setError(errorMessage);
-        }
-        break;
+          }
+          break;
                 
         default:
           console.log('Unknown message type:', wsMessage.type);
@@ -190,26 +216,26 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     setIsConnecting(true); // Keep connecting state until authenticated
     setError(null);
     
-    // Send user registration instead of user_online
+    // Send user registration
     if (socketRef.current && user) {
-        socketRef.current.send(JSON.stringify({
-        type: 'register_user',
+      socketRef.current.send(JSON.stringify({
+        type: 'authenticate',
         payload: {
-            userId: user.id,
-            name: user.name,
-            type: user.type,
-            avatar: user.avatar
+          userEmail: user.email,
+          name: user.firstName,
+          type: user.userType,
+          avatar: user.avatar
         }
-        }));
+      }));
     }
-}, [user]);
+  }, [user]);
 
   const handleClose = useCallback((event: CloseEvent) => {
     console.log('WebSocket disconnected:', event.code, event.reason);
     
+    connectionStateRef.current = 'disconnected';
     setIsConnected(false);
     setIsConnecting(false);
-    setSocket(null);
     socketRef.current = null;
     
     // Clear typing users
@@ -220,22 +246,23 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     // 2. We haven't exceeded max retries
     // 3. We should still be reconnecting
     const wasManualDisconnect = isManualDisconnectRef.current || 
-                           event.code === 1000 || 
-                           event.code === 1001;
+                               event.code === 1000 || 
+                               event.code === 1001;
     const wasAuthError = event.code >= 4000 && event.code < 5000;
     
     if (!wasManualDisconnect && 
-    !wasAuthError && // Add this line
-    shouldReconnectRef.current && 
-    retryCountRef.current < maxRetries) {
+        !wasAuthError && 
+        shouldReconnectRef.current && 
+        retryCountRef.current < maxRetries) {
       
       retryCountRef.current++;
       const retryDelay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 10000); // Exponential backoff, max 10s
       
       setError(`Connection lost. Retrying in ${retryDelay / 1000}s... (${retryCountRef.current}/${maxRetries})`);
       
+      // FIXED: Uncommented the reconnection logic
       reconnectTimeoutRef.current = setTimeout(() => {
-        if (shouldReconnectRef.current) {
+        if (shouldReconnectRef.current && connectionStateRef.current === 'disconnected') {
           console.log(`Reconnection attempt ${retryCountRef.current}/${maxRetries}`);
           connect();
         }
@@ -252,12 +279,14 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     console.error('WebSocket error:', event);
     setError('Connection error occurred');
     setIsConnecting(false);
+    connectionStateRef.current = 'disconnected';
   }, []);
 
-  // Connect function
+  // Connect function - moved outside to avoid dependency issues
   const connect = useCallback(() => {
     // Don't connect if already connected or connecting
-    if (socketRef.current?.readyState === WebSocket.OPEN || isConnecting) {
+    if (connectionStateRef.current === 'connected' || connectionStateRef.current === 'connecting') {
+      console.log(`Already ${connectionStateRef.current}, skipping connection attempt`);
       return;
     }
 
@@ -267,9 +296,17 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       return;
     }
 
+    console.log('Attempting to connect...');
+    connectionStateRef.current = 'connecting';
     setIsConnecting(true);
     setError(null);
     isManualDisconnectRef.current = false;
+    
+    // Clean up existing socket if any
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+    }
     
     try {
       const ws = new WebSocket(wsUrl);
@@ -280,13 +317,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       ws.addEventListener('error', handleError);
       
       socketRef.current = ws;
-      setSocket(ws);
     } catch (err) {
       console.error('Failed to create WebSocket connection:', err);
       setError('Failed to create connection');
       setIsConnecting(false);
+      connectionStateRef.current = 'disconnected';
     }
-  }, [wsUrl, isConnecting, maxRetries, handleOpen, handleMessage, handleClose, handleError]);
+  }, [wsUrl, maxRetries, handleOpen, handleMessage, handleClose, handleError]);
 
   // Disconnect function
   const disconnect = useCallback(() => {
@@ -295,19 +332,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     // Mark as manual disconnect
     isManualDisconnectRef.current = true;
     shouldReconnectRef.current = false;
+    connectionStateRef.current = 'disconnected';
     
-    // Clear any pending reconnection attempts
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-    
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = null;
-    }
+    // Clear timeouts
+    clearTimeouts();
     
     if (socketRef.current) {
+      // Remove event listeners to prevent handling close event
       socketRef.current.removeEventListener('open', handleOpen);
       socketRef.current.removeEventListener('message', handleMessage);
       socketRef.current.removeEventListener('close', handleClose);
@@ -320,7 +351,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       socketRef.current = null;
     }
     
-    setSocket(null);
     setIsConnected(false);
     setIsConnecting(false);
     setError(null);
@@ -328,7 +358,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     
     // Reset retry count for future connections
     retryCountRef.current = 0;
-  }, [handleOpen, handleMessage, handleClose, handleError]);
+  }, [clearTimeouts, handleOpen, handleMessage, handleClose, handleError]);
 
   // Manual reconnect function (resets retry count)
   const manualReconnect = useCallback(() => {
@@ -336,6 +366,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     retryCountRef.current = 0;
     shouldReconnectRef.current = true;
     isManualDisconnectRef.current = false;
+    connectionStateRef.current = 'disconnected';
     connect();
   }, [connect]);
 
@@ -350,7 +381,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   }, []);
 
   const sendMessage = useCallback((content: string, type: 'text' | 'file' | 'image' = 'text') => {
+    console.log("In sendmessage")
+    console.log(socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim())
     if (socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim()) {
+      console.log("Sending message")
       socketRef.current.send(JSON.stringify({
         type: 'send_message',
         payload: { 
@@ -407,7 +441,16 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       shouldReconnectRef.current = false;
       disconnect();
     };
-  }, [connect, disconnect]);
+  }, []); // Empty dependency array - only run on mount/unmount
+
+  // Separate effect for user changes (if user changes, reconnect)
+  // useEffect(() => {
+  //   if (isConnected && socketRef.current) {
+  //     // If user changes while connected, we might need to re-authenticate
+  //     // This depends on your server implementation
+  //     console.log('User changed while connected');
+  //   }
+  // }, [user.id, user.name, user.type, isConnected]);
 
   // Context value
   const contextValue: WebSocketContextType = {

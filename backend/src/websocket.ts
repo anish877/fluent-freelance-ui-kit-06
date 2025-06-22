@@ -1,14 +1,7 @@
-import WebSocket from 'ws';
-import { createServer } from 'http';
-import { v4 as uuidv4 } from 'uuid';
+import WebSocket from "ws";
+import { createServer } from "http";
+import prisma from "./lib/prisma";
 
-// Types
-interface User {
-  id: string;
-  name: string;
-  type: 'client' | 'freelancer';
-  avatar?: string;
-}
 
 interface Message {
   id: string;
@@ -17,7 +10,7 @@ interface Message {
   senderName: string;
   content: string;
   timestamp: string;
-  type: 'text' | 'file' | 'image';
+  type: "text" | "file" | "image";
 }
 
 interface Conversation {
@@ -29,125 +22,108 @@ interface Conversation {
 }
 
 interface WSMessage {
-  type: 'register_user' | 'join_conversation' | 'send_message' | 'typing' | 'stop_typing' | 'user_online' | 'user_offline';
+  type:
+    | "authenticate"
+    | "join_conversation"
+    | "authentication_success"
+    | "send_message"
+    | "typing"
+    | "stop_typing"
+    | "user_online"
+    | "user_offline";
   payload: any;
 }
 
 interface ClientConnection {
   ws: WebSocket;
-  userId: string;
-  user: User;
+  userEmail: string;
   conversationId?: string;
   authenticated: boolean;
 }
 
-// In-memory storage (replace with database in production)
-const users = new Map<string, User>();
-const conversations = new Map<string, Conversation>();
-const messages = new Map<string, Message[]>();
 const connections = new Map<string, ClientConnection>();
-const conversationRooms = new Map<string, Set<string>>(); // conversationId -> Set of userIds
-
-// Initialize some sample data
-const initializeSampleData = () => {
-  // Sample users
-  const user1: User = { id: 'user1', name: 'John Client', type: 'client' };
-  const user2: User = { id: 'user2', name: 'Jane Freelancer', type: 'freelancer' };
-  users.set(user1.id, user1);
-  users.set(user2.id, user2);
-
-  // Sample conversation
-  const conv1: Conversation = {
-    id: 'conv1',
-    participants: ['user1', 'user2'],
-    projectName: 'Website Development',
-    createdAt: new Date().toISOString()
-  };
-  conversations.set(conv1.id, conv1);
-  
-  // Sample messages
-  const msg1: Message = {
-    id: 'msg1',
-    conversationId: 'conv1',
-    senderId: 'user1',
-    senderName: 'John Client',
-    content: 'Hello, how is the project going?',
-    timestamp: new Date().toISOString(),
-    type: 'text'
-  };
-  messages.set('conv1', [msg1]);
-  conv1.lastMessage = msg1;
-};
+const conversationRooms = new Map<string, Set<string>>();
 
 // WebSocket Server
 const server = createServer();
 const wss = new WebSocket.Server({ server });
 
 // Utility functions
-const broadcast = (conversationId: string, message: any, excludeUserId?: string) => {
+const broadcast = (
+  conversationId: string,
+  message: any,
+  excludeUserEmail?: string
+) => {
   const room = conversationRooms.get(conversationId);
   if (!room) return;
 
-  room.forEach(userId => {
-    if (userId === excludeUserId) return;
-    
-    const connection = connections.get(userId);
+  room.forEach((userEmail) => {
+    if (userEmail === excludeUserEmail) return;
+
+    const connection = connections.get(userEmail);
     if (connection && connection.ws.readyState === WebSocket.OPEN) {
       connection.ws.send(JSON.stringify(message));
     }
   });
 };
 
-const addUserToRoom = (conversationId: string, userId: string) => {
+const addUserToRoom = (conversationId: string, userEmail: string) => {
   if (!conversationRooms.has(conversationId)) {
     conversationRooms.set(conversationId, new Set());
   }
-  conversationRooms.get(conversationId)!.add(userId);
+  conversationRooms.get(conversationId)!.add(userEmail);
 };
 
-const removeUserFromRoom = (conversationId: string, userId: string) => {
+const removeUserFromRoom = (conversationId: string, userEmail: string) => {
   const room = conversationRooms.get(conversationId);
   if (room) {
-    room.delete(userId);
+    room.delete(userEmail);
     if (room.size === 0) {
       conversationRooms.delete(conversationId);
     }
   }
 };
 
-const getUserConversations = (userId: string): Conversation[] => {
-  return Array.from(conversations.values()).filter(conv => 
-    conv.participants.includes(userId)
-  );
-};
 
-const getConversationMessages = (conversationId: string): Message[] => {
-  return messages.get(conversationId) || [];
+// Replace getConversationMessages function
+const getConversationMessages = async (conversationId: string) => {
+  return await prisma.message.findMany({
+    where: {
+      conversationId: conversationId,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
 };
 
 const sendError = (ws: WebSocket, message: string, code = 4000) => {
   if (ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({
-      type: 'error',
-      payload: { message, code }
-    }));
+    ws.send(
+      JSON.stringify({
+        type: "error",
+        payload: { message, code },
+      })
+    );
   }
 };
 
 // WebSocket connection handler
-wss.on('connection', (ws: WebSocket, req) => {
+wss.on("connection", (ws: WebSocket, req) => {
   const ip = req.socket.remoteAddress;
   console.log(`New WebSocket connection from ${ip}`);
-  
+
   let currentConnection: ClientConnection | null = null;
   let isAuthenticated = false;
   let heartbeatInterval: NodeJS.Timeout;
 
   // Send initial connection success
-  ws.send(JSON.stringify({
-    type: 'connection_established',
-    payload: { message: 'Connected to server. Please authenticate.' }
-  }));
+  ws.send(
+    JSON.stringify({
+      type: "connection_established",
+      payload: { message: "Connected to server. Please authenticate." },
+    })
+  );
 
   // Heartbeat to keep connection alive
   heartbeatInterval = setInterval(() => {
@@ -156,224 +132,274 @@ wss.on('connection', (ws: WebSocket, req) => {
     }
   }, 30000);
 
-  ws.on('message', (data: WebSocket.Data) => {
+  ws.on("message", (data: WebSocket.Data) => {
     try {
       const message: WSMessage = JSON.parse(data.toString());
-      
+
       // Handle authentication first
-      if (!isAuthenticated && message.type !== 'register_user') {
-        sendError(ws, 'Authentication required. Please send register_user message first.', 4001);
+      if (!isAuthenticated && message.type !== "authenticate") {
+        sendError(
+          ws,
+          "Authentication required. Please send authenticate message first.",
+          4001
+        );
         return;
       }
-      
+
       switch (message.type) {
-        case 'register_user':
-          const { userId, name, type: userType } = message.payload;
-          
-          if (!userId || !name || !userType) {
-            sendError(ws, 'Missing required fields: userId, name, type', 4002);
-            return;
-          }
+        case "authenticate":
+          (async () => {
+            const { userEmail } = message.payload;
 
-          // Check if user exists or create new one
-          let user = users.get(userId);
-          if (!user) {
-            user = {
-              id: userId,
-              name,
-              type: userType,
-              avatar: message.payload.avatar
-            };
-            users.set(userId, user);
-            console.log(`New user registered: ${name} (${userId})`);
-          } else {
-            // Update existing user info
-            user.name = name;
-            user.type = userType;
-            if (message.payload.avatar) user.avatar = message.payload.avatar;
-            users.set(userId, user);
-            console.log(`User updated: ${name} (${userId})`);
-          }
+          try {
+            // Verify user exists in database
+            const user = await prisma.user.findUnique({
+              where: { email: userEmail },
+            });
 
-          // Create authenticated connection
-          currentConnection = {
-            ws,
-            userId,
-            user,
-            authenticated: true
-          };
-          
-          connections.set(userId, currentConnection);
-          isAuthenticated = true;
-
-          // Send authentication success
-          ws.send(JSON.stringify({
-            type: 'authentication_success',
-            payload: { 
-              message: 'Authentication successful',
-              user: user
+            if (!user) {
+              sendError(ws, "User not found", 4004);
+              return;
             }
-          }));
 
-          // Send user's conversations
-          const userConversations = getUserConversations(userId);
-          ws.send(JSON.stringify({
-            type: 'conversations_loaded',
-            payload: { conversations: userConversations }
-          }));
+            // Create authenticated connection
+            currentConnection = {
+              ws,
+              userEmail,
+              authenticated: true,
+            };
+            
+            connections.set(userEmail, currentConnection);
+            isAuthenticated = true;
 
-          console.log(`User ${user.name} authenticated successfully`);
-          break;
+            // Send success response
+            ws.send(JSON.stringify({
+              type: "authentication_success",
+              payload: { userEmail, message: "Authentication successful" }
+            }));
 
-        case 'user_online':
+          } catch (error) {
+            console.error("Authentication error:", error);
+            sendError(ws, "Authentication failed", 4500);
+          }
+        })();
+        break;
+        
+        case "user_online":
           // This is now handled in register_user, but kept for backward compatibility
           if (currentConnection) {
-            ws.send(JSON.stringify({
-              type: 'user_status',
-              payload: { status: 'online', userId: currentConnection.userId }
-            }));
+            ws.send(
+              JSON.stringify({
+                type: "user_status",
+                payload: { status: "online", userEmail: currentConnection.userEmail },
+              })
+            );
           }
           break;
 
-        case 'join_conversation':
+        case "join_conversation":
+          (async () => {
+          console.log("Reached here")
+          if (!currentConnection) {
+            sendError(ws, "Not authenticated", 4001);
+            return;
+          }
+          
           const { conversationId } = message.payload;
-          const conversation = conversations.get(conversationId);
           
-          if (!conversation) {
-            sendError(ws, 'Conversation not found', 4004);
-            return;
-          }
+          try {
+            // Fetch conversation from database
+            const conversation = await prisma.conversation.findUnique({
+              where: { id: conversationId },
+            });
+            
+            
+            if (!conversation) {
+              sendError(ws, "Conversation not found", 4004);
+              return;
+            }
+            
+            console.log("Conv: ", conversation)
+            // Check if user is participant
+            if (!conversation.participants.includes(currentConnection.userEmail)) {
+              sendError(ws, "Access denied to this conversation", 4003);
+              return;
+            }
 
-          if (!currentConnection) {
-            sendError(ws, 'Not authenticated', 4001);
-            return;
-          }
+            // Leave previous room if any
+            if (currentConnection.conversationId) {
+              removeUserFromRoom(currentConnection.conversationId, currentConnection.userEmail);
+            }
 
-          if (!conversation.participants.includes(currentConnection.userId)) {
-            sendError(ws, 'Access denied to this conversation', 4003);
-            return;
-          }
+            // Join new room
+            currentConnection.conversationId = conversationId;
+            addUserToRoom(conversationId, currentConnection.userEmail);
 
-          // Leave previous room if any
-          if (currentConnection.conversationId) {
-            removeUserFromRoom(currentConnection.conversationId, currentConnection.userId);
-          }
-          
-          // Join new room
-          currentConnection.conversationId = conversationId;
-          addUserToRoom(conversationId, currentConnection.userId);
-          
-          // Send conversation messages
-          const conversationMessages = getConversationMessages(conversationId);
-          ws.send(JSON.stringify({
-            type: 'messages_loaded',
-            payload: { 
+            // Send recent messages
+            const conversationMessages = await getConversationMessages(conversationId)
+
+            console.log("Found messages: ", conversationMessages)
+            console.log("Found conversation: ", conversationId)
+
+            ws.send(JSON.stringify({
+              type: "messages_loaded",
+              payload: {
+                conversationId,
+                messages: conversationMessages.reverse().map((msg) => ({
+                  ...msg,
+                  isOwn: msg.senderEmail === currentConnection!.userEmail,
+                })),
+              },
+            }));
+
+            // Mark messages as read
+            await prisma.message.updateMany({
+              where: {
+                conversationId,
+                isRead: false,
+                senderEmail: { not: currentConnection.userEmail }
+              },
+              data: { isRead: true }
+            });
+
+            // Notify others in the room that user joined
+            broadcast(
               conversationId,
-              messages: conversationMessages.map(msg => ({
-                ...msg,
-                isOwn: msg.senderId === currentConnection!.userId
-              }))
-            }
-          }));
-          
-          // Notify others in the room that user joined
-          broadcast(conversationId, {
-            type: 'user_joined',
-            payload: { 
-              userId: currentConnection.userId, 
-              userName: currentConnection.user.name 
-            }
-          }, currentConnection.userId);
+              {
+                type: "user_joined",
+                payload: {
+                  userEmail: currentConnection.userEmail,
+                },
+              }
+            );
 
-          console.log(`User ${currentConnection.user.name} joined conversation ${conversationId}`);
-          break;
-
-        case 'send_message':
-          const { conversationId: msgConvId, content, type = 'text' } = message.payload;
-          
+          } catch (error) {
+            console.error("Error joining conversation:", error);
+            sendError(ws, "Failed to join conversation", 4500);
+          }
+        })();
+        break;
+        
+        case "send_message":
+        (async () => {
           if (!currentConnection) {
-            sendError(ws, 'Not authenticated', 4001);
+            sendError(ws, "Not authenticated", 4001);
             return;
           }
 
-          if (!content || !content.trim()) {
-            sendError(ws, 'Message content cannot be empty', 4005);
-            return;
-          }
-
-          const msgConversation = conversations.get(msgConvId);
-          if (!msgConversation) {
-            sendError(ws, 'Conversation not found', 4004);
-            return;
-          }
-
-          if (!msgConversation.participants.includes(currentConnection.userId)) {
-            sendError(ws, 'Access denied to this conversation', 4003);
-            return;
-          }
-
-          const newMessage: Message = {
-            id: uuidv4(),
+          const {
             conversationId: msgConvId,
-            senderId: currentConnection.userId,
-            senderName: currentConnection.user.name,
-            content: content.trim(),
-            timestamp: new Date().toISOString(),
-            type
-          };
-          
-          // Save message
-          if (!messages.has(msgConvId)) {
-            messages.set(msgConvId, []);
-          }
-          messages.get(msgConvId)!.push(newMessage);
-          
-          // Update conversation's last message
-          msgConversation.lastMessage = newMessage;
-          
-          // Broadcast to all users in the conversation
-          const room = conversationRooms.get(msgConvId);
-          if (room) {
-            room.forEach(userId => {
-              const connection = connections.get(userId);
-              if (connection && connection.ws.readyState === WebSocket.OPEN) {
-                connection.ws.send(JSON.stringify({
-                  type: 'new_message',
-                  payload: {
-                    ...newMessage,
-                    isOwn: newMessage.senderId === userId
+            content,
+          } = message.payload;
+
+          try {
+            // Verify conversation exists and user has access
+            const msgConversation = await prisma.conversation.findUnique({
+              where: { id: msgConvId },
+            });
+
+            if (!msgConversation || !msgConversation.participants.includes(currentConnection.userEmail)) {
+              sendError(ws, "Access denied to this conversation", 4003);
+              return;
+            }
+
+            // Get receiver ID (the other participant)
+            const receiverEmail = msgConversation.participants.find(
+              (p) => p !== currentConnection?.userEmail
+            );
+
+            if (!receiverEmail) {
+              sendError(ws, "Invalid conversation participants", 4400);
+              return;
+            }
+
+            // Create message in database
+            const newMessage = await prisma.message.create({
+              data: {
+                content: content.trim(),
+                senderEmail: currentConnection.userEmail,
+                receiverEmail: receiverEmail,
+                conversationId: msgConvId,
+              },
+              include: {
+                sender: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    avatar: true,
+                    userType: true
                   }
-                }));
+                }
               }
             });
-          }
-          
-          console.log(`Message sent in conversation ${msgConvId} by ${currentConnection.user.name}: ${content}`);
-          break;
 
-        case 'typing':
+            console.log('New message', newMessage)
+
+            // Update conversation's lastMessage and updatedAt
+            await prisma.conversation.update({
+              where: { id: msgConvId },
+              data: {
+                lastMessageId: newMessage.id,
+                updatedAt: new Date(),
+              },
+            });
+
+            // Broadcast message to all participants in the conversation
+            broadcast(
+              msgConvId,
+              {
+                type: "new_message",
+                payload: {
+                  ...newMessage,
+                  isOwn: false,
+                },
+              }
+            );
+
+            ws.send(JSON.stringify({
+              type: "message_sent",
+              payload: {
+                ...newMessage,
+                isOwn: true,
+              },
+            }));
+
+          } catch (error) {
+            console.error("Error sending message:", error);
+            sendError(ws, "Failed to send message", 4500);
+          }
+        })();
+        break;
+        
+        case "typing":
           const { conversationId: typingConvId } = message.payload;
           if (currentConnection && typingConvId) {
-            broadcast(typingConvId, {
-              type: 'user_typing',
-              payload: { 
-                userId: currentConnection.userId, 
-                userName: currentConnection.user.name 
-              }
-            }, currentConnection.userId);
+            broadcast(
+              typingConvId,
+              {
+                type: "user_typing",
+                payload: {
+                  userEmail: currentConnection.userEmail,
+                },
+              },
+              currentConnection.userEmail
+            );
           }
           break;
 
-        case 'stop_typing':
+        case "stop_typing":
           const { conversationId: stopTypingConvId } = message.payload;
           if (currentConnection && stopTypingConvId) {
-            broadcast(stopTypingConvId, {
-              type: 'user_stop_typing',
-              payload: { 
-                userId: currentConnection.userId, 
-                userName: currentConnection.user.name 
+            broadcast(
+              stopTypingConvId,
+              {
+                type: "user_stop_typing",
+                payload: {
+                  userEmail: currentConnection.userEmail,
+                },
               }
-            }, currentConnection.userId);
+            );
           }
           break;
 
@@ -381,116 +407,52 @@ wss.on('connection', (ws: WebSocket, req) => {
           sendError(ws, `Unknown message type: ${message.type}`, 4006);
       }
     } catch (error) {
-      console.error('Error processing message:', error);
-      sendError(ws, 'Invalid message format', 4007);
+      console.error("Error processing message:", error);
+      sendError(ws, "Invalid message format", 4007);
     }
   });
 
-  ws.on('close', (code, reason) => {
-    console.log(`WebSocket connection closed. Code: ${code}, Reason: ${reason}`);
-    
+  ws.on("close", (code, reason) => {
+    console.log(
+      `WebSocket connection closed. Code: ${code}, Reason: ${reason}`
+    );
+
     clearInterval(heartbeatInterval);
-    
+
     if (currentConnection) {
       // Remove from room if in one
       if (currentConnection.conversationId) {
-        removeUserFromRoom(currentConnection.conversationId, currentConnection.userId);
-        
+        removeUserFromRoom(
+          currentConnection.conversationId,
+          currentConnection.userEmail
+        );
+
         // Notify others that user left
         broadcast(currentConnection.conversationId, {
-          type: 'user_left',
-          payload: { 
-            userId: currentConnection.userId, 
-            userName: currentConnection.user.name 
-          }
+          type: "user_left",
+          payload: {
+            userEmail: currentConnection.userEmail,
+          },
         });
       }
-      
-      connections.delete(currentConnection.userId);
-      console.log(`User ${currentConnection.user.name} disconnected`);
+
+      connections.delete(currentConnection.userEmail);
+      console.log(`User ${currentConnection.userEmail} disconnected`);
     }
   });
 
-  ws.on('error', (error) => {
-    console.error('WebSocket error:', error);
+  ws.on("error", (error) => {
+    console.error("WebSocket error:", error);
     clearInterval(heartbeatInterval);
   });
 
-  ws.on('pong', () => {
+  ws.on("pong", () => {
     // Heartbeat received
   });
 });
 
-// REST API endpoints
-server.on('request', (req, res) => {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    res.end();
-    return;
-  }
-
-  const url = new URL(req.url!, `http://${req.headers.host}`);
-  
-  if (req.method === 'GET' && url.pathname === '/api/conversations') {
-    const userId = url.searchParams.get('userId');
-    if (userId) {
-      const userConversations = getUserConversations(userId);
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ conversations: userConversations }));
-    } else {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'userId required' }));
-    }
-  } else if (req.method === 'GET' && url.pathname === '/api/messages') {
-    const conversationId = url.searchParams.get('conversationId');
-    const userId = url.searchParams.get('userId');
-    
-    if (conversationId && userId) {
-      const conversation = conversations.get(conversationId);
-      if (conversation && conversation.participants.includes(userId)) {
-        const conversationMessages = getConversationMessages(conversationId);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ 
-          messages: conversationMessages.map(msg => ({
-            ...msg,
-            isOwn: msg.senderId === userId
-          }))
-        }));
-      } else {
-        res.writeHead(403, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Access denied' }));
-      }
-    } else {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'conversationId and userId required' }));
-    }
-  } else if (req.method === 'GET' && url.pathname === '/api/health') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ 
-      status: 'healthy',
-      connections: connections.size,
-      users: users.size,
-      conversations: conversations.size
-    }));
-  } else {
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Not found' }));
-  }
-});
-
-// Initialize sample data
-initializeSampleData();
-
-// Start server
-const PORT = process.env.PORT || 8080;
+const PORT = 8080;
 server.listen(PORT, () => {
   console.log(`WebSocket server running on port ${PORT}`);
   console.log(`WebSocket endpoint: ws://localhost:${PORT}`);
-  console.log(`HTTP API endpoint: http://localhost:${PORT}/api`);
-  console.log('Sample users initialized: user1 (John Client), user2 (Jane Freelancer)');
 });
