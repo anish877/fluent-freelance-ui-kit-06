@@ -308,14 +308,14 @@ const Signup = () => {
 
   // Show success state
   if (success) {
-    return (
+  return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Account Created Successfully!
-            </h2>
+        </h2>
             <p className="text-gray-600 mb-4">
               Your account has been created and your profile has been set up.
             </p>
@@ -376,8 +376,8 @@ const Signup = () => {
                     <p className="text-sm font-medium text-center">Client</p>
                     <p className="text-xs text-gray-500 text-center">I want to hire</p>
                   </div>
-                </div>
-              </div>
+            </div>
+          </div>
             )}
 
             <div className="grid grid-cols-2 gap-4">
@@ -417,10 +417,10 @@ const Signup = () => {
 
             <div>
               <Label htmlFor="password">Password *</Label>
-              <Input
+                <Input
                 id="password"
                 type="password"
-                value={formData.password}
+                  value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className={errors.password ? "border-red-500" : ""}
               />

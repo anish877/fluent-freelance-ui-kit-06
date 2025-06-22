@@ -1,10 +1,21 @@
-
 import { Button } from "../ui/button";
 import { CheckCircle, Sparkles, ArrowRight, Star, Users, Shield } from "lucide-react";
 
+interface OnboardingCompleteData {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  city?: string;
+  country?: string;
+  category?: string;
+  hourlyRate?: number;
+  clientType?: string;
+  [key: string]: string | number | undefined;
+}
+
 interface OnboardingCompleteProps {
   onComplete: () => void;
-  data: any;
+  data: OnboardingCompleteData;
   userType: "freelancer" | "client" | null;
 }
 
