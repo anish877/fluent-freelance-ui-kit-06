@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
-
+import cookieParser from 'cookie-parser';
 // Import routes
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
@@ -23,7 +23,7 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
-
+app.use(cookieParser())
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

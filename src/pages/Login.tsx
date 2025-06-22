@@ -3,12 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import axios from "axios";
+import { useAuth } from "@/hooks/AuthContext";
+import { toast } from "sonner";
 
 const Login = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { login, isAuthenticated } = useAuth()
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -20,37 +24,12 @@ const Login = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Login failed');
+      const { success, message } = await login(formData.email, formData.password)
+      if(success){
+        toast.success(message)
       }
-
-      // Store token
-      localStorage.setItem('token', result.token);
-
-      // Check if user is onboarded
-      if (result.user.isOnboarded) {
-        // Redirect to appropriate dashboard
-        if (result.user.userType === 'FREELANCER') {
-          navigate('/dashboard');
-        } else {
-          navigate('/client-dashboard');
-        }
-      } else {
-        // Redirect to onboarding
-        navigate('/onboarding');
+      else{
+        setError(message)
       }
 
     } catch (err) {
@@ -58,8 +37,13 @@ const Login = () => {
       setError(errorMessage);
     } finally {
       setLoading(false);
+      // setFormData({email: '', password: ''})
     }
   };
+
+  if(isAuthenticated){
+    navigate("/dashboard");
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -123,18 +107,6 @@ const Login = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
-                  disabled={loading}
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
-              </div>
 
               <div className="text-sm">
                 <Link to="#" className="font-medium text-teal-600 hover:text-teal-500">

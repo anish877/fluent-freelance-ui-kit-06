@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  password       String
+  firstName      String
+  lastName       String
+  avatar         String?
+  bio            String?
+  location       String?
+  phone          String?
+  userType       UserType @default(FREELANCER)
+  isOnboarded    Boolean  @default(false)
+  onboardingStep Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Basic Info (Common)
+  country  String?
+  city     String?
+  timezone String?
+  title    String? // Professional title
+  overview String? // Professional overview
+
+  // Freelancer specific fields
+  skills           Json? // Array of skill objects with name, category, level, yearsOfExperience
+  topSkills        String[] // Array of top skill names
+  serviceOfferings String[] // Array of service offerings
+  hourlyRate       Float?
+  portfolio        String?
+  experience       String?
+  education        Json? // Array of education objects
+  workExperience   Json? // Array of work experience objects
+  certifications   String[]
+  availability     String?
+  languages        Json? // Array of language objects with language and proficiency
+  socialLinks      Json? // { linkedin, github, website, etc. }
+
+  // Professional Info
+  category        String? // Primary category
+  subcategory     String? // Subcategory
+  experienceLevel String? // entry, intermediate, expert
+
+  // Client specific fields
+  companyName        String?
+  companySize        String?
+  industry           String?
+  companyWebsite     String?
+  companyDescription String?
+  projectTypes       String[] // Types of projects they typically post
+  preferredSkills    String[] // Skills they typically look for
+  budgetRange        String? // e.g., "$1000-$5000", "$50-100/hour"
+
+  // Client specific info
+  clientType    String? // individual, small-business, medium-business, enterprise, agency, startup
+  howDidYouHear String? // How they heard about the platform
+
+  // Relations
+  jobsPosted       Job[]          @relation("JobPoster")
+  proposals        Proposal[]     @relation("ProposalAuthor")
+  reviews          Review[]       @relation("ReviewAuthor")
+  receivedReviews  Review[]       @relation("ReviewReceiver")
+  messages         Message[]      @relation("MessageSender")
+  receivedMessages Message[]      @relation("MessageReceiver")
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+model Job {
+  id           String         @id @default(cuid())
+  title        String
+  description  String
+  requirements String[]
+  budget       BudgetType
+  minBudget    Float?
+  maxBudget    Float?
+  hourlyRate   Float?
+  duration     String?
+  skills       String[]
+  category     String
+  location     String?
+  isRemote     Boolean        @default(false)
+  status       JobStatus      @default(OPEN)
+  clientId     String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  conversation Conversation[]
+
+  // Relations
+  client    User       @relation("JobPoster", fields: [clientId], references: [id], onDelete: Cascade)
+  proposals Proposal[]
+  reviews   Review[]
+
+  @@map("jobs")
+}
+
+model Proposal {
+  id                String         @id @default(cuid())
+  coverLetter       String
+  bidAmount         Float
+  estimatedDuration String
+  attachments       String[]
+  status            ProposalStatus @default(PENDING)
+  jobId             String
+  freelancerId      String
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  // Relations
+  job        Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  freelancer User @relation("ProposalAuthor", fields: [freelancerId], references: [id], onDelete: Cascade)
+
+  @@map("proposals")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  rating     Int
+  comment    String
+  jobId      String
+  authorId   String
+  receiverId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  author   User @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReviewReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Conversation {
+  id            String    @id @default(cuid())
+  participants  String[] // Array of user IDs
+  jobId         String? // Optional: link to specific job
+  projectName   String?
+  isActive      Boolean   @default(true)
+  lastMessageId String?   @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  messages      Message[]
+  lastMessage   Message?  @relation("ConversationLastMessage", fields: [lastMessageId], references: [id])
+  job           Job?      @relation(fields: [jobId], references: [id])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  content        String
+  senderEmail    String
+  receiverEmail  String
+  conversationId String
+  jobId          String?
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // Relations
+  sender       User         @relation("MessageSender", fields: [senderEmail], references: [email], onDelete: Cascade)
+  receiver     User         @relation("MessageReceiver", fields: [receiverEmail], references: [email], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  // Reverse relation for last message
+  conversationAsLast Conversation? @relation("ConversationLastMessage")
+
+  @@map("messages")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  userId    String
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum UserType {
+  FREELANCER
+  CLIENT
+}
+
+enum JobStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum BudgetType {
+  FIXED
+  HOURLY
+}
+
+enum NotificationType {
+  PROPOSAL_RECEIVED
+  PROPOSAL_ACCEPTED
+  PROPOSAL_REJECTED
+  MESSAGE_RECEIVED
+  JOB_COMPLETED
+  PAYMENT_RECEIVED
+}

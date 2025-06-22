@@ -1,10 +1,10 @@
 
 import { Link } from "react-router-dom";
-import { ArrowRight, Star, Users, Briefcase, Shield, CheckCircle, TrendingUp, Award, Globe, Zap, Target, MessageSquare } from "lucide-react";
+import { ArrowRight, Star, Users, Shield, CheckCircle, TrendingUp, Award, Globe, Zap, Target, MessageSquare } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 
 const Index = () => {
