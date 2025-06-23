@@ -4,7 +4,8 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { ArrowRight, Plus, X, Upload, ExternalLink, Image, Video, FileText } from "lucide-react";
+import { ArrowRight, Plus, X, Upload, ExternalLink, Image, Video, FileText, Loader2 } from "lucide-react";
+import { uploadService } from "../../lib/uploadService";
 
 interface PortfolioItem {
   title: string;
@@ -47,6 +48,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadingStates, setUploadingStates] = useState<Record<string, boolean>>({});
 
   const addPortfolioItem = () => {
     setFormData({
@@ -84,18 +86,30 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
     setFormData({ ...formData, portfolioItems: updated });
   };
 
-  const handleImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const item = formData.portfolioItems[index];
-    
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const newImages = [...item.images, e.target?.result as string];
+    if (files.length === 0) return;
+
+    const uploadKey = `portfolio_${index}`;
+    setUploadingStates(prev => ({ ...prev, [uploadKey]: true }));
+
+    try {
+      // Upload multiple files to Cloudinary
+      const result = await uploadService.uploadMultiple(files);
+      
+      if (result.success) {
+        const item = formData.portfolioItems[index];
+        const newImages = [...item.images, ...result.data.map(file => file.url)];
         updatePortfolioItem(index, "images", newImages);
-      };
-      reader.readAsDataURL(file);
-    });
+      } else {
+        setErrors({ [uploadKey]: 'Upload failed. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setErrors({ [uploadKey]: 'Upload failed. Please try again.' });
+    } finally {
+      setUploadingStates(prev => ({ ...prev, [uploadKey]: false }));
+    }
   };
 
   const removeImage = (itemIndex: number, imageIndex: number) => {
@@ -153,7 +167,18 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        portfolio: JSON.stringify(formData.portfolioItems), // Store portfolio items as JSON string
+        socialLinks: {
+          linkedin: formData.linkedinUrl,
+          github: formData.githubUrl,
+          website: formData.websiteUrl,
+          behance: formData.behanceUrl,
+          dribbble: formData.dribbbleUrl
+        }
+      };
+      onNext(mappedData);
     }
   };
 
@@ -267,8 +292,9 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
                 {/* Basic Info */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Project Title *</Label>
+                    <Label htmlFor={`title_${index}`}>Project Title *</Label>
                     <Input
+                      id={`title_${index}`}
                       value={item.title}
                       onChange={(e) => updatePortfolioItem(index, "title", e.target.value)}
                       placeholder="e.g., E-commerce Website Redesign"
@@ -279,7 +305,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
                     )}
                   </div>
                   <div>
-                    <Label>Category *</Label>
+                    <Label htmlFor={`category_${index}`}>Category *</Label>
                     <Select 
                       value={item.category} 
                       onValueChange={(value) => updatePortfolioItem(index, "category", value)}
@@ -299,14 +325,14 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
                   </div>
                 </div>
 
-                {/* Description */}
                 <div>
-                  <Label>Project Description *</Label>
+                  <Label htmlFor={`description_${index}`}>Project Description *</Label>
                   <Textarea
+                    id={`description_${index}`}
                     value={item.description}
                     onChange={(e) => updatePortfolioItem(index, "description", e.target.value)}
-                    placeholder="Describe the project, your role, challenges faced, and solutions provided..."
-                    rows={4}
+                    placeholder="Describe the project, your role, challenges faced, and outcomes achieved..."
+                    rows={3}
                     className={errors[`portfolio_${index}_description`] ? "border-red-500" : ""}
                   />
                   {errors[`portfolio_${index}_description`] && (
@@ -314,10 +340,92 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
                   )}
                 </div>
 
+                {/* Project Images */}
+                <div>
+                  <Label>Project Images</Label>
+                  <div className="mt-2">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                      <div className="flex items-center justify-center">
+                        <label className="cursor-pointer">
+                          {uploadingStates[`portfolio_${index}`] ? (
+                            <div className="flex items-center">
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              <span>Uploading...</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center">
+                              <Upload className="h-4 w-4 mr-2" />
+                              <span>Upload Images</span>
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(index, e)}
+                            className="hidden"
+                            disabled={uploadingStates[`portfolio_${index}`]}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    
+                    {errors[`portfolio_${index}`] && (
+                      <p className="text-red-500 text-sm mt-1">{errors[`portfolio_${index}`]}</p>
+                    )}
+
+                    {/* Display uploaded images */}
+                    {item.images.length > 0 && (
+                      <div className="grid grid-cols-3 gap-2 mt-4">
+                        {item.images.map((image, imageIndex) => (
+                          <div key={imageIndex} className="relative">
+                            <img
+                              src={image}
+                              alt={`Project ${index + 1} - Image ${imageIndex + 1}`}
+                              className="w-full h-24 object-cover rounded"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index, imageIndex)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Project Links */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor={`liveUrl_${index}`}>Live URL</Label>
+                    <Input
+                      id={`liveUrl_${index}`}
+                      type="url"
+                      value={item.liveUrl}
+                      onChange={(e) => updatePortfolioItem(index, "liveUrl", e.target.value)}
+                      placeholder="https://project-demo.com"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`sourceUrl_${index}`}>Source Code URL</Label>
+                    <Input
+                      id={`sourceUrl_${index}`}
+                      type="url"
+                      value={item.sourceUrl}
+                      onChange={(e) => updatePortfolioItem(index, "sourceUrl", e.target.value)}
+                      placeholder="https://github.com/username/project"
+                    />
+                  </div>
+                </div>
+
                 {/* Project Details */}
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label>Your Role</Label>
+                    <Label htmlFor={`role_${index}`}>Your Role</Label>
                     <Select 
                       value={item.role} 
                       onValueChange={(value) => updatePortfolioItem(index, "role", value)}
@@ -333,17 +441,19 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
                     </Select>
                   </div>
                   <div>
-                    <Label>Duration</Label>
+                    <Label htmlFor={`duration_${index}`}>Duration</Label>
                     <Input
+                      id={`duration_${index}`}
                       value={item.duration}
                       onChange={(e) => updatePortfolioItem(index, "duration", e.target.value)}
-                      placeholder="e.g., 2 months, 6 weeks"
+                      placeholder="e.g., 3 months"
                     />
                   </div>
                   <div>
-                    <Label>Completion Date</Label>
+                    <Label htmlFor={`completionDate_${index}`}>Completion Date</Label>
                     <Input
-                      type="month"
+                      id={`completionDate_${index}`}
+                      type="date"
                       value={item.completionDate}
                       onChange={(e) => updatePortfolioItem(index, "completionDate", e.target.value)}
                     />
@@ -353,119 +463,57 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
                 {/* Technologies */}
                 <div>
                   <Label>Technologies Used</Label>
-                  <div className="flex gap-2 mb-2">
-                    <Input
-                      placeholder="Add technology (press Enter)"
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addTechnology(index, e.currentTarget.value);
-                          e.currentTarget.value = "";
-                        }
-                      }}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {item.technologies.map(tech => (
-                      <span key={tech} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center gap-1">
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {item.technologies.map((tech, techIndex) => (
+                      <span
+                        key={techIndex}
+                        className="bg-teal-100 text-teal-800 px-2 py-1 rounded-full text-sm flex items-center"
+                      >
                         {tech}
                         <button
                           type="button"
                           onClick={() => removeTechnology(index, tech)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="ml-1 text-teal-600 hover:text-teal-800"
                         >
                           <X className="h-3 w-3" />
                         </button>
                       </span>
                     ))}
-                  </div>
-                </div>
-
-                {/* Links */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Live URL</Label>
-                    <Input
-                      type="url"
-                      value={item.liveUrl}
-                      onChange={(e) => updatePortfolioItem(index, "liveUrl", e.target.value)}
-                      placeholder="https://project-demo.com"
-                    />
-                  </div>
-                  <div>
-                    <Label>Source Code</Label>
-                    <Input
-                      type="url"
-                      value={item.sourceUrl}
-                      onChange={(e) => updatePortfolioItem(index, "sourceUrl", e.target.value)}
-                      placeholder="https://github.com/user/project"
-                    />
-                  </div>
-                </div>
-
-                {/* Images */}
-                <div>
-                  <Label>Project Images</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                     <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(index, e)}
-                      className="hidden"
-                      id={`images-${index}`}
+                      type="text"
+                      placeholder="Add technology"
+                      className="border rounded px-2 py-1 text-sm"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const input = e.target as HTMLInputElement;
+                          addTechnology(index, input.value);
+                          input.value = '';
+                        }
+                      }}
                     />
-                    <label
-                      htmlFor={`images-${index}`}
-                      className="flex flex-col items-center cursor-pointer"
-                    >
-                      <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                      <span className="text-sm text-gray-600">Click to upload images</span>
-                    </label>
                   </div>
-                  
-                  {item.images.length > 0 && (
-                    <div className="grid grid-cols-3 gap-4 mt-4">
-                      {item.images.map((image, imgIndex) => (
-                        <div key={imgIndex} className="relative">
-                          <img
-                            src={image}
-                            alt={`Project ${index + 1} - Image ${imgIndex + 1}`}
-                            className="w-full h-24 object-cover rounded border"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index, imgIndex)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 {/* Client Feedback */}
                 <div>
-                  <Label>Client Feedback (Optional)</Label>
+                  <Label htmlFor={`clientFeedback_${index}`}>Client Feedback (Optional)</Label>
                   <Textarea
+                    id={`clientFeedback_${index}`}
                     value={item.clientFeedback}
                     onChange={(e) => updatePortfolioItem(index, "clientFeedback", e.target.value)}
-                    placeholder="Share any positive feedback or testimonials from the client..."
-                    rows={3}
+                    placeholder="Share positive feedback from the client..."
+                    rows={2}
                   />
                 </div>
               </div>
             </div>
           ))}
-
-          {errors.portfolio && <p className="text-red-500 text-sm">{errors.portfolio}</p>}
         </div>
 
-        <Button type="submit" className="w-full" size="lg">
+        <Button type="submit" className="w-full">
           Continue
-          <ArrowRight className="ml-2 h-5 w-5" />
+          <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </form>
     </div>

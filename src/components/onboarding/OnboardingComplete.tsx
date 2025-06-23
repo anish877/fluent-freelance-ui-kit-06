@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { Button } from "../ui/button";
-import { CheckCircle, Sparkles, ArrowRight, Star, Users, Shield } from "lucide-react";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { CheckCircle, Sparkles, ArrowRight, Star, Users, Shield, Eye, EyeOff } from "lucide-react";
 
 interface OnboardingCompleteData {
   firstName?: string;
@@ -14,12 +17,45 @@ interface OnboardingCompleteData {
 }
 
 interface OnboardingCompleteProps {
-  onComplete: () => void;
+  onComplete: (password: string) => void;
   data: OnboardingCompleteData;
   userType: "freelancer" | "client" | null;
+  loading?: boolean;
+  error?: string | null;
 }
 
-const OnboardingComplete = ({ onComplete, data, userType }: OnboardingCompleteProps) => {
+const OnboardingComplete = ({ onComplete, data, userType, loading = false, error = null }: OnboardingCompleteProps) => {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ password?: string; confirmPassword?: string }>({});
+
+  const validateForm = () => {
+    const errors: { password?: string; confirmPassword?: string } = {};
+
+    if (!password) {
+      errors.password = "Password is required";
+    } else if (password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    }
+
+    if (!confirmPassword) {
+      errors.confirmPassword = "Please confirm your password";
+    } else if (password !== confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onComplete(password);
+    }
+  };
+
   const nextSteps = userType === "freelancer" ? [
     {
       icon: Star,
@@ -67,11 +103,11 @@ const OnboardingComplete = ({ onComplete, data, userType }: OnboardingCompletePr
         </div>
         
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          🎉 Welcome to FreelanceHub!
+          🎉 Almost There!
         </h2>
         
         <p className="text-lg text-gray-600 mb-2">
-          Your {userType} profile has been created successfully
+          Create your account to complete your {userType} profile
         </p>
         
         {data.firstName && (
@@ -101,6 +137,88 @@ const OnboardingComplete = ({ onComplete, data, userType }: OnboardingCompletePr
             )}
             <p><span className="font-medium">Email:</span> {data.email}</p>
           </div>
+        </div>
+      </div>
+
+      {/* Password Form */}
+      <div className="bg-white border rounded-lg p-6 mb-8">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Create Your Account</h3>
+        
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                className={formErrors.password ? "border-red-500" : ""}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {formErrors.password && (
+              <p className="text-red-500 text-sm">{formErrors.password}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                className={formErrors.confirmPassword ? "border-red-500" : ""}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {formErrors.confirmPassword && (
+              <p className="text-red-500 text-sm">{formErrors.confirmPassword}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Button 
+            onClick={handleSubmit} 
+            className="w-full" 
+            size="lg"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Creating Account...
+              </>
+            ) : (
+              <>
+                Create Account & Continue
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
@@ -138,23 +256,6 @@ const OnboardingComplete = ({ onComplete, data, userType }: OnboardingCompletePr
             <div className="text-2xl font-bold text-teal-600">98.2%</div>
             <div className="text-sm text-gray-600">Satisfaction Rate</div>
           </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="space-y-4">
-        <Button onClick={onComplete} className="w-full" size="lg">
-          Go to Dashboard
-          <ArrowRight className="ml-2 h-5 w-5" />
-        </Button>
-        
-        <div className="flex gap-4">
-          <Button variant="outline" className="flex-1">
-            {userType === "freelancer" ? "Browse Jobs" : "Post a Job"}
-          </Button>
-          <Button variant="outline" className="flex-1">
-            {userType === "freelancer" ? "Complete Profile" : "Browse Talent"}
-          </Button>
         </div>
       </div>
 

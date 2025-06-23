@@ -67,6 +67,27 @@ model User {
   clientType    String? // individual, small-business, medium-business, enterprise, agency, startup
   howDidYouHear String? // How they heard about the platform
 
+  // Additional client fields from onboarding
+  interestedCategories    String[] // Categories they're interested in
+  urgencyLevel            String? // How urgent their projects typically are
+  preferredWorkingStyle   String? // Hands-off, collaborative, hands-on
+  communicationPreference String[] // Preferred communication methods
+  projectDescription      String? // Description of ideal projects
+  paymentPreference       String? // Hourly, fixed, milestone-based, flexible
+  projectFrequency        String? // One-time, occasional, regular, ongoing
+  averageProjectDuration  String? // Typical project duration
+  maxHourlyRate           String? // Maximum hourly rate they're comfortable with
+  totalMonthlyBudget      String? // Total monthly budget for regular clients
+
+  // Additional freelancer fields from onboarding
+  projectBasedRates    Json? // { small, medium, large }
+  hoursPerWeek         String? // Hours available per week
+  workingHours         Json? // { start, end }
+  workingDays          String[] // Days of the week available
+  responseTime         String? // How quickly they respond
+  minimumProjectBudget String? // Minimum project budget they accept
+  specialRequirements  String? // Special requirements or notes
+
   // Relations
   jobsPosted       Job[]          @relation("JobPoster")
   proposals        Proposal[]     @relation("ProposalAuthor")

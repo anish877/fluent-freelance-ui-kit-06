@@ -79,7 +79,16 @@ const ClientBudgetTimeline = ({ onNext, data }: ClientBudgetTimelineProps) => {
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        budgetRange: formData.budgetRange,
+        paymentPreference: formData.paymentPreference,
+        projectFrequency: formData.projectFrequency,
+        averageProjectDuration: formData.averageProjectDuration,
+        maxHourlyRate: formData.maxHourlyRate,
+        totalMonthlyBudget: formData.totalMonthlyBudget
+      };
+      onNext(mappedData);
     }
   };
 

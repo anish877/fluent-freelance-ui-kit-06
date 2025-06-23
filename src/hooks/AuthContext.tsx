@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const location = useLocation();
 
   // Routes that don't require authentication
-  const publicRoutes = ['/login', '/signup', '/forgot-password', '/'];
+  const publicRoutes = ['/login', '/signup', '/forgot-password', '/', '/onboarding'];
 
   
   // Check if current route is public

@@ -164,7 +164,24 @@ exports.Prisma.UserScalarFieldEnum = {
   preferredSkills: 'preferredSkills',
   budgetRange: 'budgetRange',
   clientType: 'clientType',
-  howDidYouHear: 'howDidYouHear'
+  howDidYouHear: 'howDidYouHear',
+  interestedCategories: 'interestedCategories',
+  urgencyLevel: 'urgencyLevel',
+  preferredWorkingStyle: 'preferredWorkingStyle',
+  communicationPreference: 'communicationPreference',
+  projectDescription: 'projectDescription',
+  paymentPreference: 'paymentPreference',
+  projectFrequency: 'projectFrequency',
+  averageProjectDuration: 'averageProjectDuration',
+  maxHourlyRate: 'maxHourlyRate',
+  totalMonthlyBudget: 'totalMonthlyBudget',
+  projectBasedRates: 'projectBasedRates',
+  hoursPerWeek: 'hoursPerWeek',
+  workingHours: 'workingHours',
+  workingDays: 'workingDays',
+  responseTime: 'responseTime',
+  minimumProjectBudget: 'minimumProjectBudget',
+  specialRequirements: 'specialRequirements'
 };
 
 exports.Prisma.JobScalarFieldEnum = {

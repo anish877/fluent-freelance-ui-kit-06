@@ -115,7 +115,16 @@ const ClientProjectNeeds = ({ onNext, data }: ClientProjectNeedsProps) => {
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        interestedCategories: formData.interestedCategories,
+        projectTypes: formData.projectTypes,
+        urgencyLevel: formData.urgencyLevel,
+        preferredWorkingStyle: formData.preferredWorkingStyle,
+        communicationPreference: formData.communicationPreference,
+        projectDescription: formData.projectDescription
+      };
+      onNext(mappedData);
     }
   };
 

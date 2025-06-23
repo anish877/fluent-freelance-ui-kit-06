@@ -139,7 +139,19 @@ const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabili
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        hourlyRate: formData.hourlyRate,
+        projectBasedRates: formData.projectBasedRates,
+        availability: formData.availability,
+        hoursPerWeek: formData.hoursPerWeek,
+        workingHours: formData.workingHours,
+        workingDays: formData.workingDays,
+        responseTime: formData.responseTime,
+        minimumProjectBudget: formData.minimumProjectBudget,
+        specialRequirements: formData.specialRequirements
+      };
+      onNext(mappedData);
     }
   };
 

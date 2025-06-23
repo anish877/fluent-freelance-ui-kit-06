@@ -13,6 +13,7 @@ import proposalRoutes from './routes/proposals';
 import messageRoutes from './routes/messages';
 import notificationRoutes from './routes/notifications';
 import onboardingRoutes from './routes/onboarding';
+import uploadRoutes from './routes/upload';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -59,6 +60,7 @@ app.use('/api/proposals', proposalRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Error handling middleware
 app.use(notFound);

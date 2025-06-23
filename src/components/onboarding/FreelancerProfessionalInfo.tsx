@@ -177,7 +177,17 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        category: formData.category,
+        subcategory: formData.subcategory,
+        experienceLevel: formData.experienceLevel,
+        workExperience: formData.workExperience,
+        education: formData.education,
+        certifications: formData.certifications,
+        languages: formData.languages
+      };
+      onNext(mappedData);
     }
   };
 

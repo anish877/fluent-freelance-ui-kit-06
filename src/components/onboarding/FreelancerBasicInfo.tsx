@@ -4,7 +4,8 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { ArrowRight, Upload, Camera } from "lucide-react";
+import { ArrowRight, Upload, Camera, Loader2 } from "lucide-react";
+import { uploadService } from "../../lib/uploadService";
 
 interface FreelancerBasicInfoData {
   firstName?: string;
@@ -41,6 +42,7 @@ const FreelancerBasicInfo = ({ onNext, data }: FreelancerBasicInfoProps) => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
 
   const countries = [
     "United States", "Canada", "United Kingdom", "Australia", "Germany", 
@@ -75,18 +77,51 @@ const FreelancerBasicInfo = ({ onNext, data }: FreelancerBasicInfoProps) => {
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+        city: formData.city,
+        timezone: formData.timezone,
+        profilePhoto: formData.profilePhoto,
+        title: formData.title,
+        overview: formData.overview
+      };
+      onNext(mappedData);
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData({ ...formData, profilePhoto: e.target?.result as string });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Validate file
+    const validation = uploadService.validateFile(file);
+    if (!validation.isValid) {
+      setErrors({ profilePhoto: validation.error });
+      return;
+    }
+
+    setUploading(true);
+    setErrors({});
+
+    try {
+      // Upload to Cloudinary
+      const result = await uploadService.uploadSingle(file);
+      
+      if (result.success) {
+        setFormData({ ...formData, profilePhoto: result.data.url });
+      } else {
+        setErrors({ profilePhoto: 'Upload failed. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setErrors({ profilePhoto: 'Upload failed. Please try again.' });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -117,16 +152,24 @@ const FreelancerBasicInfo = ({ onNext, data }: FreelancerBasicInfoProps) => {
               </div>
             )}
             <label className="absolute bottom-0 right-0 bg-teal-600 text-white p-2 rounded-full cursor-pointer hover:bg-teal-700 transition-colors">
-              <Upload className="h-4 w-4" />
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileUpload}
                 className="hidden"
+                disabled={uploading}
               />
             </label>
           </div>
           <p className="text-sm text-gray-500 mt-2">Upload a professional photo</p>
+          {errors.profilePhoto && (
+            <p className="text-red-500 text-sm mt-1">{errors.profilePhoto}</p>
+          )}
         </div>
 
         {/* Basic Information */}
@@ -208,7 +251,7 @@ const FreelancerBasicInfo = ({ onNext, data }: FreelancerBasicInfoProps) => {
         </div>
 
         <div>
-          <Label htmlFor="timezone">Timezone</Label>
+          <Label htmlFor="timezone">Timezone (Optional)</Label>
           <Select 
             value={formData.timezone} 
             onValueChange={(value) => setFormData({ ...formData, timezone: value })}
@@ -217,27 +260,23 @@ const FreelancerBasicInfo = ({ onNext, data }: FreelancerBasicInfoProps) => {
               <SelectValue placeholder="Select timezone" />
             </SelectTrigger>
             <SelectContent>
-              {timezones.map(tz => (
-                <SelectItem key={tz} value={tz}>{tz}</SelectItem>
+              {timezones.map(timezone => (
+                <SelectItem key={timezone} value={timezone}>{timezone}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        {/* Professional Information */}
         <div>
           <Label htmlFor="title">Professional Title *</Label>
           <Input
             id="title"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="e.g., Full Stack Developer, UI/UX Designer, Content Writer"
+            placeholder="e.g., Senior Frontend Developer, UI/UX Designer"
             className={errors.title ? "border-red-500" : ""}
           />
           {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
-          <p className="text-sm text-gray-500 mt-1">
-            This will be the first thing clients see about you
-          </p>
         </div>
 
         <div>
@@ -246,21 +285,21 @@ const FreelancerBasicInfo = ({ onNext, data }: FreelancerBasicInfoProps) => {
             id="overview"
             value={formData.overview}
             onChange={(e) => setFormData({ ...formData, overview: e.target.value })}
-            placeholder="Describe your experience, skills, and what makes you unique..."
-            rows={6}
+            placeholder="Tell clients about your experience, skills, and what makes you unique. This should be at least 100 characters."
+            rows={4}
             className={errors.overview ? "border-red-500" : ""}
           />
-          <div className="flex justify-between mt-1">
+          <div className="flex justify-between items-center mt-1">
             {errors.overview && <p className="text-red-500 text-sm">{errors.overview}</p>}
-            <p className="text-sm text-gray-500">
-              {formData.overview.length}/1000 characters (minimum 100)
+            <p className="text-sm text-gray-500 ml-auto">
+              {formData.overview?.length || 0}/100 characters
             </p>
           </div>
         </div>
 
-        <Button type="submit" className="w-full" size="lg">
+        <Button type="submit" className="w-full" disabled={uploading}>
           Continue
-          <ArrowRight className="ml-2 h-5 w-5" />
+          <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </form>
     </div>

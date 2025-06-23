@@ -1,0 +1,18 @@
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "averageProjectDuration" TEXT,
+ADD COLUMN     "communicationPreference" TEXT[],
+ADD COLUMN     "hoursPerWeek" TEXT,
+ADD COLUMN     "interestedCategories" TEXT[],
+ADD COLUMN     "maxHourlyRate" TEXT,
+ADD COLUMN     "minimumProjectBudget" TEXT,
+ADD COLUMN     "paymentPreference" TEXT,
+ADD COLUMN     "preferredWorkingStyle" TEXT,
+ADD COLUMN     "projectBasedRates" JSONB,
+ADD COLUMN     "projectDescription" TEXT,
+ADD COLUMN     "projectFrequency" TEXT,
+ADD COLUMN     "responseTime" TEXT,
+ADD COLUMN     "specialRequirements" TEXT,
+ADD COLUMN     "totalMonthlyBudget" TEXT,
+ADD COLUMN     "urgencyLevel" TEXT,
+ADD COLUMN     "workingDays" TEXT[],
+ADD COLUMN     "workingHours" JSONB;

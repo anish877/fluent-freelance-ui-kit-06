@@ -160,7 +160,13 @@ const FreelancerSkillsExperience = ({ onNext, data }: FreelancerSkillsExperience
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        skills: formData.skills,
+        topSkills: formData.topSkills,
+        serviceOfferings: formData.serviceOfferings
+      };
+      onNext(mappedData);
     }
   };
 

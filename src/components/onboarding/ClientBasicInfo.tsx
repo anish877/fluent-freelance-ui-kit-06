@@ -75,7 +75,20 @@ const ClientBasicInfo = ({ onNext, data }: ClientBasicInfoProps) => {
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+        city: formData.city,
+        timezone: formData.timezone,
+        profilePhoto: formData.profilePhoto,
+        clientType: formData.clientType,
+        howDidYouHear: formData.howDidYouHear
+      };
+      onNext(mappedData);
     }
   };
 

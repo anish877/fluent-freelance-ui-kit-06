@@ -637,4 +637,233 @@ router.put('/complete', protect, (async (req: AuthRequest, res: Response): Promi
   }
 }) as RequestHandler);
 
+// @desc    Complete onboarding with all data from localStorage
+// @route   POST /api/onboarding/complete-with-data
+// @access  Public (no auth required)
+router.post('/complete-with-data', [
+  body('userType').isIn(['FREELANCER', 'CLIENT']).withMessage('Invalid user type'),
+  body('firstName').notEmpty().withMessage('First name is required'),
+  body('lastName').notEmpty().withMessage('Last name is required'),
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], (async (req: Request, res: Response): Promise<void> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log('Validation errors:', errors.array());
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  try {
+    console.log('Received onboarding data:', JSON.stringify(req.body, null, 2));
+    
+    const {
+      userType,
+      firstName,
+      lastName,
+      email,
+      password,
+      phone,
+      country,
+      city,
+      timezone,
+      profilePhoto,
+      title,
+      overview,
+      
+      // Freelancer specific fields
+      category,
+      subcategory,
+      experienceLevel,
+      workExperience,
+      education,
+      certifications,
+      languages,
+      skills,
+      topSkills,
+      serviceOfferings,
+      portfolio,
+      socialLinks,
+      hourlyRate,
+      availability,
+      
+      // Additional freelancer fields
+      projectBasedRates,
+      hoursPerWeek,
+      workingHours,
+      workingDays,
+      responseTime,
+      minimumProjectBudget,
+      specialRequirements,
+      
+      // Client specific fields
+      clientType,
+      howDidYouHear,
+      companyName,
+      companySize,
+      industry,
+      companyWebsite,
+      companyDescription,
+      projectTypes,
+      preferredSkills,
+      budgetRange,
+      
+      // Additional client fields
+      interestedCategories,
+      urgencyLevel,
+      preferredWorkingStyle,
+      communicationPreference,
+      projectDescription,
+      paymentPreference,
+      projectFrequency,
+      averageProjectDuration,
+      maxHourlyRate,
+      totalMonthlyBudget
+    } = req.body;
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      console.log('User already exists:', email);
+      res.status(400).json({ message: 'User with this email already exists' });
+      return;
+    }
+
+    // Hash password using the same method as auth route
+    const crypto = require('crypto');
+    const hashPassword = (password: string): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const salt = crypto.randomBytes(16).toString('hex');
+        crypto.scrypt(password, salt, 64, (err: any, derivedKey: any) => {
+          if (err) reject(err);
+          resolve(salt + ':' + derivedKey.toString('hex'));
+        });
+      });
+    };
+    
+    const hashedPassword = await hashPassword(password);
+    console.log('Password hashed successfully');
+
+    // Create user with all onboarding data
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        avatar: profilePhoto,
+        phone,
+        country,
+        city,
+        timezone,
+        title,
+        overview,
+        userType,
+        isOnboarded: true,
+        onboardingStep: userType === 'FREELANCER' ? 8 : 7,
+        
+        // Freelancer fields
+        category,
+        subcategory,
+        experienceLevel,
+        workExperience: workExperience || [],
+        education: education || [],
+        certifications: certifications || [],
+        languages: languages || [],
+        skills,
+        topSkills: topSkills || [],
+        serviceOfferings: serviceOfferings || [],
+        portfolio,
+        socialLinks,
+        hourlyRate: hourlyRate ? parseFloat(hourlyRate.toString()) : null,
+        availability,
+        
+        // Additional freelancer fields
+        projectBasedRates,
+        hoursPerWeek,
+        workingHours,
+        workingDays: workingDays || [],
+        responseTime,
+        minimumProjectBudget,
+        specialRequirements,
+        
+        // Client fields
+        clientType,
+        howDidYouHear,
+        companyName,
+        companySize,
+        industry,
+        companyWebsite,
+        companyDescription,
+        projectTypes: projectTypes || [],
+        preferredSkills: preferredSkills || [],
+        budgetRange,
+        
+        // Additional client fields
+        interestedCategories: interestedCategories || [],
+        urgencyLevel,
+        preferredWorkingStyle,
+        communicationPreference: communicationPreference || [],
+        projectDescription,
+        paymentPreference,
+        projectFrequency,
+        averageProjectDuration,
+        maxHourlyRate,
+        totalMonthlyBudget
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        userType: true,
+        isOnboarded: true,
+        onboardingStep: true,
+        avatar: true,
+        title: true,
+        overview: true,
+        skills: true,
+        hourlyRate: true,
+        portfolio: true,
+        companyName: true,
+        companySize: true,
+        industry: true
+      }
+    });
+
+    console.log('User created successfully:', user.id);
+
+    // Generate JWT token
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET!,
+      { expiresIn: '30d' }
+    );
+
+    console.log('JWT token generated');
+
+    // Set cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    });
+
+    res.status(201).json({
+      success: true,
+      data: user,
+      token
+    });
+  } catch (error) {
+    console.error('Error in complete-with-data:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    res.status(500).json({ message: 'Server error', details: error instanceof Error ? error.message : 'Unknown error' });
+  }
+}) as RequestHandler);
+
 export default router; 

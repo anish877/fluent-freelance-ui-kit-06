@@ -1,94 +1,88 @@
 # Fluent Freelance Backend API
 
-A robust TypeScript backend API for the Fluent Freelance platform, built with Express.js, Prisma ORM, and PostgreSQL.
+A comprehensive backend API for the Fluent Freelance platform built with Node.js, Express, TypeScript, and Prisma.
 
-## 🚀 Features
+## Features
 
-- **User Authentication & Authorization** - JWT-based authentication with role-based access control
-- **Job Management** - Full CRUD operations for job postings
-- **Proposal System** - Freelancers can submit proposals, clients can accept/reject
-- **Messaging System** - Real-time communication between users
-- **Notification System** - User notifications for various events
-- **Review System** - User reviews and ratings
-- **Advanced Filtering** - Search and filter jobs, users, and proposals
-- **Pagination** - Efficient data pagination for all endpoints
-- **Input Validation** - Comprehensive request validation
-- **Error Handling** - Centralized error handling with proper HTTP status codes
-- **Rate Limiting** - API rate limiting for security
-- **CORS Support** - Cross-origin resource sharing configuration
+- 🔐 **Authentication & Authorization** - JWT-based auth with role-based access
+- 👥 **User Management** - Complete user profiles for freelancers and clients
+- 💼 **Job Management** - Post, browse, and manage freelance jobs
+- 📝 **Proposal System** - Submit and manage job proposals
+- 💬 **Messaging System** - Real-time messaging between users
+- 🔔 **Notifications** - Real-time notifications for platform activities
+- 📊 **Onboarding Flow** - Multi-step onboarding process with localStorage persistence
+- 📁 **File Upload** - Cloudinary integration for images and PDFs
+- 🗄️ **Database** - PostgreSQL with Prisma ORM
 
-## 🛠 Tech Stack
+## Prerequisites
 
-- **Runtime**: Node.js with TypeScript
-- **Framework**: Express.js
-- **Database**: PostgreSQL (Neon)
-- **ORM**: Prisma
-- **Authentication**: JWT with bcryptjs
-- **Validation**: express-validator
-- **Security**: Helmet, CORS, Rate Limiting
-- **Development**: Nodemon, ts-node
+- Node.js (v18 or higher)
+- pnpm
+- PostgreSQL database (Neon recommended)
+- Cloudinary account for file uploads
 
-## 📋 Prerequisites
+## Installation
 
-- Node.js (v16 or higher)
-- npm or yarn
-- PostgreSQL database (Neon)
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd fluent-freelance-ui-kit-06/backend
+   ```
 
-## 🚀 Quick Start
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
 
-### 1. Install Dependencies
+3. **Set up environment variables**
+   Create a `.env` file in the backend directory with the following variables:
+   ```env
+   # Database
+   DATABASE_URL="postgresql://your-neon-connection-string-here"
+   
+   # JWT
+   JWT_SECRET="your-super-secret-jwt-key-here"
+   JWT_EXPIRES_IN="30d"
+   
+   # Server
+   PORT=5000
+   NODE_ENV=development
+   
+   # CORS
+   CORS_ORIGIN="http://localhost:3000"
+   
+   # Cloudinary Configuration
+   CLOUDINARY_CLOUD_NAME="your-cloud-name"
+   CLOUDINARY_API_KEY="your-api-key"
+   CLOUDINARY_API_SECRET="your-api-secret"
+   ```
 
-```bash
-npm install
-```
+4. **Set up Cloudinary**
+   - Sign up at [Cloudinary](https://cloudinary.com/)
+   - Get your Cloud Name, API Key, and API Secret from your dashboard
+   - Add them to your `.env` file
 
-### 2. Environment Setup
+5. **Database setup**
+   ```bash
+   # Generate Prisma client
+   pnpm prisma generate
+   
+   # Push schema to database
+   pnpm prisma db push
+   ```
 
-Create a `.env` file in the root directory:
+6. **Start the development server**
+   ```bash
+   pnpm run dev
+   ```
 
-```env
-# Database
-DATABASE_URL="postgresql://neondb_owner:npg_3EFX1TORxVHw@ep-spring-smoke-a860gitf-pooler.eastus2.azure.neon.tech/neondb?sslmode=require"
-
-# Server
-PORT=5000
-NODE_ENV=development
-
-# JWT
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRES_IN=7d
-
-# CORS
-CORS_ORIGIN=http://localhost:3000
-```
-
-### 3. Database Setup
-
-```bash
-# Generate Prisma client
-npm run db:generate
-
-# Push schema to database
-npm run db:push
-
-# (Optional) Run migrations
-npm run db:migrate
-```
-
-### 4. Start Development Server
-
-```bash
-npm run dev
-```
-
-The API will be available at `http://localhost:5000`
-
-## 📚 API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
+- `POST /api/auth/login` - Login user
 - `GET /api/auth/me` - Get current user
+- `POST /api/auth/logout` - Logout user
 
 ### Users
 - `GET /api/users` - Get all users (with filters)
@@ -98,78 +92,156 @@ The API will be available at `http://localhost:5000`
 
 ### Jobs
 - `GET /api/jobs` - Get all jobs (with filters)
+- `POST /api/jobs` - Create new job
 - `GET /api/jobs/:id` - Get job by ID
-- `POST /api/jobs` - Create new job (Clients only)
-- `PUT /api/jobs/:id` - Update job (Job owner only)
-- `DELETE /api/jobs/:id` - Delete job (Job owner only)
-- `GET /api/jobs/client/me` - Get jobs by current client
+- `PUT /api/jobs/:id` - Update job
+- `DELETE /api/jobs/:id` - Delete job
 
 ### Proposals
-- `GET /api/proposals/job/:jobId` - Get proposals for a job
-- `GET /api/proposals/freelancer/me` - Get proposals by current freelancer
-- `POST /api/proposals` - Submit proposal (Freelancers only)
-- `PUT /api/proposals/:id/status` - Update proposal status (Job owner only)
-- `PUT /api/proposals/:id/withdraw` - Withdraw proposal (Proposal owner only)
+- `GET /api/proposals` - Get proposals (with filters)
+- `POST /api/proposals` - Submit proposal
+- `GET /api/proposals/:id` - Get proposal by ID
+- `PUT /api/proposals/:id` - Update proposal status
 
 ### Messages
-- `GET /api/messages/conversations` - Get user conversations
-- `GET /api/messages/conversation/:userId` - Get messages with specific user
+- `GET /api/messages` - Get conversations
 - `POST /api/messages` - Send message
-- `PUT /api/messages/read` - Mark messages as read
-- `GET /api/messages/unread-count` - Get unread message count
+- `GET /api/messages/:conversationId` - Get conversation messages
 
 ### Notifications
 - `GET /api/notifications` - Get user notifications
 - `PUT /api/notifications/:id/read` - Mark notification as read
-- `PUT /api/notifications/read-all` - Mark all notifications as read
-- `GET /api/notifications/unread-count` - Get unread notification count
-- `DELETE /api/notifications/:id` - Delete notification
-- `DELETE /api/notifications` - Delete all notifications
 
-## 🗄 Database Schema
+### Onboarding
+- `GET /api/onboarding/progress` - Get onboarding progress
+- `PUT /api/onboarding/user-type` - Update user type
+- `PUT /api/onboarding/freelancer/basic` - Update freelancer basic info
+- `PUT /api/onboarding/freelancer/professional` - Update freelancer professional info
+- `PUT /api/onboarding/freelancer/skills` - Update freelancer skills
+- `PUT /api/onboarding/freelancer/portfolio` - Update freelancer portfolio
+- `PUT /api/onboarding/freelancer/rates` - Update freelancer rates
+- `PUT /api/onboarding/freelancer/verification` - Update freelancer verification
+- `PUT /api/onboarding/client/basic` - Update client basic info
+- `PUT /api/onboarding/client/company` - Update client company info
+- `PUT /api/onboarding/client/projects` - Update client project needs
+- `PUT /api/onboarding/client/budget` - Update client budget
+- `PUT /api/onboarding/client/verification` - Update client verification
+- `PUT /api/onboarding/complete` - Complete onboarding
+- `POST /api/onboarding/complete-with-data` - Complete onboarding with all data (public)
 
-The database includes the following main entities:
+### File Upload
+- `POST /api/upload/single` - Upload single file
+- `POST /api/upload/multiple` - Upload multiple files
+- `DELETE /api/upload/:publicId` - Delete file from Cloudinary
 
-- **Users** - Freelancers and clients with profile information
-- **Jobs** - Job postings with requirements and budget
-- **Proposals** - Freelancer proposals for jobs
-- **Reviews** - User reviews and ratings
-- **Messages** - Communication between users
-- **Notifications** - User notifications
+## File Upload Features
 
-## 🔧 Available Scripts
+The API includes comprehensive file upload functionality using Cloudinary:
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build TypeScript to JavaScript
-- `npm run start` - Start production server
-- `npm run db:generate` - Generate Prisma client
-- `npm run db:push` - Push schema changes to database
-- `npm run db:migrate` - Run database migrations
-- `npm run db:studio` - Open Prisma Studio
-- `npm run db:seed` - Seed database with sample data
+### Supported File Types
+- **Images**: JPG, PNG, GIF, WebP, SVG
+- **Documents**: PDF
+- **Size Limit**: 10MB per file
 
-## 🔒 Security Features
+### Upload Endpoints
+- **Single File Upload**: `POST /api/upload/single`
+  - Form field: `file`
+  - Returns: Cloudinary URL and metadata
 
-- JWT-based authentication
-- Password hashing with bcrypt
-- Role-based access control
-- Input validation and sanitization
-- Rate limiting
-- CORS configuration
-- Helmet security headers
+- **Multiple Files Upload**: `POST /api/upload/multiple`
+  - Form field: `files` (array)
+  - Returns: Array of Cloudinary URLs and metadata
 
-## 📝 Environment Variables
+- **File Deletion**: `DELETE /api/upload/:publicId`
+  - Deletes file from Cloudinary
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | Required |
-| `PORT` | Server port | 5000 |
-| `NODE_ENV` | Environment mode | development |
-| `JWT_SECRET` | JWT signing secret | Required |
-| `JWT_EXPIRES_IN` | JWT expiration time | 7d |
-| `CORS_ORIGIN` | Allowed CORS origin | http://localhost:3000 |
+### Usage in Frontend
+```javascript
+// Single file upload
+const formData = new FormData();
+formData.append('file', file);
 
-## 🤝 Contributing
+const response = await fetch('/api/upload/single', {
+  method: 'POST',
+  body: formData
+});
+
+const result = await response.json();
+// result.data.url contains the Cloudinary URL
+```
+
+## Onboarding Flow
+
+The onboarding system supports both authenticated and unauthenticated users:
+
+### For Unauthenticated Users
+1. **localStorage Storage**: All data is stored in localStorage
+2. **Resume Capability**: Users can leave and return to continue
+3. **Final Account Creation**: Password is collected on the last step
+4. **Complete Data Transfer**: All onboarding data is saved to database
+
+### For Authenticated Users
+1. **Database Storage**: Data is saved directly to database
+2. **Progress Tracking**: Backend tracks current step
+3. **Immediate Updates**: Changes are saved in real-time
+
+## Development
+
+### Scripts
+- `pnpm run dev` - Start development server with hot reload
+- `pnpm run build` - Build for production
+- `pnpm run start` - Start production server
+- `pnpm prisma studio` - Open Prisma Studio
+- `pnpm prisma generate` - Generate Prisma client
+- `pnpm prisma db push` - Push schema to database
+
+### Database Management
+```bash
+# Generate Prisma client after schema changes
+pnpm prisma generate
+
+# Push schema changes to database
+pnpm prisma db push
+
+# Create a new migration
+pnpm prisma migrate dev --name migration_name
+
+# Reset database (development only)
+pnpm prisma migrate reset
+```
+
+## Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `JWT_SECRET` | Secret key for JWT tokens | Yes |
+| `JWT_EXPIRES_IN` | JWT token expiration time | No (default: 7d) |
+| `PORT` | Server port | No (default: 5000) |
+| `NODE_ENV` | Environment mode | No (default: development) |
+| `CORS_ORIGIN` | Allowed CORS origin | No (default: http://localhost:3000) |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | Yes |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | Yes |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Yes |
+
+## Security Features
+
+- **JWT Authentication** - Secure token-based authentication
+- **Password Hashing** - bcrypt-based password security
+- **CORS Protection** - Configurable cross-origin requests
+- **Rate Limiting** - Request rate limiting
+- **Input Validation** - Express-validator for request validation
+- **Helmet** - Security headers middleware
+
+## Error Handling
+
+The API includes comprehensive error handling:
+- **Validation Errors** - Detailed validation error messages
+- **Authentication Errors** - Proper 401/403 responses
+- **Database Errors** - Graceful database error handling
+- **File Upload Errors** - Upload validation and error responses
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -177,6 +249,6 @@ The database includes the following main entities:
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## License
 
-This project is licensed under the ISC License. 
+This project is licensed under the MIT License. 

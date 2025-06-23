@@ -1709,6 +1709,18 @@ export namespace Prisma {
     budgetRange: string | null
     clientType: string | null
     howDidYouHear: string | null
+    urgencyLevel: string | null
+    preferredWorkingStyle: string | null
+    projectDescription: string | null
+    paymentPreference: string | null
+    projectFrequency: string | null
+    averageProjectDuration: string | null
+    maxHourlyRate: string | null
+    totalMonthlyBudget: string | null
+    hoursPerWeek: string | null
+    responseTime: string | null
+    minimumProjectBudget: string | null
+    specialRequirements: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1746,6 +1758,18 @@ export namespace Prisma {
     budgetRange: string | null
     clientType: string | null
     howDidYouHear: string | null
+    urgencyLevel: string | null
+    preferredWorkingStyle: string | null
+    projectDescription: string | null
+    paymentPreference: string | null
+    projectFrequency: string | null
+    averageProjectDuration: string | null
+    maxHourlyRate: string | null
+    totalMonthlyBudget: string | null
+    hoursPerWeek: string | null
+    responseTime: string | null
+    minimumProjectBudget: string | null
+    specialRequirements: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -1793,6 +1817,23 @@ export namespace Prisma {
     budgetRange: number
     clientType: number
     howDidYouHear: number
+    interestedCategories: number
+    urgencyLevel: number
+    preferredWorkingStyle: number
+    communicationPreference: number
+    projectDescription: number
+    paymentPreference: number
+    projectFrequency: number
+    averageProjectDuration: number
+    maxHourlyRate: number
+    totalMonthlyBudget: number
+    projectBasedRates: number
+    hoursPerWeek: number
+    workingHours: number
+    workingDays: number
+    responseTime: number
+    minimumProjectBudget: number
+    specialRequirements: number
     _all: number
   }
 
@@ -1842,6 +1883,18 @@ export namespace Prisma {
     budgetRange?: true
     clientType?: true
     howDidYouHear?: true
+    urgencyLevel?: true
+    preferredWorkingStyle?: true
+    projectDescription?: true
+    paymentPreference?: true
+    projectFrequency?: true
+    averageProjectDuration?: true
+    maxHourlyRate?: true
+    totalMonthlyBudget?: true
+    hoursPerWeek?: true
+    responseTime?: true
+    minimumProjectBudget?: true
+    specialRequirements?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1879,6 +1932,18 @@ export namespace Prisma {
     budgetRange?: true
     clientType?: true
     howDidYouHear?: true
+    urgencyLevel?: true
+    preferredWorkingStyle?: true
+    projectDescription?: true
+    paymentPreference?: true
+    projectFrequency?: true
+    averageProjectDuration?: true
+    maxHourlyRate?: true
+    totalMonthlyBudget?: true
+    hoursPerWeek?: true
+    responseTime?: true
+    minimumProjectBudget?: true
+    specialRequirements?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1926,6 +1991,23 @@ export namespace Prisma {
     budgetRange?: true
     clientType?: true
     howDidYouHear?: true
+    interestedCategories?: true
+    urgencyLevel?: true
+    preferredWorkingStyle?: true
+    communicationPreference?: true
+    projectDescription?: true
+    paymentPreference?: true
+    projectFrequency?: true
+    averageProjectDuration?: true
+    maxHourlyRate?: true
+    totalMonthlyBudget?: true
+    projectBasedRates?: true
+    hoursPerWeek?: true
+    workingHours?: true
+    workingDays?: true
+    responseTime?: true
+    minimumProjectBudget?: true
+    specialRequirements?: true
     _all?: true
   }
 
@@ -2060,6 +2142,23 @@ export namespace Prisma {
     budgetRange: string | null
     clientType: string | null
     howDidYouHear: string | null
+    interestedCategories: string[]
+    urgencyLevel: string | null
+    preferredWorkingStyle: string | null
+    communicationPreference: string[]
+    projectDescription: string | null
+    paymentPreference: string | null
+    projectFrequency: string | null
+    averageProjectDuration: string | null
+    maxHourlyRate: string | null
+    totalMonthlyBudget: string | null
+    projectBasedRates: JsonValue | null
+    hoursPerWeek: string | null
+    workingHours: JsonValue | null
+    workingDays: string[]
+    responseTime: string | null
+    minimumProjectBudget: string | null
+    specialRequirements: string | null
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -2126,6 +2225,23 @@ export namespace Prisma {
     budgetRange?: boolean
     clientType?: boolean
     howDidYouHear?: boolean
+    interestedCategories?: boolean
+    urgencyLevel?: boolean
+    preferredWorkingStyle?: boolean
+    communicationPreference?: boolean
+    projectDescription?: boolean
+    paymentPreference?: boolean
+    projectFrequency?: boolean
+    averageProjectDuration?: boolean
+    maxHourlyRate?: boolean
+    totalMonthlyBudget?: boolean
+    projectBasedRates?: boolean
+    hoursPerWeek?: boolean
+    workingHours?: boolean
+    workingDays?: boolean
+    responseTime?: boolean
+    minimumProjectBudget?: boolean
+    specialRequirements?: boolean
     jobsPosted?: boolean | User$jobsPostedArgs<ExtArgs>
     proposals?: boolean | User$proposalsArgs<ExtArgs>
     reviews?: boolean | User$reviewsArgs<ExtArgs>
@@ -2181,6 +2297,23 @@ export namespace Prisma {
     budgetRange?: boolean
     clientType?: boolean
     howDidYouHear?: boolean
+    interestedCategories?: boolean
+    urgencyLevel?: boolean
+    preferredWorkingStyle?: boolean
+    communicationPreference?: boolean
+    projectDescription?: boolean
+    paymentPreference?: boolean
+    projectFrequency?: boolean
+    averageProjectDuration?: boolean
+    maxHourlyRate?: boolean
+    totalMonthlyBudget?: boolean
+    projectBasedRates?: boolean
+    hoursPerWeek?: boolean
+    workingHours?: boolean
+    workingDays?: boolean
+    responseTime?: boolean
+    minimumProjectBudget?: boolean
+    specialRequirements?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2228,6 +2361,23 @@ export namespace Prisma {
     budgetRange?: boolean
     clientType?: boolean
     howDidYouHear?: boolean
+    interestedCategories?: boolean
+    urgencyLevel?: boolean
+    preferredWorkingStyle?: boolean
+    communicationPreference?: boolean
+    projectDescription?: boolean
+    paymentPreference?: boolean
+    projectFrequency?: boolean
+    averageProjectDuration?: boolean
+    maxHourlyRate?: boolean
+    totalMonthlyBudget?: boolean
+    projectBasedRates?: boolean
+    hoursPerWeek?: boolean
+    workingHours?: boolean
+    workingDays?: boolean
+    responseTime?: boolean
+    minimumProjectBudget?: boolean
+    specialRequirements?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -2275,9 +2425,26 @@ export namespace Prisma {
     budgetRange?: boolean
     clientType?: boolean
     howDidYouHear?: boolean
+    interestedCategories?: boolean
+    urgencyLevel?: boolean
+    preferredWorkingStyle?: boolean
+    communicationPreference?: boolean
+    projectDescription?: boolean
+    paymentPreference?: boolean
+    projectFrequency?: boolean
+    averageProjectDuration?: boolean
+    maxHourlyRate?: boolean
+    totalMonthlyBudget?: boolean
+    projectBasedRates?: boolean
+    hoursPerWeek?: boolean
+    workingHours?: boolean
+    workingDays?: boolean
+    responseTime?: boolean
+    minimumProjectBudget?: boolean
+    specialRequirements?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "responseTime" | "minimumProjectBudget" | "specialRequirements", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     jobsPosted?: boolean | User$jobsPostedArgs<ExtArgs>
     proposals?: boolean | User$proposalsArgs<ExtArgs>
@@ -2347,6 +2514,23 @@ export namespace Prisma {
       budgetRange: string | null
       clientType: string | null
       howDidYouHear: string | null
+      interestedCategories: string[]
+      urgencyLevel: string | null
+      preferredWorkingStyle: string | null
+      communicationPreference: string[]
+      projectDescription: string | null
+      paymentPreference: string | null
+      projectFrequency: string | null
+      averageProjectDuration: string | null
+      maxHourlyRate: string | null
+      totalMonthlyBudget: string | null
+      projectBasedRates: Prisma.JsonValue | null
+      hoursPerWeek: string | null
+      workingHours: Prisma.JsonValue | null
+      workingDays: string[]
+      responseTime: string | null
+      minimumProjectBudget: string | null
+      specialRequirements: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2821,6 +3005,23 @@ export namespace Prisma {
     readonly budgetRange: FieldRef<"User", 'String'>
     readonly clientType: FieldRef<"User", 'String'>
     readonly howDidYouHear: FieldRef<"User", 'String'>
+    readonly interestedCategories: FieldRef<"User", 'String[]'>
+    readonly urgencyLevel: FieldRef<"User", 'String'>
+    readonly preferredWorkingStyle: FieldRef<"User", 'String'>
+    readonly communicationPreference: FieldRef<"User", 'String[]'>
+    readonly projectDescription: FieldRef<"User", 'String'>
+    readonly paymentPreference: FieldRef<"User", 'String'>
+    readonly projectFrequency: FieldRef<"User", 'String'>
+    readonly averageProjectDuration: FieldRef<"User", 'String'>
+    readonly maxHourlyRate: FieldRef<"User", 'String'>
+    readonly totalMonthlyBudget: FieldRef<"User", 'String'>
+    readonly projectBasedRates: FieldRef<"User", 'Json'>
+    readonly hoursPerWeek: FieldRef<"User", 'String'>
+    readonly workingHours: FieldRef<"User", 'Json'>
+    readonly workingDays: FieldRef<"User", 'String[]'>
+    readonly responseTime: FieldRef<"User", 'String'>
+    readonly minimumProjectBudget: FieldRef<"User", 'String'>
+    readonly specialRequirements: FieldRef<"User", 'String'>
   }
     
 
@@ -10484,7 +10685,24 @@ export namespace Prisma {
     preferredSkills: 'preferredSkills',
     budgetRange: 'budgetRange',
     clientType: 'clientType',
-    howDidYouHear: 'howDidYouHear'
+    howDidYouHear: 'howDidYouHear',
+    interestedCategories: 'interestedCategories',
+    urgencyLevel: 'urgencyLevel',
+    preferredWorkingStyle: 'preferredWorkingStyle',
+    communicationPreference: 'communicationPreference',
+    projectDescription: 'projectDescription',
+    paymentPreference: 'paymentPreference',
+    projectFrequency: 'projectFrequency',
+    averageProjectDuration: 'averageProjectDuration',
+    maxHourlyRate: 'maxHourlyRate',
+    totalMonthlyBudget: 'totalMonthlyBudget',
+    projectBasedRates: 'projectBasedRates',
+    hoursPerWeek: 'hoursPerWeek',
+    workingHours: 'workingHours',
+    workingDays: 'workingDays',
+    responseTime: 'responseTime',
+    minimumProjectBudget: 'minimumProjectBudget',
+    specialRequirements: 'specialRequirements'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -10828,6 +11046,23 @@ export namespace Prisma {
     budgetRange?: StringNullableFilter<"User"> | string | null
     clientType?: StringNullableFilter<"User"> | string | null
     howDidYouHear?: StringNullableFilter<"User"> | string | null
+    interestedCategories?: StringNullableListFilter<"User">
+    urgencyLevel?: StringNullableFilter<"User"> | string | null
+    preferredWorkingStyle?: StringNullableFilter<"User"> | string | null
+    communicationPreference?: StringNullableListFilter<"User">
+    projectDescription?: StringNullableFilter<"User"> | string | null
+    paymentPreference?: StringNullableFilter<"User"> | string | null
+    projectFrequency?: StringNullableFilter<"User"> | string | null
+    averageProjectDuration?: StringNullableFilter<"User"> | string | null
+    maxHourlyRate?: StringNullableFilter<"User"> | string | null
+    totalMonthlyBudget?: StringNullableFilter<"User"> | string | null
+    projectBasedRates?: JsonNullableFilter<"User">
+    hoursPerWeek?: StringNullableFilter<"User"> | string | null
+    workingHours?: JsonNullableFilter<"User">
+    workingDays?: StringNullableListFilter<"User">
+    responseTime?: StringNullableFilter<"User"> | string | null
+    minimumProjectBudget?: StringNullableFilter<"User"> | string | null
+    specialRequirements?: StringNullableFilter<"User"> | string | null
     jobsPosted?: JobListRelationFilter
     proposals?: ProposalListRelationFilter
     reviews?: ReviewListRelationFilter
@@ -10882,6 +11117,23 @@ export namespace Prisma {
     budgetRange?: SortOrderInput | SortOrder
     clientType?: SortOrderInput | SortOrder
     howDidYouHear?: SortOrderInput | SortOrder
+    interestedCategories?: SortOrder
+    urgencyLevel?: SortOrderInput | SortOrder
+    preferredWorkingStyle?: SortOrderInput | SortOrder
+    communicationPreference?: SortOrder
+    projectDescription?: SortOrderInput | SortOrder
+    paymentPreference?: SortOrderInput | SortOrder
+    projectFrequency?: SortOrderInput | SortOrder
+    averageProjectDuration?: SortOrderInput | SortOrder
+    maxHourlyRate?: SortOrderInput | SortOrder
+    totalMonthlyBudget?: SortOrderInput | SortOrder
+    projectBasedRates?: SortOrderInput | SortOrder
+    hoursPerWeek?: SortOrderInput | SortOrder
+    workingHours?: SortOrderInput | SortOrder
+    workingDays?: SortOrder
+    responseTime?: SortOrderInput | SortOrder
+    minimumProjectBudget?: SortOrderInput | SortOrder
+    specialRequirements?: SortOrderInput | SortOrder
     jobsPosted?: JobOrderByRelationAggregateInput
     proposals?: ProposalOrderByRelationAggregateInput
     reviews?: ReviewOrderByRelationAggregateInput
@@ -10939,6 +11191,23 @@ export namespace Prisma {
     budgetRange?: StringNullableFilter<"User"> | string | null
     clientType?: StringNullableFilter<"User"> | string | null
     howDidYouHear?: StringNullableFilter<"User"> | string | null
+    interestedCategories?: StringNullableListFilter<"User">
+    urgencyLevel?: StringNullableFilter<"User"> | string | null
+    preferredWorkingStyle?: StringNullableFilter<"User"> | string | null
+    communicationPreference?: StringNullableListFilter<"User">
+    projectDescription?: StringNullableFilter<"User"> | string | null
+    paymentPreference?: StringNullableFilter<"User"> | string | null
+    projectFrequency?: StringNullableFilter<"User"> | string | null
+    averageProjectDuration?: StringNullableFilter<"User"> | string | null
+    maxHourlyRate?: StringNullableFilter<"User"> | string | null
+    totalMonthlyBudget?: StringNullableFilter<"User"> | string | null
+    projectBasedRates?: JsonNullableFilter<"User">
+    hoursPerWeek?: StringNullableFilter<"User"> | string | null
+    workingHours?: JsonNullableFilter<"User">
+    workingDays?: StringNullableListFilter<"User">
+    responseTime?: StringNullableFilter<"User"> | string | null
+    minimumProjectBudget?: StringNullableFilter<"User"> | string | null
+    specialRequirements?: StringNullableFilter<"User"> | string | null
     jobsPosted?: JobListRelationFilter
     proposals?: ProposalListRelationFilter
     reviews?: ReviewListRelationFilter
@@ -10993,6 +11262,23 @@ export namespace Prisma {
     budgetRange?: SortOrderInput | SortOrder
     clientType?: SortOrderInput | SortOrder
     howDidYouHear?: SortOrderInput | SortOrder
+    interestedCategories?: SortOrder
+    urgencyLevel?: SortOrderInput | SortOrder
+    preferredWorkingStyle?: SortOrderInput | SortOrder
+    communicationPreference?: SortOrder
+    projectDescription?: SortOrderInput | SortOrder
+    paymentPreference?: SortOrderInput | SortOrder
+    projectFrequency?: SortOrderInput | SortOrder
+    averageProjectDuration?: SortOrderInput | SortOrder
+    maxHourlyRate?: SortOrderInput | SortOrder
+    totalMonthlyBudget?: SortOrderInput | SortOrder
+    projectBasedRates?: SortOrderInput | SortOrder
+    hoursPerWeek?: SortOrderInput | SortOrder
+    workingHours?: SortOrderInput | SortOrder
+    workingDays?: SortOrder
+    responseTime?: SortOrderInput | SortOrder
+    minimumProjectBudget?: SortOrderInput | SortOrder
+    specialRequirements?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -11048,6 +11334,23 @@ export namespace Prisma {
     budgetRange?: StringNullableWithAggregatesFilter<"User"> | string | null
     clientType?: StringNullableWithAggregatesFilter<"User"> | string | null
     howDidYouHear?: StringNullableWithAggregatesFilter<"User"> | string | null
+    interestedCategories?: StringNullableListFilter<"User">
+    urgencyLevel?: StringNullableWithAggregatesFilter<"User"> | string | null
+    preferredWorkingStyle?: StringNullableWithAggregatesFilter<"User"> | string | null
+    communicationPreference?: StringNullableListFilter<"User">
+    projectDescription?: StringNullableWithAggregatesFilter<"User"> | string | null
+    paymentPreference?: StringNullableWithAggregatesFilter<"User"> | string | null
+    projectFrequency?: StringNullableWithAggregatesFilter<"User"> | string | null
+    averageProjectDuration?: StringNullableWithAggregatesFilter<"User"> | string | null
+    maxHourlyRate?: StringNullableWithAggregatesFilter<"User"> | string | null
+    totalMonthlyBudget?: StringNullableWithAggregatesFilter<"User"> | string | null
+    projectBasedRates?: JsonNullableWithAggregatesFilter<"User">
+    hoursPerWeek?: StringNullableWithAggregatesFilter<"User"> | string | null
+    workingHours?: JsonNullableWithAggregatesFilter<"User">
+    workingDays?: StringNullableListFilter<"User">
+    responseTime?: StringNullableWithAggregatesFilter<"User"> | string | null
+    minimumProjectBudget?: StringNullableWithAggregatesFilter<"User"> | string | null
+    specialRequirements?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type JobWhereInput = {
@@ -11604,6 +11907,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -11658,6 +11978,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -11712,6 +12049,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -11766,6 +12120,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -11820,6 +12191,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -11867,6 +12255,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -11914,6 +12319,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type JobCreateInput = {
@@ -12662,6 +13084,23 @@ export namespace Prisma {
     budgetRange?: SortOrder
     clientType?: SortOrder
     howDidYouHear?: SortOrder
+    interestedCategories?: SortOrder
+    urgencyLevel?: SortOrder
+    preferredWorkingStyle?: SortOrder
+    communicationPreference?: SortOrder
+    projectDescription?: SortOrder
+    paymentPreference?: SortOrder
+    projectFrequency?: SortOrder
+    averageProjectDuration?: SortOrder
+    maxHourlyRate?: SortOrder
+    totalMonthlyBudget?: SortOrder
+    projectBasedRates?: SortOrder
+    hoursPerWeek?: SortOrder
+    workingHours?: SortOrder
+    workingDays?: SortOrder
+    responseTime?: SortOrder
+    minimumProjectBudget?: SortOrder
+    specialRequirements?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -12704,6 +13143,18 @@ export namespace Prisma {
     budgetRange?: SortOrder
     clientType?: SortOrder
     howDidYouHear?: SortOrder
+    urgencyLevel?: SortOrder
+    preferredWorkingStyle?: SortOrder
+    projectDescription?: SortOrder
+    paymentPreference?: SortOrder
+    projectFrequency?: SortOrder
+    averageProjectDuration?: SortOrder
+    maxHourlyRate?: SortOrder
+    totalMonthlyBudget?: SortOrder
+    hoursPerWeek?: SortOrder
+    responseTime?: SortOrder
+    minimumProjectBudget?: SortOrder
+    specialRequirements?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -12741,6 +13192,18 @@ export namespace Prisma {
     budgetRange?: SortOrder
     clientType?: SortOrder
     howDidYouHear?: SortOrder
+    urgencyLevel?: SortOrder
+    preferredWorkingStyle?: SortOrder
+    projectDescription?: SortOrder
+    paymentPreference?: SortOrder
+    projectFrequency?: SortOrder
+    averageProjectDuration?: SortOrder
+    maxHourlyRate?: SortOrder
+    totalMonthlyBudget?: SortOrder
+    hoursPerWeek?: SortOrder
+    responseTime?: SortOrder
+    minimumProjectBudget?: SortOrder
+    specialRequirements?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -13277,6 +13740,18 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type UserCreateinterestedCategoriesInput = {
+    set: string[]
+  }
+
+  export type UserCreatecommunicationPreferenceInput = {
+    set: string[]
+  }
+
+  export type UserCreateworkingDaysInput = {
+    set: string[]
+  }
+
   export type JobCreateNestedManyWithoutClientInput = {
     create?: XOR<JobCreateWithoutClientInput, JobUncheckedCreateWithoutClientInput> | JobCreateWithoutClientInput[] | JobUncheckedCreateWithoutClientInput[]
     connectOrCreate?: JobCreateOrConnectWithoutClientInput | JobCreateOrConnectWithoutClientInput[]
@@ -13432,6 +13907,21 @@ export namespace Prisma {
   }
 
   export type UserUpdatepreferredSkillsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserUpdateinterestedCategoriesInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserUpdatecommunicationPreferenceInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserUpdateworkingDaysInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -14873,6 +15363,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
@@ -14926,6 +15433,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
@@ -15089,6 +15613,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
@@ -15142,6 +15683,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
@@ -15276,6 +15834,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
@@ -15329,6 +15904,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
@@ -15453,6 +16045,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
@@ -15506,6 +16115,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
@@ -15608,6 +16234,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
@@ -15661,6 +16304,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
@@ -15719,6 +16379,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -15772,6 +16449,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -15896,6 +16590,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
@@ -15949,6 +16660,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
@@ -16013,6 +16741,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -16066,6 +16811,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -16331,6 +17093,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -16384,6 +17163,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -16442,6 +17238,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -16495,6 +17308,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -16618,6 +17448,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -16671,6 +17518,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -16735,6 +17599,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -16788,6 +17669,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -16907,6 +17805,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -16960,6 +17875,23 @@ export namespace Prisma {
     budgetRange?: string | null
     clientType?: string | null
     howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    responseTime?: string | null
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -17029,6 +17961,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -17082,6 +18031,23 @@ export namespace Prisma {
     budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
     clientType?: NullableStringFieldUpdateOperationsInput | string | null
     howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput

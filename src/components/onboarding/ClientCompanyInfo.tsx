@@ -71,7 +71,17 @@ const ClientCompanyInfo = ({ onNext, data }: ClientCompanyInfoProps) => {
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
-      onNext(formData);
+      // Map the data to the correct field names for the database
+      const mappedData = {
+        companyName: formData.companyName,
+        industry: formData.industry,
+        companySize: formData.companySize,
+        companyWebsite: formData.website,
+        companyDescription: formData.companyDescription,
+        foundedYear: formData.foundedYear,
+        annualRevenue: formData.annualRevenue
+      };
+      onNext(mappedData);
     }
   };
 
