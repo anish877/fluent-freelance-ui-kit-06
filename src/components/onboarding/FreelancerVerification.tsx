@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -218,7 +219,7 @@ const FreelancerVerification = ({ onNext, data }: FreelancerVerificationProps) =
               <Checkbox
                 id="terms"
                 checked={formData.agreedToTerms}
-                onCheckedChange={(checked) => setFormData({ ...formData, agreedToTerms: checked })}
+                onCheckedChange={(checked) => setFormData({ ...formData, agreedToTerms: Boolean(checked) })}
                 className={errors.agreedToTerms ? "border-red-500" : ""}
               />
               <div>
@@ -233,7 +234,7 @@ const FreelancerVerification = ({ onNext, data }: FreelancerVerificationProps) =
               <Checkbox
                 id="privacy"
                 checked={formData.agreedToPrivacy}
-                onCheckedChange={(checked) => setFormData({ ...formData, agreedToPrivacy: checked })}
+                onCheckedChange={(checked) => setFormData({ ...formData, agreedToPrivacy: Boolean(checked) })}
                 className={errors.agreedToPrivacy ? "border-red-500" : ""}
               />
               <div>
@@ -248,7 +249,7 @@ const FreelancerVerification = ({ onNext, data }: FreelancerVerificationProps) =
               <Checkbox
                 id="fees"
                 checked={formData.agreedToFees}
-                onCheckedChange={(checked) => setFormData({ ...formData, agreedToFees: checked })}
+                onCheckedChange={(checked) => setFormData({ ...formData, agreedToFees: Boolean(checked) })}
                 className={errors.agreedToFees ? "border-red-500" : ""}
               />
               <div>
