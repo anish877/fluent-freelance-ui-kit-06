@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +12,7 @@ import { WebSocketProvider } from "./hooks/socketContext";
 import Index from "./pages/Index";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
+import ClientJobView from "./pages/ClientJobView";
 import FreelancerProfile from "./pages/FreelancerProfile";
 import Dashboard from "./pages/Dashboard";
 import ClientDashboard from "./pages/ClientDashboard";
@@ -48,6 +50,7 @@ const App = () => {
                 {/* Job-related routes */}
                 <Route path="/jobs" element={<Jobs />} />
                 <Route path="/jobs/:id" element={<JobDetails />} />
+                <Route path="/client-jobs/:id" element={<ClientJobView />} />
                 <Route path="/post-job" element={<PostJob />} />
                 
                 {/* User routes */}
