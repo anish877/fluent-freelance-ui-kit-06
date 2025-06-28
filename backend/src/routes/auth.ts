@@ -1,4 +1,4 @@
-import express, { Request, Response, Router } from 'express';
+import express, { Request, Response, Router, RequestHandler } from 'express';
 import crypto from 'crypto';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
@@ -75,6 +75,7 @@ router.post('/register', [
         firstName: true,
         lastName: true,
         userType: true,
+        isOnboarded: true,
         avatar: true,
         bio: true,
         location: true,
@@ -93,7 +94,7 @@ router.post('/register', [
     });
 
     // Create token
-    const signOptions: SignOptions = { expiresIn: process.env.JWT_EXPIRES_IN as any || '7d' };
+    const signOptions: SignOptions = { expiresIn: '7d' };
     const token = jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET as Secret,
@@ -133,29 +134,62 @@ router.post('/login', [
   const { email, password } = req.body;
 
   try {
-    // Check for user
-    const user = await prisma.user.findUnique({
-      where: { email }
+    // Check for user with password for verification
+    const userWithPassword = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        userType: true,
+        isOnboarded: true
+      }
     });
 
-    if (!user) {
+    if (!userWithPassword) {
       res.status(404).json({ message: 'User not Found', success: false });
       return;
     }
 
     // Check password
-    const isMatch = await verifyPassword(password, user.password);
+    const isMatch = await verifyPassword(password, userWithPassword.password);
 
     if (!isMatch) {
       res.status(401).json({ message: 'Invalid credentials', success: false });
       return;
     }
 
+    // Fetch user data without password for response
+    const user = await prisma.user.findUnique({
+      where: { id: userWithPassword.id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        userType: true,
+        isOnboarded: true,
+        avatar: true,
+        bio: true,
+        location: true,
+        phone: true,
+        skills: true,
+        hourlyRate: true,
+        portfolio: true,
+        experience: true,
+        education: true,
+        certifications: true,
+        companyName: true,
+        companySize: true,
+        industry: true,
+        createdAt: true
+      }
+    });
 
     // Create token
-    const signOptions: SignOptions = { expiresIn: process.env.JWT_EXPIRES_IN as any || '7d' };
+    const signOptions: SignOptions = { expiresIn: '7d' };
     const token = jwt.sign(
-      { id: user.id },
+      { id: userWithPassword.id },
       process.env.JWT_SECRET as Secret,
       signOptions
     );
@@ -176,7 +210,7 @@ router.post('/login', [
   }
 });
 
-router.get('/me', protect as any, (async (req: AuthRequest, res: Response) => {
+router.get('/me', protect, (async (req: AuthRequest, res: Response): Promise<void> => {
   console.log("hitted")
   try {
     const user = await prisma.user.findUnique({
@@ -187,6 +221,7 @@ router.get('/me', protect as any, (async (req: AuthRequest, res: Response) => {
         firstName: true,
         lastName: true,
         userType: true,
+        isOnboarded: true,
         avatar: true,
         bio: true,
         location: true,
@@ -213,7 +248,7 @@ router.get('/me', protect as any, (async (req: AuthRequest, res: Response) => {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
-}) as any);
+}) as RequestHandler);
 
 router.post('/logout', (req: Request, res: Response) => {
   res.clearCookie('token').json({

@@ -3630,9 +3630,17 @@ export namespace Prisma {
     hourlyRate: number | null
     duration: string | null
     category: string | null
+    subcategory: string | null
+    projectType: string | null
+    experienceLevel: string | null
+    workingHours: string | null
+    timezone: string | null
     location: string | null
     isRemote: boolean | null
     status: $Enums.JobStatus | null
+    isUrgent: boolean | null
+    visibility: string | null
+    applicationDeadline: Date | null
     clientId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3648,9 +3656,17 @@ export namespace Prisma {
     hourlyRate: number | null
     duration: string | null
     category: string | null
+    subcategory: string | null
+    projectType: string | null
+    experienceLevel: string | null
+    workingHours: string | null
+    timezone: string | null
     location: string | null
     isRemote: boolean | null
     status: $Enums.JobStatus | null
+    isUrgent: boolean | null
+    visibility: string | null
+    applicationDeadline: Date | null
     clientId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3668,9 +3684,18 @@ export namespace Prisma {
     duration: number
     skills: number
     category: number
+    subcategory: number
+    projectType: number
+    experienceLevel: number
+    workingHours: number
+    timezone: number
+    communicationPreferences: number
     location: number
     isRemote: number
     status: number
+    isUrgent: number
+    visibility: number
+    applicationDeadline: number
     clientId: number
     createdAt: number
     updatedAt: number
@@ -3700,9 +3725,17 @@ export namespace Prisma {
     hourlyRate?: true
     duration?: true
     category?: true
+    subcategory?: true
+    projectType?: true
+    experienceLevel?: true
+    workingHours?: true
+    timezone?: true
     location?: true
     isRemote?: true
     status?: true
+    isUrgent?: true
+    visibility?: true
+    applicationDeadline?: true
     clientId?: true
     createdAt?: true
     updatedAt?: true
@@ -3718,9 +3751,17 @@ export namespace Prisma {
     hourlyRate?: true
     duration?: true
     category?: true
+    subcategory?: true
+    projectType?: true
+    experienceLevel?: true
+    workingHours?: true
+    timezone?: true
     location?: true
     isRemote?: true
     status?: true
+    isUrgent?: true
+    visibility?: true
+    applicationDeadline?: true
     clientId?: true
     createdAt?: true
     updatedAt?: true
@@ -3738,9 +3779,18 @@ export namespace Prisma {
     duration?: true
     skills?: true
     category?: true
+    subcategory?: true
+    projectType?: true
+    experienceLevel?: true
+    workingHours?: true
+    timezone?: true
+    communicationPreferences?: true
     location?: true
     isRemote?: true
     status?: true
+    isUrgent?: true
+    visibility?: true
+    applicationDeadline?: true
     clientId?: true
     createdAt?: true
     updatedAt?: true
@@ -3845,9 +3895,18 @@ export namespace Prisma {
     duration: string | null
     skills: string[]
     category: string
+    subcategory: string | null
+    projectType: string | null
+    experienceLevel: string | null
+    workingHours: string | null
+    timezone: string | null
+    communicationPreferences: string[]
     location: string | null
     isRemote: boolean
     status: $Enums.JobStatus
+    isUrgent: boolean
+    visibility: string
+    applicationDeadline: Date | null
     clientId: string
     createdAt: Date
     updatedAt: Date
@@ -3884,9 +3943,18 @@ export namespace Prisma {
     duration?: boolean
     skills?: boolean
     category?: boolean
+    subcategory?: boolean
+    projectType?: boolean
+    experienceLevel?: boolean
+    workingHours?: boolean
+    timezone?: boolean
+    communicationPreferences?: boolean
     location?: boolean
     isRemote?: boolean
     status?: boolean
+    isUrgent?: boolean
+    visibility?: boolean
+    applicationDeadline?: boolean
     clientId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3909,9 +3977,18 @@ export namespace Prisma {
     duration?: boolean
     skills?: boolean
     category?: boolean
+    subcategory?: boolean
+    projectType?: boolean
+    experienceLevel?: boolean
+    workingHours?: boolean
+    timezone?: boolean
+    communicationPreferences?: boolean
     location?: boolean
     isRemote?: boolean
     status?: boolean
+    isUrgent?: boolean
+    visibility?: boolean
+    applicationDeadline?: boolean
     clientId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3930,9 +4007,18 @@ export namespace Prisma {
     duration?: boolean
     skills?: boolean
     category?: boolean
+    subcategory?: boolean
+    projectType?: boolean
+    experienceLevel?: boolean
+    workingHours?: boolean
+    timezone?: boolean
+    communicationPreferences?: boolean
     location?: boolean
     isRemote?: boolean
     status?: boolean
+    isUrgent?: boolean
+    visibility?: boolean
+    applicationDeadline?: boolean
     clientId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3951,15 +4037,24 @@ export namespace Prisma {
     duration?: boolean
     skills?: boolean
     category?: boolean
+    subcategory?: boolean
+    projectType?: boolean
+    experienceLevel?: boolean
+    workingHours?: boolean
+    timezone?: boolean
+    communicationPreferences?: boolean
     location?: boolean
     isRemote?: boolean
     status?: boolean
+    isUrgent?: boolean
+    visibility?: boolean
+    applicationDeadline?: boolean
     clientId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type JobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "requirements" | "budget" | "minBudget" | "maxBudget" | "hourlyRate" | "duration" | "skills" | "category" | "location" | "isRemote" | "status" | "clientId" | "createdAt" | "updatedAt", ExtArgs["result"]["job"]>
+  export type JobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "requirements" | "budget" | "minBudget" | "maxBudget" | "hourlyRate" | "duration" | "skills" | "category" | "subcategory" | "projectType" | "experienceLevel" | "workingHours" | "timezone" | "communicationPreferences" | "location" | "isRemote" | "status" | "isUrgent" | "visibility" | "applicationDeadline" | "clientId" | "createdAt" | "updatedAt", ExtArgs["result"]["job"]>
   export type JobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     conversation?: boolean | Job$conversationArgs<ExtArgs>
     client?: boolean | UserDefaultArgs<ExtArgs>
@@ -3994,9 +4089,18 @@ export namespace Prisma {
       duration: string | null
       skills: string[]
       category: string
+      subcategory: string | null
+      projectType: string | null
+      experienceLevel: string | null
+      workingHours: string | null
+      timezone: string | null
+      communicationPreferences: string[]
       location: string | null
       isRemote: boolean
       status: $Enums.JobStatus
+      isUrgent: boolean
+      visibility: string
+      applicationDeadline: Date | null
       clientId: string
       createdAt: Date
       updatedAt: Date
@@ -4438,9 +4542,18 @@ export namespace Prisma {
     readonly duration: FieldRef<"Job", 'String'>
     readonly skills: FieldRef<"Job", 'String[]'>
     readonly category: FieldRef<"Job", 'String'>
+    readonly subcategory: FieldRef<"Job", 'String'>
+    readonly projectType: FieldRef<"Job", 'String'>
+    readonly experienceLevel: FieldRef<"Job", 'String'>
+    readonly workingHours: FieldRef<"Job", 'String'>
+    readonly timezone: FieldRef<"Job", 'String'>
+    readonly communicationPreferences: FieldRef<"Job", 'String[]'>
     readonly location: FieldRef<"Job", 'String'>
     readonly isRemote: FieldRef<"Job", 'Boolean'>
     readonly status: FieldRef<"Job", 'JobStatus'>
+    readonly isUrgent: FieldRef<"Job", 'Boolean'>
+    readonly visibility: FieldRef<"Job", 'String'>
+    readonly applicationDeadline: FieldRef<"Job", 'DateTime'>
     readonly clientId: FieldRef<"Job", 'String'>
     readonly createdAt: FieldRef<"Job", 'DateTime'>
     readonly updatedAt: FieldRef<"Job", 'DateTime'>
@@ -10720,9 +10833,18 @@ export namespace Prisma {
     duration: 'duration',
     skills: 'skills',
     category: 'category',
+    subcategory: 'subcategory',
+    projectType: 'projectType',
+    experienceLevel: 'experienceLevel',
+    workingHours: 'workingHours',
+    timezone: 'timezone',
+    communicationPreferences: 'communicationPreferences',
     location: 'location',
     isRemote: 'isRemote',
     status: 'status',
+    isUrgent: 'isUrgent',
+    visibility: 'visibility',
+    applicationDeadline: 'applicationDeadline',
     clientId: 'clientId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -11368,9 +11490,18 @@ export namespace Prisma {
     duration?: StringNullableFilter<"Job"> | string | null
     skills?: StringNullableListFilter<"Job">
     category?: StringFilter<"Job"> | string
+    subcategory?: StringNullableFilter<"Job"> | string | null
+    projectType?: StringNullableFilter<"Job"> | string | null
+    experienceLevel?: StringNullableFilter<"Job"> | string | null
+    workingHours?: StringNullableFilter<"Job"> | string | null
+    timezone?: StringNullableFilter<"Job"> | string | null
+    communicationPreferences?: StringNullableListFilter<"Job">
     location?: StringNullableFilter<"Job"> | string | null
     isRemote?: BoolFilter<"Job"> | boolean
     status?: EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+    isUrgent?: BoolFilter<"Job"> | boolean
+    visibility?: StringFilter<"Job"> | string
+    applicationDeadline?: DateTimeNullableFilter<"Job"> | Date | string | null
     clientId?: StringFilter<"Job"> | string
     createdAt?: DateTimeFilter<"Job"> | Date | string
     updatedAt?: DateTimeFilter<"Job"> | Date | string
@@ -11392,9 +11523,18 @@ export namespace Prisma {
     duration?: SortOrderInput | SortOrder
     skills?: SortOrder
     category?: SortOrder
+    subcategory?: SortOrderInput | SortOrder
+    projectType?: SortOrderInput | SortOrder
+    experienceLevel?: SortOrderInput | SortOrder
+    workingHours?: SortOrderInput | SortOrder
+    timezone?: SortOrderInput | SortOrder
+    communicationPreferences?: SortOrder
     location?: SortOrderInput | SortOrder
     isRemote?: SortOrder
     status?: SortOrder
+    isUrgent?: SortOrder
+    visibility?: SortOrder
+    applicationDeadline?: SortOrderInput | SortOrder
     clientId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -11419,9 +11559,18 @@ export namespace Prisma {
     duration?: StringNullableFilter<"Job"> | string | null
     skills?: StringNullableListFilter<"Job">
     category?: StringFilter<"Job"> | string
+    subcategory?: StringNullableFilter<"Job"> | string | null
+    projectType?: StringNullableFilter<"Job"> | string | null
+    experienceLevel?: StringNullableFilter<"Job"> | string | null
+    workingHours?: StringNullableFilter<"Job"> | string | null
+    timezone?: StringNullableFilter<"Job"> | string | null
+    communicationPreferences?: StringNullableListFilter<"Job">
     location?: StringNullableFilter<"Job"> | string | null
     isRemote?: BoolFilter<"Job"> | boolean
     status?: EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+    isUrgent?: BoolFilter<"Job"> | boolean
+    visibility?: StringFilter<"Job"> | string
+    applicationDeadline?: DateTimeNullableFilter<"Job"> | Date | string | null
     clientId?: StringFilter<"Job"> | string
     createdAt?: DateTimeFilter<"Job"> | Date | string
     updatedAt?: DateTimeFilter<"Job"> | Date | string
@@ -11443,9 +11592,18 @@ export namespace Prisma {
     duration?: SortOrderInput | SortOrder
     skills?: SortOrder
     category?: SortOrder
+    subcategory?: SortOrderInput | SortOrder
+    projectType?: SortOrderInput | SortOrder
+    experienceLevel?: SortOrderInput | SortOrder
+    workingHours?: SortOrderInput | SortOrder
+    timezone?: SortOrderInput | SortOrder
+    communicationPreferences?: SortOrder
     location?: SortOrderInput | SortOrder
     isRemote?: SortOrder
     status?: SortOrder
+    isUrgent?: SortOrder
+    visibility?: SortOrder
+    applicationDeadline?: SortOrderInput | SortOrder
     clientId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -11471,9 +11629,18 @@ export namespace Prisma {
     duration?: StringNullableWithAggregatesFilter<"Job"> | string | null
     skills?: StringNullableListFilter<"Job">
     category?: StringWithAggregatesFilter<"Job"> | string
+    subcategory?: StringNullableWithAggregatesFilter<"Job"> | string | null
+    projectType?: StringNullableWithAggregatesFilter<"Job"> | string | null
+    experienceLevel?: StringNullableWithAggregatesFilter<"Job"> | string | null
+    workingHours?: StringNullableWithAggregatesFilter<"Job"> | string | null
+    timezone?: StringNullableWithAggregatesFilter<"Job"> | string | null
+    communicationPreferences?: StringNullableListFilter<"Job">
     location?: StringNullableWithAggregatesFilter<"Job"> | string | null
     isRemote?: BoolWithAggregatesFilter<"Job"> | boolean
     status?: EnumJobStatusWithAggregatesFilter<"Job"> | $Enums.JobStatus
+    isUrgent?: BoolWithAggregatesFilter<"Job"> | boolean
+    visibility?: StringWithAggregatesFilter<"Job"> | string
+    applicationDeadline?: DateTimeNullableWithAggregatesFilter<"Job"> | Date | string | null
     clientId?: StringWithAggregatesFilter<"Job"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Job"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Job"> | Date | string
@@ -12350,9 +12517,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     conversation?: ConversationCreateNestedManyWithoutJobInput
@@ -12373,9 +12549,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     clientId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -12396,9 +12581,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUpdateManyWithoutJobNestedInput
@@ -12419,9 +12613,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     clientId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12442,9 +12645,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     clientId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -12462,9 +12674,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12481,9 +12702,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     clientId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13351,6 +13581,17 @@ export namespace Prisma {
     not?: NestedEnumJobStatusFilter<$PrismaModel> | $Enums.JobStatus
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type ConversationListRelationFilter = {
     every?: ConversationWhereInput
     some?: ConversationWhereInput
@@ -13378,9 +13619,18 @@ export namespace Prisma {
     duration?: SortOrder
     skills?: SortOrder
     category?: SortOrder
+    subcategory?: SortOrder
+    projectType?: SortOrder
+    experienceLevel?: SortOrder
+    workingHours?: SortOrder
+    timezone?: SortOrder
+    communicationPreferences?: SortOrder
     location?: SortOrder
     isRemote?: SortOrder
     status?: SortOrder
+    isUrgent?: SortOrder
+    visibility?: SortOrder
+    applicationDeadline?: SortOrder
     clientId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13402,9 +13652,17 @@ export namespace Prisma {
     hourlyRate?: SortOrder
     duration?: SortOrder
     category?: SortOrder
+    subcategory?: SortOrder
+    projectType?: SortOrder
+    experienceLevel?: SortOrder
+    workingHours?: SortOrder
+    timezone?: SortOrder
     location?: SortOrder
     isRemote?: SortOrder
     status?: SortOrder
+    isUrgent?: SortOrder
+    visibility?: SortOrder
+    applicationDeadline?: SortOrder
     clientId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13420,9 +13678,17 @@ export namespace Prisma {
     hourlyRate?: SortOrder
     duration?: SortOrder
     category?: SortOrder
+    subcategory?: SortOrder
+    projectType?: SortOrder
+    experienceLevel?: SortOrder
+    workingHours?: SortOrder
+    timezone?: SortOrder
     location?: SortOrder
     isRemote?: SortOrder
     status?: SortOrder
+    isUrgent?: SortOrder
+    visibility?: SortOrder
+    applicationDeadline?: SortOrder
     clientId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13452,6 +13718,20 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumJobStatusFilter<$PrismaModel>
     _max?: NestedEnumJobStatusFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -14130,6 +14410,10 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type JobCreatecommunicationPreferencesInput = {
+    set: string[]
+  }
+
   export type ConversationCreateNestedManyWithoutJobInput = {
     create?: XOR<ConversationCreateWithoutJobInput, ConversationUncheckedCreateWithoutJobInput> | ConversationCreateWithoutJobInput[] | ConversationUncheckedCreateWithoutJobInput[]
     connectOrCreate?: ConversationCreateOrConnectWithoutJobInput | ConversationCreateOrConnectWithoutJobInput[]
@@ -14192,8 +14476,17 @@ export namespace Prisma {
     push?: string | string[]
   }
 
+  export type JobUpdatecommunicationPreferencesInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
   export type EnumJobStatusFieldUpdateOperationsInput = {
     set?: $Enums.JobStatus
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type ConversationUpdateManyWithoutJobNestedInput = {
@@ -14784,6 +15077,17 @@ export namespace Prisma {
     not?: NestedEnumJobStatusFilter<$PrismaModel> | $Enums.JobStatus
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedEnumBudgetTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.BudgetType | EnumBudgetTypeFieldRefInput<$PrismaModel>
     in?: $Enums.BudgetType[] | ListEnumBudgetTypeFieldRefInput<$PrismaModel>
@@ -14802,6 +15106,20 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumJobStatusFilter<$PrismaModel>
     _max?: NestedEnumJobStatusFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumProposalStatusFilter<$PrismaModel = never> = {
@@ -14866,9 +15184,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     conversation?: ConversationCreateNestedManyWithoutJobInput
@@ -14888,9 +15215,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     conversation?: ConversationUncheckedCreateNestedManyWithoutJobInput
@@ -15125,9 +15461,18 @@ export namespace Prisma {
     duration?: StringNullableFilter<"Job"> | string | null
     skills?: StringNullableListFilter<"Job">
     category?: StringFilter<"Job"> | string
+    subcategory?: StringNullableFilter<"Job"> | string | null
+    projectType?: StringNullableFilter<"Job"> | string | null
+    experienceLevel?: StringNullableFilter<"Job"> | string | null
+    workingHours?: StringNullableFilter<"Job"> | string | null
+    timezone?: StringNullableFilter<"Job"> | string | null
+    communicationPreferences?: StringNullableListFilter<"Job">
     location?: StringNullableFilter<"Job"> | string | null
     isRemote?: BoolFilter<"Job"> | boolean
     status?: EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+    isUrgent?: BoolFilter<"Job"> | boolean
+    visibility?: StringFilter<"Job"> | string
+    applicationDeadline?: DateTimeNullableFilter<"Job"> | Date | string | null
     clientId?: StringFilter<"Job"> | string
     createdAt?: DateTimeFilter<"Job"> | Date | string
     updatedAt?: DateTimeFilter<"Job"> | Date | string
@@ -15752,9 +16097,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     conversation?: ConversationCreateNestedManyWithoutJobInput
@@ -15774,9 +16128,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     clientId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -15957,9 +16320,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUpdateManyWithoutJobNestedInput
@@ -15979,9 +16351,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     clientId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16152,9 +16533,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     conversation?: ConversationCreateNestedManyWithoutJobInput
@@ -16174,9 +16564,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     clientId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -16502,9 +16901,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUpdateManyWithoutJobNestedInput
@@ -16524,9 +16932,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     clientId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16907,9 +17324,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     client: UserCreateNestedOneWithoutJobsPostedInput
@@ -16929,9 +17355,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     clientId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -17016,9 +17451,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     client?: UserUpdateOneRequiredWithoutJobsPostedNestedInput
@@ -17038,9 +17482,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     clientId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18068,9 +18521,18 @@ export namespace Prisma {
     duration?: string | null
     skills?: JobCreateskillsInput | string[]
     category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
     location?: string | null
     isRemote?: boolean
     status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -18148,9 +18610,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUpdateManyWithoutJobNestedInput
@@ -18170,9 +18641,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUncheckedUpdateManyWithoutJobNestedInput
@@ -18192,9 +18672,18 @@ export namespace Prisma {
     duration?: NullableStringFieldUpdateOperationsInput | string | null
     skills?: JobUpdateskillsInput | string[]
     category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
     location?: NullableStringFieldUpdateOperationsInput | string | null
     isRemote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

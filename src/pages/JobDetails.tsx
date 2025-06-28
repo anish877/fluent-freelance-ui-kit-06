@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
   MapPin, Clock, DollarSign, Star, Users, Calendar, 
@@ -11,77 +10,167 @@ import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import axios from "axios";
+import { useToast } from "../hooks/use-toast";
+
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  budget: 'FIXED' | 'HOURLY';
+  minBudget?: number;
+  maxBudget?: number;
+  hourlyRate?: number;
+  duration?: string;
+  skills: string[];
+  category: string;
+  subcategory?: string;
+  projectType?: string;
+  experienceLevel?: string;
+  workingHours?: string;
+  timezone?: string;
+  communicationPreferences: string[];
+  location?: string;
+  isRemote: boolean;
+  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  isUrgent: boolean;
+  visibility: string;
+  applicationDeadline?: string;
+  requirements: string[];
+  createdAt: string;
+  updatedAt: string;
+  client: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+    bio?: string;
+    location?: string;
+    companyName?: string;
+    companySize?: string;
+    industry?: string;
+  };
+  _count: {
+    proposals: number;
+  };
+}
 
 const JobDetails = () => {
   const { id } = useParams();
+  const { toast } = useToast();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [proposal, setProposal] = useState("");
   const [proposalBudget, setProposalBudget] = useState("");
   const [proposalDelivery, setProposalDelivery] = useState("");
+  const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock job data - in real app, this would come from API
-  const job = {
-    id: parseInt(id || "1"),
-    title: "Full-Stack React Developer for E-commerce Platform",
-    description: `We are looking for an experienced full-stack React developer to help us build a modern e-commerce platform. This is a challenging project that requires expertise in React, Node.js, and modern web technologies.
+  useEffect(() => {
+    const fetchJobDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`/jobs/${id}`);
+        if (response.data.success) {
+          setJob(response.data.data);
+        } else {
+          setError('Failed to fetch job details');
+        }
+      } catch (err: any) {
+        console.error('Error fetching job details:', err);
+        setError(err.response?.data?.message || 'Failed to fetch job details');
+        toast({
+          title: "Error",
+          description: "Failed to load job details",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-The platform will include:
-- User authentication and authorization
-- Product catalog with search and filtering
-- Shopping cart and checkout process
-- Payment integration (Stripe/PayPal)
-- Admin dashboard for inventory management
-- Real-time notifications
-- Mobile-responsive design
-- Performance optimization
+    if (id) {
+      fetchJobDetails();
+    }
+  }, [id, toast]);
 
-We value clean, maintainable code and expect the developer to follow best practices including:
-- TypeScript implementation
-- Unit and integration testing
-- Git workflow with proper documentation
-- Code reviews and collaboration
-- Agile development methodology
-
-This is a great opportunity to work with a growing startup and make a significant impact on our product development. We offer competitive compensation and the possibility of long-term collaboration.`,
-    budget: "$3,000 - $5,000",
-    budgetType: "Fixed Price",
-    duration: "2-3 months",
-    experienceLevel: "Intermediate",
-    skills: ["React", "TypeScript", "Node.js", "MongoDB", "Express.js", "Stripe API", "AWS", "Jest"],
-    category: "Web Development",
-    subcategory: "Full Stack Development",
-    client: {
-      name: "TechCorp Solutions",
-      avatar: "/placeholder.svg",
-      rating: 4.8,
-      reviews: 47,
-      jobsPosted: 12,
-      hireRate: 85,
-      location: "San Francisco, CA",
-      memberSince: "January 2022",
-      totalSpent: "$45,000+",
-      description: "We are a fast-growing tech startup focused on building innovative e-commerce solutions. Our team is passionate about creating exceptional user experiences and cutting-edge technology.",
-      verificationStatus: "Payment Verified",
-      responseTime: "Usually responds within 2 hours",
-      lastActive: "Online now"
-    },
-    postedTime: "2 hours ago",
-    proposals: 8,
-    interviewsRequested: 2,
-    clientTimezone: "PST (UTC-8)",
-    projectType: "One-time project",
-    attachments: [
-      { name: "Project_Requirements.pdf", size: "2.4 MB" },
-      { name: "Wireframes.sketch", size: "15.7 MB" }
-    ],
-    questions: [
-      "What is your experience with React and TypeScript?",
-      "Have you worked with e-commerce platforms before?",
-      "Can you provide examples of your previous work?",
-      "What is your preferred development methodology?"
-    ]
+  const formatBudget = (job: Job) => {
+    if (job.budget === 'FIXED') {
+      if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
+        return `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`;
+      } else if (job.minBudget) {
+        return `$${job.minBudget.toLocaleString()}`;
+      } else if (job.maxBudget) {
+        return `$${job.maxBudget.toLocaleString()}`;
+      }
+      return "Budget not specified";
+    } else if (job.budget === 'HOURLY') {
+      if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
+        return `$${job.minBudget}/hr - $${job.maxBudget}/hr`;
+      } else if (job.hourlyRate) {
+        return `$${job.hourlyRate}/hr`;
+      }
+      return "Hourly rate not specified";
+    }
+    return "Budget not specified";
   };
 
+  const formatPostedTime = (createdAt: string) => {
+    const now = new Date();
+    const posted = new Date(createdAt);
+    const diffInHours = Math.floor((now.getTime() - posted.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) return `${diffInWeeks} week${diffInWeeks > 1 ? 's' : ''} ago`;
+    
+    const diffInMonths = Math.floor(diffInDays / 30);
+    return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
+  };
+
+  const handleProposalSubmit = () => {
+    console.log("Proposal submitted:", { proposal, proposalBudget, proposalDelivery });
+    // In real app, this would submit to API
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-500"></div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !job) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Job Not Found</h1>
+            <p className="text-gray-600 mb-4">{error || "The job you're looking for doesn't exist."}</p>
+            <Button onClick={() => window.history.back()}>
+              Go Back
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Mock data for sections that should remain unchanged
   const similarJobs = [
     {
       id: 2,
@@ -122,11 +211,6 @@ This is a great opportunity to work with a growing startup and make a significan
     }
   ];
 
-  const handleProposalSubmit = () => {
-    console.log("Proposal submitted:", { proposal, proposalBudget, proposalDelivery });
-    // In real app, this would submit to API
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -154,15 +238,15 @@ This is a great opportunity to work with a growing startup and make a significan
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
                     <span className="flex items-center">
                       <Clock className="h-4 w-4 mr-1" />
-                      Posted {job.postedTime}
+                      Posted {formatPostedTime(job.createdAt)}
                     </span>
                     <span className="flex items-center">
                       <MapPin className="h-4 w-4 mr-1" />
-                      {job.client.location}
+                      {job.location || 'Remote'}
                     </span>
                     <span className="flex items-center">
                       <Eye className="h-4 w-4 mr-1" />
-                      {job.proposals} proposals
+                      {job._count.proposals} proposals
                     </span>
                   </div>
                 </div>
@@ -191,22 +275,22 @@ This is a great opportunity to work with a growing startup and make a significan
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="text-sm text-gray-600">Budget</p>
-                  <p className="font-semibold text-gray-900">{job.budget}</p>
-                  <p className="text-xs text-gray-500">{job.budgetType}</p>
+                  <p className="font-semibold text-gray-900">{formatBudget(job)}</p>
+                  <p className="text-xs text-gray-500">{job.budget === 'FIXED' ? 'Fixed Price' : 'Hourly Rate'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Duration</p>
-                  <p className="font-semibold text-gray-900">{job.duration}</p>
-                  <p className="text-xs text-gray-500">{job.projectType}</p>
+                  <p className="font-semibold text-gray-900">{job.duration || 'Not specified'}</p>
+                  <p className="text-xs text-gray-500">{job.projectType || 'Project'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Experience Level</p>
-                  <p className="font-semibold text-gray-900">{job.experienceLevel}</p>
+                  <p className="font-semibold text-gray-900">{job.experienceLevel || 'Any level'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Proposals</p>
-                  <p className="font-semibold text-gray-900">{job.proposals}</p>
-                  <p className="text-xs text-gray-500">{job.interviewsRequested} interviews</p>
+                  <p className="font-semibold text-gray-900">{job._count.proposals}</p>
+                  <p className="text-xs text-gray-500">0 interviews</p>
                 </div>
               </div>
 
@@ -227,42 +311,59 @@ This is a great opportunity to work with a growing startup and make a significan
                 <h3 className="font-semibold text-gray-900 mb-3">Project Description</h3>
                 <div className="prose prose-gray max-w-none">
                   {job.description.split('\n').map((paragraph, index) => (
-                    <p key={index} className="mb-4 text-gray-700 leading-relaxed">
+                    <p key={index} className="mb-4 text-gray-700 leading-relaxed break-words whitespace-pre-wrap">
                       {paragraph}
                     </p>
                   ))}
                 </div>
               </div>
 
-              {/* Attachments */}
-              {job.attachments && job.attachments.length > 0 && (
+              {/* Requirements */}
+              {job.requirements && job.requirements.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3">Attachments</h3>
+                  <h3 className="font-semibold text-gray-900 mb-3">Requirements</h3>
                   <div className="space-y-2">
-                    {job.attachments.map((attachment, index) => (
-                      <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <Paperclip className="h-4 w-4 text-gray-600 mr-2" />
-                        <span className="font-medium text-gray-900">{attachment.name}</span>
-                        <span className="text-sm text-gray-500 ml-2">({attachment.size})</span>
-                        <Button variant="outline" size="sm" className="ml-auto">
-                          Download
-                        </Button>
+                    {job.requirements.map((requirement, index) => (
+                      <div key={index} className="flex items-start">
+                        <span className="text-teal-500 mr-2 mt-1">•</span>
+                        <span className="text-gray-700">{requirement}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Screening Questions */}
-              {job.questions && job.questions.length > 0 && (
+              {/* Communication Preferences */}
+              {job.communicationPreferences && job.communicationPreferences.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3">Screening Questions</h3>
-                  <div className="space-y-3">
-                    {job.questions.map((question, index) => (
-                      <div key={index} className="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                        <p className="text-gray-900">{question}</p>
-                      </div>
+                  <h3 className="font-semibold text-gray-900 mb-3">Communication Preferences</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {job.communicationPreferences.map((pref, index) => (
+                      <Badge key={index} variant="outline">
+                        {pref}
+                      </Badge>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Working Details */}
+              {(job.workingHours || job.timezone) && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-3">Working Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {job.workingHours && (
+                      <div>
+                        <p className="text-sm text-gray-600">Working Hours</p>
+                        <p className="font-medium text-gray-900">{job.workingHours}</p>
+                      </div>
+                    )}
+                    {job.timezone && (
+                      <div>
+                        <p className="text-sm text-gray-600">Timezone</p>
+                        <p className="font-medium text-gray-900">{job.timezone}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -274,43 +375,47 @@ This is a great opportunity to work with a growing startup and make a significan
               
               <div className="flex items-start space-x-4 mb-4">
                 <img 
-                  src={job.client.avatar} 
-                  alt={job.client.name}
+                  src={job.client.avatar || "/placeholder.svg"} 
+                  alt={`${job.client.firstName} ${job.client.lastName}`}
                   className="w-16 h-16 rounded-full border-2 border-gray-200"
                 />
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
-                    <h3 className="text-lg font-semibold text-gray-900">{job.client.name}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {job.client.firstName} {job.client.lastName}
+                    </h3>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                     <div className="flex items-center">
                       <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-                      {job.client.rating} ({job.client.reviews} reviews)
+                      4.8 (47 reviews)
                     </div>
-                    <span>{job.client.location}</span>
-                    <span className="text-green-600">{job.client.lastActive}</span>
+                    <span>{job.client.location || 'Location not specified'}</span>
+                    <span className="text-green-600">Online now</span>
                   </div>
-                  <p className="text-gray-700 mb-3">{job.client.description}</p>
+                  <p className="text-gray-700 mb-3">
+                    {job.client.bio || `${job.client.firstName} ${job.client.lastName} is a client looking for talented freelancers.`}
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600">Total Spent</p>
-                  <p className="font-semibold text-gray-900">{job.client.totalSpent}</p>
+                  <p className="text-sm text-gray-600">Company</p>
+                  <p className="font-semibold text-gray-900">{job.client.companyName || 'Individual'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Hire Rate</p>
-                  <p className="font-semibold text-gray-900">{job.client.hireRate}%</p>
+                  <p className="text-sm text-gray-600">Company Size</p>
+                  <p className="font-semibold text-gray-900">{job.client.companySize || 'Not specified'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Jobs Posted</p>
-                  <p className="font-semibold text-gray-900">{job.client.jobsPosted}</p>
+                  <p className="text-sm text-gray-600">Industry</p>
+                  <p className="font-semibold text-gray-900">{job.client.industry || 'Not specified'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Member Since</p>
-                  <p className="font-semibold text-gray-900">{job.client.memberSince}</p>
+                  <p className="font-semibold text-gray-900">January 2022</p>
                 </div>
               </div>
 
@@ -318,9 +423,9 @@ This is a great opportunity to work with a growing startup and make a significan
                 <div className="flex items-center space-x-4 text-sm">
                   <span className="flex items-center text-green-600">
                     <CheckCircle className="h-4 w-4 mr-1" />
-                    {job.client.verificationStatus}
+                    Payment Verified
                   </span>
-                  <span className="text-gray-600">{job.client.responseTime}</span>
+                  <span className="text-gray-600">Usually responds within 2 hours</span>
                 </div>
                 <Button variant="outline">
                   <MessageCircle className="h-4 w-4 mr-2" />
@@ -432,11 +537,11 @@ This is a great opportunity to work with a growing startup and make a significan
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Proposals</span>
-                  <span className="font-medium">{job.proposals}</span>
+                  <span className="font-medium">{job._count.proposals}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Interviews</span>
-                  <span className="font-medium">{job.interviewsRequested}</span>
+                  <span className="font-medium">0</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Invites sent</span>

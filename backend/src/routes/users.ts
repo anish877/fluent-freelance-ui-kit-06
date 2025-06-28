@@ -2,6 +2,7 @@ import express, { Request, Response, RequestHandler, Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, authorize, AuthRequest } from '../middleware/auth';
+import { Prisma } from '../../prisma/generated';
 
 const router: Router = express.Router();
 
@@ -10,19 +11,13 @@ const router: Router = express.Router();
 // @access  Private
 router.get('/', protect, (async (req: Request, res: Response): Promise<void> => {
   try {
-    const { page = 1, limit = 10, userType, skills, location } = req.query;
+    const { page = 1, limit = 10, userType, location } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
     
     if (userType) {
-      where.userType = userType;
-    }
-    
-    if (skills) {
-      where.skills = {
-        hasSome: Array.isArray(skills) ? skills : [skills]
-      };
+      where.userType = userType as 'FREELANCER' | 'CLIENT';
     }
     
     if (location) {

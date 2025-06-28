@@ -9,6 +9,7 @@ interface User {
   firstName: string;
   lastName: string;
   userType: 'FREELANCER' | 'CLIENT';
+  isOnboarded: boolean;
   avatar?: string;
   bio?: string;
   location?: string;
@@ -34,6 +35,7 @@ interface AuthContextType {
   register: (userData: RegisterData) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
+  completeOnboarding: (userData: any) => Promise<{ success: boolean; message?: string }>;
 }
 
 interface RegisterData {
@@ -104,8 +106,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(user);
         setIsAuthenticated(true);
 
-        if(user.isonboarded){
-            const from = location.state?.from?.pathname || user.isonboarded ? '/dashboard' : "/onbording";
+        if(user.isOnboarded){
+            // Redirect based on user type
+            const dashboardPath = user.userType === 'FREELANCER' ? '/dashboard' : '/client-dashboard';
+            const from = location.state?.from?.pathname || dashboardPath;
             navigate(from, { replace: true });
             return { success: true, message: "Signed In" };
         } else {
@@ -137,8 +141,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(user);
         setIsAuthenticated(true);
         
-        // Redirect to dashboard
-        navigate('/dashboard', { replace: true });
+        // Redirect based on user type
+        const dashboardPath = user.userType === 'FREELANCER' ? '/dashboard' : '/client-dashboard';
+        navigate(dashboardPath, { replace: true });
         
         return { success: true };
       } else {
@@ -226,6 +231,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return null; // Will redirect to login
   }
 
+  // Complete onboarding function
+  const completeOnboarding = async (userData: any): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const response = await axios.post('/onboarding/complete-with-data', userData);
+      
+      if (response.data.success) {
+        const { user } = response.data;
+        
+        setUser(user);
+        setIsAuthenticated(true);
+
+        // Redirect based on user type
+        const dashboardPath = user.userType === 'FREELANCER' ? '/dashboard' : '/client-dashboard';
+        navigate(dashboardPath, { replace: true });
+        
+        return { success: true, message: "Onboarding completed successfully" };
+      } else {
+        return { success: false, message: response.data.message || 'Onboarding completion failed' };
+      }
+    } catch (error: any) {
+      console.error('Onboarding completion error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Onboarding completion failed. Please try again.' 
+      };
+    }
+  };
+
   const value: AuthContextType = {
     user,
     loading,
@@ -234,6 +267,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     checkAuth,
+    completeOnboarding,
   };
 
   return (

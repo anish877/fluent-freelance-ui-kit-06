@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
@@ -13,6 +12,8 @@ import JobRequirementsStep from "../components/forms/JobRequirementsStep";
 import JobBudgetStep from "../components/forms/JobBudgetStep";
 import JobReviewStep from "../components/forms/JobReviewStep";
 import { useToast } from "../hooks/use-toast";
+import { useAuth } from "../hooks/AuthContext";
+import axios from "axios";
 
 export interface JobFormData {
   // Basic Info
@@ -57,7 +58,9 @@ export interface JobFormData {
 const PostJob = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<JobFormData>({
     title: "",
     category: "",
@@ -104,23 +107,102 @@ const PostJob = () => {
     }
   };
 
+  const validateForm = (): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    // Basic validation
+    if (!formData.title.trim()) errors.push("Job title is required");
+    if (!formData.category) errors.push("Category is required");
+    if (!formData.subcategory) errors.push("Subcategory is required");
+    if (!formData.projectType) errors.push("Project type is required");
+    if (!formData.duration) errors.push("Duration is required");
+
+    // Description validation
+    if (!formData.description.trim()) errors.push("Job description is required");
+    if (formData.description.length < 50) errors.push("Description must be at least 50 characters");
+    if (formData.deliverables.length === 0) errors.push("At least one deliverable is required");
+
+    // Requirements validation
+    if (formData.skills.length === 0) errors.push("At least one skill is required");
+    if (!formData.experienceLevel) errors.push("Experience level is required");
+
+    // Budget validation
+    if (!formData.budgetType) errors.push("Budget type is required");
+    if (formData.budgetType === "fixed" && (!formData.budgetAmount || formData.budgetAmount <= 0)) {
+      errors.push("Fixed budget amount is required and must be greater than 0");
+    }
+    if (formData.budgetType === "hourly" && (!formData.hourlyRateMin || !formData.hourlyRateMax)) {
+      errors.push("Hourly rate range is required");
+    }
+    if (formData.budgetType === "hourly" && formData.hourlyRateMin && formData.hourlyRateMax && formData.hourlyRateMin >= formData.hourlyRateMax) {
+      errors.push("Minimum hourly rate must be less than maximum hourly rate");
+    }
+
+    return { isValid: errors.length === 0, errors };
+  };
+
   const handleSubmit = async () => {
-    try {
-      // Here you would typically submit to an API
-      console.log('Submitting job:', formData);
-      
+    const validation = validateForm();
+    if (!validation.isValid) {
       toast({
-        title: "Job Posted Successfully!",
-        description: "Your job has been posted and is now live on the platform.",
-      });
-      
-      navigate('/client-dashboard');
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to post job. Please try again.",
+        title: "Validation Error",
+        description: validation.errors.join(", "),
         variant: "destructive"
       });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Prepare data for API
+      const jobData = {
+        title: formData.title,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        projectType: formData.projectType,
+        duration: formData.duration,
+        description: formData.description,
+        objectives: formData.objectives,
+        deliverables: formData.deliverables,
+        skills: formData.skills,
+        experienceLevel: formData.experienceLevel,
+        preferredQualifications: formData.preferredQualifications,
+        workingHours: formData.workingHours,
+        timezone: formData.timezone,
+        communicationPreferences: formData.communicationPreferences,
+        budgetType: formData.budgetType,
+        budgetAmount: formData.budgetAmount,
+        hourlyRateMin: formData.hourlyRateMin,
+        hourlyRateMax: formData.hourlyRateMax,
+        milestones: formData.milestones,
+        isUrgent: formData.isUrgent,
+        visibility: formData.visibility,
+        applicationDeadline: formData.applicationDeadline,
+        additionalNotes: formData.additionalNotes
+      };
+
+      const response = await axios.post('/jobs', jobData);
+      
+      if (response.data.success) {
+        toast({
+          title: "Job Posted Successfully!",
+          description: "Your job has been posted and is now live on the platform.",
+        });
+        
+        navigate('/client-dashboard');
+      } else {
+        throw new Error(response.data.message || 'Failed to post job');
+      }
+    } catch (error: any) {
+      console.error('Error posting job:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to post job. Please try again.';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -142,6 +224,21 @@ const PostJob = () => {
   };
 
   const progressPercentage = ((currentStep - 1) / (steps.length - 1)) * 100;
+
+  // Check if user is a client
+  if (user && user.userType !== 'CLIENT') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-4">Only clients can post jobs.</p>
+          <Button onClick={() => navigate('/dashboard')}>
+            Go to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -218,8 +315,12 @@ const PostJob = () => {
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
-              Post Job
+            <Button 
+              onClick={handleSubmit} 
+              className="bg-green-600 hover:bg-green-700"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Posting..." : "Post Job"}
             </Button>
           )}
         </div>

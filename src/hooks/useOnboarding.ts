@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 interface OnboardingData {
   userType?: 'freelancer' | 'client';
@@ -97,6 +98,7 @@ export const useOnboarding = (): UseOnboardingReturn => {
   const [userType, setUserType] = useState<'freelancer' | 'client' | null>(null);
   const [isOnboarded, setIsOnboarded] = useState(false);
   const navigate = useNavigate();
+  const { completeOnboarding: authCompleteOnboarding } = useAuth();
 
   // Load data from localStorage
   const loadFromLocalStorage = () => {
@@ -258,38 +260,17 @@ export const useOnboarding = (): UseOnboardingReturn => {
       };
 
       console.log('Sending onboarding data to API:', JSON.stringify(apiData, null, 2));
-      console.log('API URL:', `${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/onboarding/complete-with-data`);
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/onboarding/complete-with-data`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(apiData),
-      });
+      const { success, message } = await authCompleteOnboarding(apiData);
 
-      console.log('Response status:', response.status);
-      const result = await response.json();
-      console.log('Response data:', result);
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to complete onboarding');
-      }
-
-      // Store token in localStorage
-      localStorage.setItem('token', result.token);
-      
-      // Clear onboarding data from localStorage
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-      
-      setIsOnboarded(true);
-      setCurrentStep(userType === 'freelancer' ? 8 : 7);
-      
-      // Redirect to appropriate dashboard
-      if (userType === 'freelancer') {
-        navigate('/dashboard');
+      if (success) {
+        // Clear onboarding data from localStorage
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        
+        setIsOnboarded(true);
+        setCurrentStep(userType === 'freelancer' ? 8 : 7);
       } else {
-        navigate('/client-dashboard');
+        throw new Error(message || 'Failed to complete onboarding');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to complete onboarding';

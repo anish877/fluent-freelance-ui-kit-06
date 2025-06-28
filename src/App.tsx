@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import { AuthProvider } from "./hooks/AuthContext";
 import { WebSocketProvider } from "./hooks/socketContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Import all pages
 import Index from "./pages/Index";
@@ -48,7 +49,14 @@ const App = () => {
                 {/* Job-related routes */}
                 <Route path="/jobs" element={<Jobs />} />
                 <Route path="/jobs/:id" element={<JobDetails />} />
-                <Route path="/post-job" element={<PostJob />} />
+                <Route 
+                  path="/post-job" 
+                  element={
+                    <ProtectedRoute allowedUserTypes={['CLIENT']}>
+                      <PostJob />
+                    </ProtectedRoute>
+                  } 
+                />
                 
                 {/* User routes */}
                 <Route path="/freelancer/:id" element={<FreelancerProfile />} />
