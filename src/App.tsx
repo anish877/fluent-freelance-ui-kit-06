@@ -59,6 +59,14 @@ const App = () => {
                     </ProtectedRoute>
                   } 
                 />
+                <Route 
+                  path="/client-jobs/:id" 
+                  element={
+                    <ProtectedRoute allowedUserTypes={['CLIENT']}>
+                      <ClientJobView />
+                    </ProtectedRoute>
+                  } 
+                />
                 
                 {/* User routes */}
                 <Route path="/freelancer/:id" element={<FreelancerProfile />} />
