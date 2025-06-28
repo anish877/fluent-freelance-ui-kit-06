@@ -21,6 +21,14 @@ interface PortfolioItem {
   duration: string;
 }
 
+interface SocialLinks {
+  linkedin?: string;
+  github?: string;
+  website?: string;
+  behance?: string;
+  dribbble?: string;
+}
+
 interface FreelancerPortfolioData {
   portfolioItems?: PortfolioItem[];
   githubUrl?: string;
@@ -28,7 +36,9 @@ interface FreelancerPortfolioData {
   websiteUrl?: string;
   behanceUrl?: string;
   dribbbleUrl?: string;
-  [key: string]: PortfolioItem[] | string | undefined;
+  socialLinks?: SocialLinks;
+  portfolio?: string;
+  [key: string]: PortfolioItem[] | string | SocialLinks | undefined;
 }
 
 interface FreelancerPortfolioProps {
@@ -54,7 +64,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
     setFormData({
       ...formData,
       portfolioItems: [
-        ...formData.portfolioItems,
+        ...formData.portfolioItems!,
         {
           title: "",
           description: "",
@@ -75,12 +85,12 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
   const removePortfolioItem = (index: number) => {
     setFormData({
       ...formData,
-      portfolioItems: formData.portfolioItems.filter((_, i) => i !== index)
+      portfolioItems: formData.portfolioItems!.filter((_, i) => i !== index)
     });
   };
 
   const updatePortfolioItem = (index: number, field: string, value: any) => {
-    const updated = formData.portfolioItems.map((item, i) => 
+    const updated = formData.portfolioItems!.map((item, i) => 
       i === index ? { ...item, [field]: value } : item
     );
     setFormData({ ...formData, portfolioItems: updated });
@@ -98,7 +108,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
       const result = await uploadService.uploadMultiple(files);
       
       if (result.success) {
-        const item = formData.portfolioItems[index];
+        const item = formData.portfolioItems![index];
         const newImages = [...item.images, ...result.data.map(file => file.url)];
         updatePortfolioItem(index, "images", newImages);
       } else {
@@ -113,20 +123,20 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
   };
 
   const removeImage = (itemIndex: number, imageIndex: number) => {
-    const item = formData.portfolioItems[itemIndex];
+    const item = formData.portfolioItems![itemIndex];
     const newImages = item.images.filter((_, i) => i !== imageIndex);
     updatePortfolioItem(itemIndex, "images", newImages);
   };
 
   const addTechnology = (itemIndex: number, tech: string) => {
-    const item = formData.portfolioItems[itemIndex];
+    const item = formData.portfolioItems![itemIndex];
     if (tech && !item.technologies.includes(tech)) {
       updatePortfolioItem(itemIndex, "technologies", [...item.technologies, tech]);
     }
   };
 
   const removeTechnology = (itemIndex: number, tech: string) => {
-    const item = formData.portfolioItems[itemIndex];
+    const item = formData.portfolioItems![itemIndex];
     updatePortfolioItem(itemIndex, "technologies", item.technologies.filter(t => t !== tech));
   };
 
@@ -147,12 +157,12 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
     
     const newErrors: Record<string, string> = {};
     
-    if (formData.portfolioItems.length === 0) {
+    if (formData.portfolioItems!.length === 0) {
       newErrors.portfolio = "Please add at least one portfolio item to showcase your work";
     }
 
     // Validate each portfolio item
-    formData.portfolioItems.forEach((item, index) => {
+    formData.portfolioItems!.forEach((item, index) => {
       if (!item.title) {
         newErrors[`portfolio_${index}_title`] = "Project title is required";
       }
@@ -168,7 +178,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
     
     if (Object.keys(newErrors).length === 0) {
       // Map the data to the correct field names for the database
-      const mappedData = {
+      const mappedData: FreelancerPortfolioData = {
         portfolio: JSON.stringify(formData.portfolioItems), // Store portfolio items as JSON string
         socialLinks: {
           linkedin: formData.linkedinUrl,
@@ -260,7 +270,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
             </Button>
           </div>
 
-          {formData.portfolioItems.length === 0 && (
+          {formData.portfolioItems!.length === 0 && (
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
               <div className="flex flex-col items-center">
                 <FileText className="h-12 w-12 text-gray-400 mb-4" />
@@ -274,7 +284,7 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
             </div>
           )}
 
-          {formData.portfolioItems.map((item, index) => (
+          {formData.portfolioItems!.map((item, index) => (
             <div key={index} className="border rounded-lg p-6 mb-6">
               <div className="flex justify-between items-start mb-6">
                 <h4 className="text-lg font-semibold">Portfolio Item {index + 1}</h4>
