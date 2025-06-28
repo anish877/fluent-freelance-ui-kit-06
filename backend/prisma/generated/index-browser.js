@@ -155,6 +155,14 @@ exports.Prisma.UserScalarFieldEnum = {
   category: 'category',
   subcategory: 'subcategory',
   experienceLevel: 'experienceLevel',
+  totalEarnings: 'totalEarnings',
+  successRate: 'successRate',
+  completedJobs: 'completedJobs',
+  onTime: 'onTime',
+  responseTime: 'responseTime',
+  lastActive: 'lastActive',
+  topRatedPlus: 'topRatedPlus',
+  verified: 'verified',
   companyName: 'companyName',
   companySize: 'companySize',
   industry: 'industry',
@@ -179,7 +187,6 @@ exports.Prisma.UserScalarFieldEnum = {
   hoursPerWeek: 'hoursPerWeek',
   workingHours: 'workingHours',
   workingDays: 'workingDays',
-  responseTime: 'responseTime',
   minimumProjectBudget: 'minimumProjectBudget',
   specialRequirements: 'specialRequirements'
 };
@@ -223,7 +230,15 @@ exports.Prisma.ProposalScalarFieldEnum = {
   jobId: 'jobId',
   freelancerId: 'freelancerId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  questionResponses: 'questionResponses',
+  milestones: 'milestones',
+  clientNotes: 'clientNotes',
+  clientViewed: 'clientViewed',
+  rating: 'rating',
+  interview: 'interview',
+  originalBudget: 'originalBudget',
+  isShortlisted: 'isShortlisted'
 };
 
 exports.Prisma.ReviewScalarFieldEnum = {

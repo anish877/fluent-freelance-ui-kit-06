@@ -53,6 +53,16 @@ model User {
   subcategory  String? // Subcategory
   experienceLevel String? // entry, intermediate, expert
 
+  // Freelancer performance metrics
+  totalEarnings String? // Total earnings as string (e.g., "$127,000+")
+  successRate   Int? // Success rate percentage
+  completedJobs Int? // Number of completed jobs
+  onTime        Int? // On-time delivery percentage
+  responseTime  String? // Response time (e.g., "within 1 hour")
+  lastActive    String? // Last active status (e.g., "Online now", "2 hours ago")
+  topRatedPlus  Boolean @default(false) // Top rated plus status
+  verified      Boolean @default(false) // Verification status
+
   // Client specific fields
   companyName  String?
   companySize  String?
@@ -84,7 +94,6 @@ model User {
   hoursPerWeek String? // Hours available per week
   workingHours Json? // { start, end }
   workingDays String[] // Days of the week available
-  responseTime String? // How quickly they respond
   minimumProjectBudget String? // Minimum project budget they accept
   specialRequirements String? // Special requirements or notes
 
@@ -148,6 +157,16 @@ model Proposal {
   freelancerId String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Additional fields for enhanced proposal details
+  questionResponses Json? // Array of question-response objects
+  milestones Json? // Array of milestone objects with title, duration, amount
+  clientNotes String? // Notes from client about this proposal
+  clientViewed Boolean @default(false) // Whether client has viewed this proposal
+  rating Int? // Rating given by client (1-5)
+  interview Json? // Interview details: { scheduled: boolean, date: string, notes: string }
+  originalBudget Float? // Original budget if freelancer changed their bid
+  isShortlisted Boolean @default(false) // Whether proposal is shortlisted by client
 
   // Relations
   job        Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)

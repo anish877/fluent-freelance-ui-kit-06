@@ -1667,11 +1667,17 @@ export namespace Prisma {
   export type UserAvgAggregateOutputType = {
     onboardingStep: number | null
     hourlyRate: number | null
+    successRate: number | null
+    completedJobs: number | null
+    onTime: number | null
   }
 
   export type UserSumAggregateOutputType = {
     onboardingStep: number | null
     hourlyRate: number | null
+    successRate: number | null
+    completedJobs: number | null
+    onTime: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -1701,6 +1707,14 @@ export namespace Prisma {
     category: string | null
     subcategory: string | null
     experienceLevel: string | null
+    totalEarnings: string | null
+    successRate: number | null
+    completedJobs: number | null
+    onTime: number | null
+    responseTime: string | null
+    lastActive: string | null
+    topRatedPlus: boolean | null
+    verified: boolean | null
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -1718,7 +1732,6 @@ export namespace Prisma {
     maxHourlyRate: string | null
     totalMonthlyBudget: string | null
     hoursPerWeek: string | null
-    responseTime: string | null
     minimumProjectBudget: string | null
     specialRequirements: string | null
   }
@@ -1750,6 +1763,14 @@ export namespace Prisma {
     category: string | null
     subcategory: string | null
     experienceLevel: string | null
+    totalEarnings: string | null
+    successRate: number | null
+    completedJobs: number | null
+    onTime: number | null
+    responseTime: string | null
+    lastActive: string | null
+    topRatedPlus: boolean | null
+    verified: boolean | null
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -1767,7 +1788,6 @@ export namespace Prisma {
     maxHourlyRate: string | null
     totalMonthlyBudget: string | null
     hoursPerWeek: string | null
-    responseTime: string | null
     minimumProjectBudget: string | null
     specialRequirements: string | null
   }
@@ -1807,6 +1827,14 @@ export namespace Prisma {
     category: number
     subcategory: number
     experienceLevel: number
+    totalEarnings: number
+    successRate: number
+    completedJobs: number
+    onTime: number
+    responseTime: number
+    lastActive: number
+    topRatedPlus: number
+    verified: number
     companyName: number
     companySize: number
     industry: number
@@ -1831,7 +1859,6 @@ export namespace Prisma {
     hoursPerWeek: number
     workingHours: number
     workingDays: number
-    responseTime: number
     minimumProjectBudget: number
     specialRequirements: number
     _all: number
@@ -1841,11 +1868,17 @@ export namespace Prisma {
   export type UserAvgAggregateInputType = {
     onboardingStep?: true
     hourlyRate?: true
+    successRate?: true
+    completedJobs?: true
+    onTime?: true
   }
 
   export type UserSumAggregateInputType = {
     onboardingStep?: true
     hourlyRate?: true
+    successRate?: true
+    completedJobs?: true
+    onTime?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -1875,6 +1908,14 @@ export namespace Prisma {
     category?: true
     subcategory?: true
     experienceLevel?: true
+    totalEarnings?: true
+    successRate?: true
+    completedJobs?: true
+    onTime?: true
+    responseTime?: true
+    lastActive?: true
+    topRatedPlus?: true
+    verified?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -1892,7 +1933,6 @@ export namespace Prisma {
     maxHourlyRate?: true
     totalMonthlyBudget?: true
     hoursPerWeek?: true
-    responseTime?: true
     minimumProjectBudget?: true
     specialRequirements?: true
   }
@@ -1924,6 +1964,14 @@ export namespace Prisma {
     category?: true
     subcategory?: true
     experienceLevel?: true
+    totalEarnings?: true
+    successRate?: true
+    completedJobs?: true
+    onTime?: true
+    responseTime?: true
+    lastActive?: true
+    topRatedPlus?: true
+    verified?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -1941,7 +1989,6 @@ export namespace Prisma {
     maxHourlyRate?: true
     totalMonthlyBudget?: true
     hoursPerWeek?: true
-    responseTime?: true
     minimumProjectBudget?: true
     specialRequirements?: true
   }
@@ -1981,6 +2028,14 @@ export namespace Prisma {
     category?: true
     subcategory?: true
     experienceLevel?: true
+    totalEarnings?: true
+    successRate?: true
+    completedJobs?: true
+    onTime?: true
+    responseTime?: true
+    lastActive?: true
+    topRatedPlus?: true
+    verified?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -2005,7 +2060,6 @@ export namespace Prisma {
     hoursPerWeek?: true
     workingHours?: true
     workingDays?: true
-    responseTime?: true
     minimumProjectBudget?: true
     specialRequirements?: true
     _all?: true
@@ -2132,6 +2186,14 @@ export namespace Prisma {
     category: string | null
     subcategory: string | null
     experienceLevel: string | null
+    totalEarnings: string | null
+    successRate: number | null
+    completedJobs: number | null
+    onTime: number | null
+    responseTime: string | null
+    lastActive: string | null
+    topRatedPlus: boolean
+    verified: boolean
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -2156,7 +2218,6 @@ export namespace Prisma {
     hoursPerWeek: string | null
     workingHours: JsonValue | null
     workingDays: string[]
-    responseTime: string | null
     minimumProjectBudget: string | null
     specialRequirements: string | null
     _count: UserCountAggregateOutputType | null
@@ -2215,6 +2276,14 @@ export namespace Prisma {
     category?: boolean
     subcategory?: boolean
     experienceLevel?: boolean
+    totalEarnings?: boolean
+    successRate?: boolean
+    completedJobs?: boolean
+    onTime?: boolean
+    responseTime?: boolean
+    lastActive?: boolean
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2239,7 +2308,6 @@ export namespace Prisma {
     hoursPerWeek?: boolean
     workingHours?: boolean
     workingDays?: boolean
-    responseTime?: boolean
     minimumProjectBudget?: boolean
     specialRequirements?: boolean
     jobsPosted?: boolean | User$jobsPostedArgs<ExtArgs>
@@ -2287,6 +2355,14 @@ export namespace Prisma {
     category?: boolean
     subcategory?: boolean
     experienceLevel?: boolean
+    totalEarnings?: boolean
+    successRate?: boolean
+    completedJobs?: boolean
+    onTime?: boolean
+    responseTime?: boolean
+    lastActive?: boolean
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2311,7 +2387,6 @@ export namespace Prisma {
     hoursPerWeek?: boolean
     workingHours?: boolean
     workingDays?: boolean
-    responseTime?: boolean
     minimumProjectBudget?: boolean
     specialRequirements?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2351,6 +2426,14 @@ export namespace Prisma {
     category?: boolean
     subcategory?: boolean
     experienceLevel?: boolean
+    totalEarnings?: boolean
+    successRate?: boolean
+    completedJobs?: boolean
+    onTime?: boolean
+    responseTime?: boolean
+    lastActive?: boolean
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2375,7 +2458,6 @@ export namespace Prisma {
     hoursPerWeek?: boolean
     workingHours?: boolean
     workingDays?: boolean
-    responseTime?: boolean
     minimumProjectBudget?: boolean
     specialRequirements?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2415,6 +2497,14 @@ export namespace Prisma {
     category?: boolean
     subcategory?: boolean
     experienceLevel?: boolean
+    totalEarnings?: boolean
+    successRate?: boolean
+    completedJobs?: boolean
+    onTime?: boolean
+    responseTime?: boolean
+    lastActive?: boolean
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2439,12 +2529,11 @@ export namespace Prisma {
     hoursPerWeek?: boolean
     workingHours?: boolean
     workingDays?: boolean
-    responseTime?: boolean
     minimumProjectBudget?: boolean
     specialRequirements?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "responseTime" | "minimumProjectBudget" | "specialRequirements", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "totalEarnings" | "successRate" | "completedJobs" | "onTime" | "responseTime" | "lastActive" | "topRatedPlus" | "verified" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "minimumProjectBudget" | "specialRequirements", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     jobsPosted?: boolean | User$jobsPostedArgs<ExtArgs>
     proposals?: boolean | User$proposalsArgs<ExtArgs>
@@ -2504,6 +2593,14 @@ export namespace Prisma {
       category: string | null
       subcategory: string | null
       experienceLevel: string | null
+      totalEarnings: string | null
+      successRate: number | null
+      completedJobs: number | null
+      onTime: number | null
+      responseTime: string | null
+      lastActive: string | null
+      topRatedPlus: boolean
+      verified: boolean
       companyName: string | null
       companySize: string | null
       industry: string | null
@@ -2528,7 +2625,6 @@ export namespace Prisma {
       hoursPerWeek: string | null
       workingHours: Prisma.JsonValue | null
       workingDays: string[]
-      responseTime: string | null
       minimumProjectBudget: string | null
       specialRequirements: string | null
     }, ExtArgs["result"]["user"]>
@@ -2995,6 +3091,14 @@ export namespace Prisma {
     readonly category: FieldRef<"User", 'String'>
     readonly subcategory: FieldRef<"User", 'String'>
     readonly experienceLevel: FieldRef<"User", 'String'>
+    readonly totalEarnings: FieldRef<"User", 'String'>
+    readonly successRate: FieldRef<"User", 'Int'>
+    readonly completedJobs: FieldRef<"User", 'Int'>
+    readonly onTime: FieldRef<"User", 'Int'>
+    readonly responseTime: FieldRef<"User", 'String'>
+    readonly lastActive: FieldRef<"User", 'String'>
+    readonly topRatedPlus: FieldRef<"User", 'Boolean'>
+    readonly verified: FieldRef<"User", 'Boolean'>
     readonly companyName: FieldRef<"User", 'String'>
     readonly companySize: FieldRef<"User", 'String'>
     readonly industry: FieldRef<"User", 'String'>
@@ -3019,7 +3123,6 @@ export namespace Prisma {
     readonly hoursPerWeek: FieldRef<"User", 'String'>
     readonly workingHours: FieldRef<"User", 'Json'>
     readonly workingDays: FieldRef<"User", 'String[]'>
-    readonly responseTime: FieldRef<"User", 'String'>
     readonly minimumProjectBudget: FieldRef<"User", 'String'>
     readonly specialRequirements: FieldRef<"User", 'String'>
   }
@@ -5057,10 +5160,14 @@ export namespace Prisma {
 
   export type ProposalAvgAggregateOutputType = {
     bidAmount: number | null
+    rating: number | null
+    originalBudget: number | null
   }
 
   export type ProposalSumAggregateOutputType = {
     bidAmount: number | null
+    rating: number | null
+    originalBudget: number | null
   }
 
   export type ProposalMinAggregateOutputType = {
@@ -5073,6 +5180,11 @@ export namespace Prisma {
     freelancerId: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    clientNotes: string | null
+    clientViewed: boolean | null
+    rating: number | null
+    originalBudget: number | null
+    isShortlisted: boolean | null
   }
 
   export type ProposalMaxAggregateOutputType = {
@@ -5085,6 +5197,11 @@ export namespace Prisma {
     freelancerId: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    clientNotes: string | null
+    clientViewed: boolean | null
+    rating: number | null
+    originalBudget: number | null
+    isShortlisted: boolean | null
   }
 
   export type ProposalCountAggregateOutputType = {
@@ -5098,16 +5215,28 @@ export namespace Prisma {
     freelancerId: number
     createdAt: number
     updatedAt: number
+    questionResponses: number
+    milestones: number
+    clientNotes: number
+    clientViewed: number
+    rating: number
+    interview: number
+    originalBudget: number
+    isShortlisted: number
     _all: number
   }
 
 
   export type ProposalAvgAggregateInputType = {
     bidAmount?: true
+    rating?: true
+    originalBudget?: true
   }
 
   export type ProposalSumAggregateInputType = {
     bidAmount?: true
+    rating?: true
+    originalBudget?: true
   }
 
   export type ProposalMinAggregateInputType = {
@@ -5120,6 +5249,11 @@ export namespace Prisma {
     freelancerId?: true
     createdAt?: true
     updatedAt?: true
+    clientNotes?: true
+    clientViewed?: true
+    rating?: true
+    originalBudget?: true
+    isShortlisted?: true
   }
 
   export type ProposalMaxAggregateInputType = {
@@ -5132,6 +5266,11 @@ export namespace Prisma {
     freelancerId?: true
     createdAt?: true
     updatedAt?: true
+    clientNotes?: true
+    clientViewed?: true
+    rating?: true
+    originalBudget?: true
+    isShortlisted?: true
   }
 
   export type ProposalCountAggregateInputType = {
@@ -5145,6 +5284,14 @@ export namespace Prisma {
     freelancerId?: true
     createdAt?: true
     updatedAt?: true
+    questionResponses?: true
+    milestones?: true
+    clientNotes?: true
+    clientViewed?: true
+    rating?: true
+    interview?: true
+    originalBudget?: true
+    isShortlisted?: true
     _all?: true
   }
 
@@ -5245,6 +5392,14 @@ export namespace Prisma {
     freelancerId: string
     createdAt: Date
     updatedAt: Date
+    questionResponses: JsonValue | null
+    milestones: JsonValue | null
+    clientNotes: string | null
+    clientViewed: boolean
+    rating: number | null
+    interview: JsonValue | null
+    originalBudget: number | null
+    isShortlisted: boolean
     _count: ProposalCountAggregateOutputType | null
     _avg: ProposalAvgAggregateOutputType | null
     _sum: ProposalSumAggregateOutputType | null
@@ -5277,6 +5432,14 @@ export namespace Prisma {
     freelancerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    questionResponses?: boolean
+    milestones?: boolean
+    clientNotes?: boolean
+    clientViewed?: boolean
+    rating?: boolean
+    interview?: boolean
+    originalBudget?: boolean
+    isShortlisted?: boolean
     job?: boolean | JobDefaultArgs<ExtArgs>
     freelancer?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["proposal"]>
@@ -5292,6 +5455,14 @@ export namespace Prisma {
     freelancerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    questionResponses?: boolean
+    milestones?: boolean
+    clientNotes?: boolean
+    clientViewed?: boolean
+    rating?: boolean
+    interview?: boolean
+    originalBudget?: boolean
+    isShortlisted?: boolean
     job?: boolean | JobDefaultArgs<ExtArgs>
     freelancer?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["proposal"]>
@@ -5307,6 +5478,14 @@ export namespace Prisma {
     freelancerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    questionResponses?: boolean
+    milestones?: boolean
+    clientNotes?: boolean
+    clientViewed?: boolean
+    rating?: boolean
+    interview?: boolean
+    originalBudget?: boolean
+    isShortlisted?: boolean
     job?: boolean | JobDefaultArgs<ExtArgs>
     freelancer?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["proposal"]>
@@ -5322,9 +5501,17 @@ export namespace Prisma {
     freelancerId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    questionResponses?: boolean
+    milestones?: boolean
+    clientNotes?: boolean
+    clientViewed?: boolean
+    rating?: boolean
+    interview?: boolean
+    originalBudget?: boolean
+    isShortlisted?: boolean
   }
 
-  export type ProposalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "coverLetter" | "bidAmount" | "estimatedDuration" | "attachments" | "status" | "jobId" | "freelancerId" | "createdAt" | "updatedAt", ExtArgs["result"]["proposal"]>
+  export type ProposalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "coverLetter" | "bidAmount" | "estimatedDuration" | "attachments" | "status" | "jobId" | "freelancerId" | "createdAt" | "updatedAt" | "questionResponses" | "milestones" | "clientNotes" | "clientViewed" | "rating" | "interview" | "originalBudget" | "isShortlisted", ExtArgs["result"]["proposal"]>
   export type ProposalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     job?: boolean | JobDefaultArgs<ExtArgs>
     freelancer?: boolean | UserDefaultArgs<ExtArgs>
@@ -5355,6 +5542,14 @@ export namespace Prisma {
       freelancerId: string
       createdAt: Date
       updatedAt: Date
+      questionResponses: Prisma.JsonValue | null
+      milestones: Prisma.JsonValue | null
+      clientNotes: string | null
+      clientViewed: boolean
+      rating: number | null
+      interview: Prisma.JsonValue | null
+      originalBudget: number | null
+      isShortlisted: boolean
     }, ExtArgs["result"]["proposal"]>
     composites: {}
   }
@@ -5790,6 +5985,14 @@ export namespace Prisma {
     readonly freelancerId: FieldRef<"Proposal", 'String'>
     readonly createdAt: FieldRef<"Proposal", 'DateTime'>
     readonly updatedAt: FieldRef<"Proposal", 'DateTime'>
+    readonly questionResponses: FieldRef<"Proposal", 'Json'>
+    readonly milestones: FieldRef<"Proposal", 'Json'>
+    readonly clientNotes: FieldRef<"Proposal", 'String'>
+    readonly clientViewed: FieldRef<"Proposal", 'Boolean'>
+    readonly rating: FieldRef<"Proposal", 'Int'>
+    readonly interview: FieldRef<"Proposal", 'Json'>
+    readonly originalBudget: FieldRef<"Proposal", 'Float'>
+    readonly isShortlisted: FieldRef<"Proposal", 'Boolean'>
   }
     
 
@@ -10789,6 +10992,14 @@ export namespace Prisma {
     category: 'category',
     subcategory: 'subcategory',
     experienceLevel: 'experienceLevel',
+    totalEarnings: 'totalEarnings',
+    successRate: 'successRate',
+    completedJobs: 'completedJobs',
+    onTime: 'onTime',
+    responseTime: 'responseTime',
+    lastActive: 'lastActive',
+    topRatedPlus: 'topRatedPlus',
+    verified: 'verified',
     companyName: 'companyName',
     companySize: 'companySize',
     industry: 'industry',
@@ -10813,7 +11024,6 @@ export namespace Prisma {
     hoursPerWeek: 'hoursPerWeek',
     workingHours: 'workingHours',
     workingDays: 'workingDays',
-    responseTime: 'responseTime',
     minimumProjectBudget: 'minimumProjectBudget',
     specialRequirements: 'specialRequirements'
   };
@@ -10863,7 +11073,15 @@ export namespace Prisma {
     jobId: 'jobId',
     freelancerId: 'freelancerId',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    questionResponses: 'questionResponses',
+    milestones: 'milestones',
+    clientNotes: 'clientNotes',
+    clientViewed: 'clientViewed',
+    rating: 'rating',
+    interview: 'interview',
+    originalBudget: 'originalBudget',
+    isShortlisted: 'isShortlisted'
   };
 
   export type ProposalScalarFieldEnum = (typeof ProposalScalarFieldEnum)[keyof typeof ProposalScalarFieldEnum]
@@ -11158,6 +11376,14 @@ export namespace Prisma {
     category?: StringNullableFilter<"User"> | string | null
     subcategory?: StringNullableFilter<"User"> | string | null
     experienceLevel?: StringNullableFilter<"User"> | string | null
+    totalEarnings?: StringNullableFilter<"User"> | string | null
+    successRate?: IntNullableFilter<"User"> | number | null
+    completedJobs?: IntNullableFilter<"User"> | number | null
+    onTime?: IntNullableFilter<"User"> | number | null
+    responseTime?: StringNullableFilter<"User"> | string | null
+    lastActive?: StringNullableFilter<"User"> | string | null
+    topRatedPlus?: BoolFilter<"User"> | boolean
+    verified?: BoolFilter<"User"> | boolean
     companyName?: StringNullableFilter<"User"> | string | null
     companySize?: StringNullableFilter<"User"> | string | null
     industry?: StringNullableFilter<"User"> | string | null
@@ -11182,7 +11408,6 @@ export namespace Prisma {
     hoursPerWeek?: StringNullableFilter<"User"> | string | null
     workingHours?: JsonNullableFilter<"User">
     workingDays?: StringNullableListFilter<"User">
-    responseTime?: StringNullableFilter<"User"> | string | null
     minimumProjectBudget?: StringNullableFilter<"User"> | string | null
     specialRequirements?: StringNullableFilter<"User"> | string | null
     jobsPosted?: JobListRelationFilter
@@ -11229,6 +11454,14 @@ export namespace Prisma {
     category?: SortOrderInput | SortOrder
     subcategory?: SortOrderInput | SortOrder
     experienceLevel?: SortOrderInput | SortOrder
+    totalEarnings?: SortOrderInput | SortOrder
+    successRate?: SortOrderInput | SortOrder
+    completedJobs?: SortOrderInput | SortOrder
+    onTime?: SortOrderInput | SortOrder
+    responseTime?: SortOrderInput | SortOrder
+    lastActive?: SortOrderInput | SortOrder
+    topRatedPlus?: SortOrder
+    verified?: SortOrder
     companyName?: SortOrderInput | SortOrder
     companySize?: SortOrderInput | SortOrder
     industry?: SortOrderInput | SortOrder
@@ -11253,7 +11486,6 @@ export namespace Prisma {
     hoursPerWeek?: SortOrderInput | SortOrder
     workingHours?: SortOrderInput | SortOrder
     workingDays?: SortOrder
-    responseTime?: SortOrderInput | SortOrder
     minimumProjectBudget?: SortOrderInput | SortOrder
     specialRequirements?: SortOrderInput | SortOrder
     jobsPosted?: JobOrderByRelationAggregateInput
@@ -11303,6 +11535,14 @@ export namespace Prisma {
     category?: StringNullableFilter<"User"> | string | null
     subcategory?: StringNullableFilter<"User"> | string | null
     experienceLevel?: StringNullableFilter<"User"> | string | null
+    totalEarnings?: StringNullableFilter<"User"> | string | null
+    successRate?: IntNullableFilter<"User"> | number | null
+    completedJobs?: IntNullableFilter<"User"> | number | null
+    onTime?: IntNullableFilter<"User"> | number | null
+    responseTime?: StringNullableFilter<"User"> | string | null
+    lastActive?: StringNullableFilter<"User"> | string | null
+    topRatedPlus?: BoolFilter<"User"> | boolean
+    verified?: BoolFilter<"User"> | boolean
     companyName?: StringNullableFilter<"User"> | string | null
     companySize?: StringNullableFilter<"User"> | string | null
     industry?: StringNullableFilter<"User"> | string | null
@@ -11327,7 +11567,6 @@ export namespace Prisma {
     hoursPerWeek?: StringNullableFilter<"User"> | string | null
     workingHours?: JsonNullableFilter<"User">
     workingDays?: StringNullableListFilter<"User">
-    responseTime?: StringNullableFilter<"User"> | string | null
     minimumProjectBudget?: StringNullableFilter<"User"> | string | null
     specialRequirements?: StringNullableFilter<"User"> | string | null
     jobsPosted?: JobListRelationFilter
@@ -11374,6 +11613,14 @@ export namespace Prisma {
     category?: SortOrderInput | SortOrder
     subcategory?: SortOrderInput | SortOrder
     experienceLevel?: SortOrderInput | SortOrder
+    totalEarnings?: SortOrderInput | SortOrder
+    successRate?: SortOrderInput | SortOrder
+    completedJobs?: SortOrderInput | SortOrder
+    onTime?: SortOrderInput | SortOrder
+    responseTime?: SortOrderInput | SortOrder
+    lastActive?: SortOrderInput | SortOrder
+    topRatedPlus?: SortOrder
+    verified?: SortOrder
     companyName?: SortOrderInput | SortOrder
     companySize?: SortOrderInput | SortOrder
     industry?: SortOrderInput | SortOrder
@@ -11398,7 +11645,6 @@ export namespace Prisma {
     hoursPerWeek?: SortOrderInput | SortOrder
     workingHours?: SortOrderInput | SortOrder
     workingDays?: SortOrder
-    responseTime?: SortOrderInput | SortOrder
     minimumProjectBudget?: SortOrderInput | SortOrder
     specialRequirements?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -11446,6 +11692,14 @@ export namespace Prisma {
     category?: StringNullableWithAggregatesFilter<"User"> | string | null
     subcategory?: StringNullableWithAggregatesFilter<"User"> | string | null
     experienceLevel?: StringNullableWithAggregatesFilter<"User"> | string | null
+    totalEarnings?: StringNullableWithAggregatesFilter<"User"> | string | null
+    successRate?: IntNullableWithAggregatesFilter<"User"> | number | null
+    completedJobs?: IntNullableWithAggregatesFilter<"User"> | number | null
+    onTime?: IntNullableWithAggregatesFilter<"User"> | number | null
+    responseTime?: StringNullableWithAggregatesFilter<"User"> | string | null
+    lastActive?: StringNullableWithAggregatesFilter<"User"> | string | null
+    topRatedPlus?: BoolWithAggregatesFilter<"User"> | boolean
+    verified?: BoolWithAggregatesFilter<"User"> | boolean
     companyName?: StringNullableWithAggregatesFilter<"User"> | string | null
     companySize?: StringNullableWithAggregatesFilter<"User"> | string | null
     industry?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -11470,7 +11724,6 @@ export namespace Prisma {
     hoursPerWeek?: StringNullableWithAggregatesFilter<"User"> | string | null
     workingHours?: JsonNullableWithAggregatesFilter<"User">
     workingDays?: StringNullableListFilter<"User">
-    responseTime?: StringNullableWithAggregatesFilter<"User"> | string | null
     minimumProjectBudget?: StringNullableWithAggregatesFilter<"User"> | string | null
     specialRequirements?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
@@ -11660,6 +11913,14 @@ export namespace Prisma {
     freelancerId?: StringFilter<"Proposal"> | string
     createdAt?: DateTimeFilter<"Proposal"> | Date | string
     updatedAt?: DateTimeFilter<"Proposal"> | Date | string
+    questionResponses?: JsonNullableFilter<"Proposal">
+    milestones?: JsonNullableFilter<"Proposal">
+    clientNotes?: StringNullableFilter<"Proposal"> | string | null
+    clientViewed?: BoolFilter<"Proposal"> | boolean
+    rating?: IntNullableFilter<"Proposal"> | number | null
+    interview?: JsonNullableFilter<"Proposal">
+    originalBudget?: FloatNullableFilter<"Proposal"> | number | null
+    isShortlisted?: BoolFilter<"Proposal"> | boolean
     job?: XOR<JobScalarRelationFilter, JobWhereInput>
     freelancer?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
@@ -11675,6 +11936,14 @@ export namespace Prisma {
     freelancerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    questionResponses?: SortOrderInput | SortOrder
+    milestones?: SortOrderInput | SortOrder
+    clientNotes?: SortOrderInput | SortOrder
+    clientViewed?: SortOrder
+    rating?: SortOrderInput | SortOrder
+    interview?: SortOrderInput | SortOrder
+    originalBudget?: SortOrderInput | SortOrder
+    isShortlisted?: SortOrder
     job?: JobOrderByWithRelationInput
     freelancer?: UserOrderByWithRelationInput
   }
@@ -11693,6 +11962,14 @@ export namespace Prisma {
     freelancerId?: StringFilter<"Proposal"> | string
     createdAt?: DateTimeFilter<"Proposal"> | Date | string
     updatedAt?: DateTimeFilter<"Proposal"> | Date | string
+    questionResponses?: JsonNullableFilter<"Proposal">
+    milestones?: JsonNullableFilter<"Proposal">
+    clientNotes?: StringNullableFilter<"Proposal"> | string | null
+    clientViewed?: BoolFilter<"Proposal"> | boolean
+    rating?: IntNullableFilter<"Proposal"> | number | null
+    interview?: JsonNullableFilter<"Proposal">
+    originalBudget?: FloatNullableFilter<"Proposal"> | number | null
+    isShortlisted?: BoolFilter<"Proposal"> | boolean
     job?: XOR<JobScalarRelationFilter, JobWhereInput>
     freelancer?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
@@ -11708,6 +11985,14 @@ export namespace Prisma {
     freelancerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    questionResponses?: SortOrderInput | SortOrder
+    milestones?: SortOrderInput | SortOrder
+    clientNotes?: SortOrderInput | SortOrder
+    clientViewed?: SortOrder
+    rating?: SortOrderInput | SortOrder
+    interview?: SortOrderInput | SortOrder
+    originalBudget?: SortOrderInput | SortOrder
+    isShortlisted?: SortOrder
     _count?: ProposalCountOrderByAggregateInput
     _avg?: ProposalAvgOrderByAggregateInput
     _max?: ProposalMaxOrderByAggregateInput
@@ -11729,6 +12014,14 @@ export namespace Prisma {
     freelancerId?: StringWithAggregatesFilter<"Proposal"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Proposal"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Proposal"> | Date | string
+    questionResponses?: JsonNullableWithAggregatesFilter<"Proposal">
+    milestones?: JsonNullableWithAggregatesFilter<"Proposal">
+    clientNotes?: StringNullableWithAggregatesFilter<"Proposal"> | string | null
+    clientViewed?: BoolWithAggregatesFilter<"Proposal"> | boolean
+    rating?: IntNullableWithAggregatesFilter<"Proposal"> | number | null
+    interview?: JsonNullableWithAggregatesFilter<"Proposal">
+    originalBudget?: FloatNullableWithAggregatesFilter<"Proposal"> | number | null
+    isShortlisted?: BoolWithAggregatesFilter<"Proposal"> | boolean
   }
 
   export type ReviewWhereInput = {
@@ -12064,6 +12357,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -12088,7 +12389,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
@@ -12135,6 +12435,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -12159,7 +12467,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
@@ -12206,6 +12513,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12230,7 +12545,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
@@ -12277,6 +12591,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12301,7 +12623,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
@@ -12348,6 +12669,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -12372,7 +12701,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
   }
@@ -12412,6 +12740,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12436,7 +12772,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -12476,6 +12811,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12500,7 +12843,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -12728,6 +13070,14 @@ export namespace Prisma {
     status?: $Enums.ProposalStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
     job: JobCreateNestedOneWithoutProposalsInput
     freelancer: UserCreateNestedOneWithoutProposalsInput
   }
@@ -12743,6 +13093,14 @@ export namespace Prisma {
     freelancerId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
   }
 
   export type ProposalUpdateInput = {
@@ -12754,6 +13112,14 @@ export namespace Prisma {
     status?: EnumProposalStatusFieldUpdateOperationsInput | $Enums.ProposalStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
     job?: JobUpdateOneRequiredWithoutProposalsNestedInput
     freelancer?: UserUpdateOneRequiredWithoutProposalsNestedInput
   }
@@ -12769,6 +13135,14 @@ export namespace Prisma {
     freelancerId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProposalCreateManyInput = {
@@ -12782,6 +13156,14 @@ export namespace Prisma {
     freelancerId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
   }
 
   export type ProposalUpdateManyMutationInput = {
@@ -12793,6 +13175,14 @@ export namespace Prisma {
     status?: EnumProposalStatusFieldUpdateOperationsInput | $Enums.ProposalStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProposalUncheckedUpdateManyInput = {
@@ -12806,6 +13196,14 @@ export namespace Prisma {
     freelancerId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ReviewCreateInput = {
@@ -13214,6 +13612,17 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type JobListRelationFilter = {
     every?: JobWhereInput
     some?: JobWhereInput
@@ -13304,6 +13713,14 @@ export namespace Prisma {
     category?: SortOrder
     subcategory?: SortOrder
     experienceLevel?: SortOrder
+    totalEarnings?: SortOrder
+    successRate?: SortOrder
+    completedJobs?: SortOrder
+    onTime?: SortOrder
+    responseTime?: SortOrder
+    lastActive?: SortOrder
+    topRatedPlus?: SortOrder
+    verified?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -13328,7 +13745,6 @@ export namespace Prisma {
     hoursPerWeek?: SortOrder
     workingHours?: SortOrder
     workingDays?: SortOrder
-    responseTime?: SortOrder
     minimumProjectBudget?: SortOrder
     specialRequirements?: SortOrder
   }
@@ -13336,6 +13752,9 @@ export namespace Prisma {
   export type UserAvgOrderByAggregateInput = {
     onboardingStep?: SortOrder
     hourlyRate?: SortOrder
+    successRate?: SortOrder
+    completedJobs?: SortOrder
+    onTime?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -13365,6 +13784,14 @@ export namespace Prisma {
     category?: SortOrder
     subcategory?: SortOrder
     experienceLevel?: SortOrder
+    totalEarnings?: SortOrder
+    successRate?: SortOrder
+    completedJobs?: SortOrder
+    onTime?: SortOrder
+    responseTime?: SortOrder
+    lastActive?: SortOrder
+    topRatedPlus?: SortOrder
+    verified?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -13382,7 +13809,6 @@ export namespace Prisma {
     maxHourlyRate?: SortOrder
     totalMonthlyBudget?: SortOrder
     hoursPerWeek?: SortOrder
-    responseTime?: SortOrder
     minimumProjectBudget?: SortOrder
     specialRequirements?: SortOrder
   }
@@ -13414,6 +13840,14 @@ export namespace Prisma {
     category?: SortOrder
     subcategory?: SortOrder
     experienceLevel?: SortOrder
+    totalEarnings?: SortOrder
+    successRate?: SortOrder
+    completedJobs?: SortOrder
+    onTime?: SortOrder
+    responseTime?: SortOrder
+    lastActive?: SortOrder
+    topRatedPlus?: SortOrder
+    verified?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -13431,7 +13865,6 @@ export namespace Prisma {
     maxHourlyRate?: SortOrder
     totalMonthlyBudget?: SortOrder
     hoursPerWeek?: SortOrder
-    responseTime?: SortOrder
     minimumProjectBudget?: SortOrder
     specialRequirements?: SortOrder
   }
@@ -13439,6 +13872,9 @@ export namespace Prisma {
   export type UserSumOrderByAggregateInput = {
     onboardingStep?: SortOrder
     hourlyRate?: SortOrder
+    successRate?: SortOrder
+    completedJobs?: SortOrder
+    onTime?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -13565,6 +14001,22 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type EnumBudgetTypeFilter<$PrismaModel = never> = {
@@ -13768,10 +14220,20 @@ export namespace Prisma {
     freelancerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    questionResponses?: SortOrder
+    milestones?: SortOrder
+    clientNotes?: SortOrder
+    clientViewed?: SortOrder
+    rating?: SortOrder
+    interview?: SortOrder
+    originalBudget?: SortOrder
+    isShortlisted?: SortOrder
   }
 
   export type ProposalAvgOrderByAggregateInput = {
     bidAmount?: SortOrder
+    rating?: SortOrder
+    originalBudget?: SortOrder
   }
 
   export type ProposalMaxOrderByAggregateInput = {
@@ -13784,6 +14246,11 @@ export namespace Prisma {
     freelancerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    clientNotes?: SortOrder
+    clientViewed?: SortOrder
+    rating?: SortOrder
+    originalBudget?: SortOrder
+    isShortlisted?: SortOrder
   }
 
   export type ProposalMinOrderByAggregateInput = {
@@ -13796,10 +14263,17 @@ export namespace Prisma {
     freelancerId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    clientNotes?: SortOrder
+    clientViewed?: SortOrder
+    rating?: SortOrder
+    originalBudget?: SortOrder
+    isShortlisted?: SortOrder
   }
 
   export type ProposalSumOrderByAggregateInput = {
     bidAmount?: SortOrder
+    rating?: SortOrder
+    originalBudget?: SortOrder
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -14179,6 +14653,14 @@ export namespace Prisma {
   export type UserUpdatecertificationsInput = {
     set?: string[]
     push?: string | string[]
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type UserUpdateprojectTypesInput = {
@@ -14920,6 +15402,17 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -14952,17 +15445,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumUserTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -15061,6 +15543,22 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumBudgetTypeFilter<$PrismaModel = never> = {
@@ -15253,6 +15751,14 @@ export namespace Prisma {
     status?: $Enums.ProposalStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
     job: JobCreateNestedOneWithoutProposalsInput
   }
 
@@ -15266,6 +15772,14 @@ export namespace Prisma {
     jobId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
   }
 
   export type ProposalCreateOrConnectWithoutFreelancerInput = {
@@ -15508,6 +16022,14 @@ export namespace Prisma {
     freelancerId?: StringFilter<"Proposal"> | string
     createdAt?: DateTimeFilter<"Proposal"> | Date | string
     updatedAt?: DateTimeFilter<"Proposal"> | Date | string
+    questionResponses?: JsonNullableFilter<"Proposal">
+    milestones?: JsonNullableFilter<"Proposal">
+    clientNotes?: StringNullableFilter<"Proposal"> | string | null
+    clientViewed?: BoolFilter<"Proposal"> | boolean
+    rating?: IntNullableFilter<"Proposal"> | number | null
+    interview?: JsonNullableFilter<"Proposal">
+    originalBudget?: FloatNullableFilter<"Proposal"> | number | null
+    isShortlisted?: BoolFilter<"Proposal"> | boolean
   }
 
   export type ReviewUpsertWithWhereUniqueWithoutAuthorInput = {
@@ -15698,6 +16220,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -15722,7 +16252,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
@@ -15768,6 +16297,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -15792,7 +16329,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
@@ -15817,6 +16353,14 @@ export namespace Prisma {
     status?: $Enums.ProposalStatus
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
     freelancer: UserCreateNestedOneWithoutProposalsInput
   }
 
@@ -15830,6 +16374,14 @@ export namespace Prisma {
     freelancerId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
   }
 
   export type ProposalCreateOrConnectWithoutJobInput = {
@@ -15948,6 +16500,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15972,7 +16532,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
@@ -16018,6 +16577,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16042,7 +16609,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
@@ -16187,6 +16753,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16211,7 +16785,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
@@ -16257,6 +16830,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16281,7 +16862,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
@@ -16416,6 +16996,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16440,7 +17028,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
@@ -16486,6 +17073,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16510,7 +17105,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
@@ -16623,6 +17217,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16647,7 +17249,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
@@ -16693,6 +17294,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16717,7 +17326,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
@@ -16768,6 +17376,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16792,7 +17408,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
@@ -16838,6 +17453,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16862,7 +17485,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
@@ -16997,6 +17619,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17021,7 +17651,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
@@ -17067,6 +17696,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17091,7 +17728,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
@@ -17148,6 +17784,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17172,7 +17816,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
@@ -17218,6 +17861,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17242,7 +17893,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
@@ -17536,6 +18186,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -17560,7 +18218,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
@@ -17606,6 +18263,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -17630,7 +18295,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
@@ -17681,6 +18345,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -17705,7 +18377,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
@@ -17751,6 +18422,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -17775,7 +18454,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
@@ -17891,6 +18569,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17915,7 +18601,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
@@ -17961,6 +18646,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17985,7 +18678,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
@@ -18042,6 +18734,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18066,7 +18766,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
@@ -18112,6 +18811,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18136,7 +18843,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
@@ -18248,6 +18954,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18272,7 +18986,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobCreateNestedManyWithoutClientInput
@@ -18318,6 +19031,14 @@ export namespace Prisma {
     category?: string | null
     subcategory?: string | null
     experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18342,7 +19063,6 @@ export namespace Prisma {
     hoursPerWeek?: string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserCreateworkingDaysInput | string[]
-    responseTime?: string | null
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
@@ -18404,6 +19124,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18428,7 +19156,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
@@ -18474,6 +19201,14 @@ export namespace Prisma {
     category?: NullableStringFieldUpdateOperationsInput | string | null
     subcategory?: NullableStringFieldUpdateOperationsInput | string | null
     experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18498,7 +19233,6 @@ export namespace Prisma {
     hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
     workingHours?: NullableJsonNullValueInput | InputJsonValue
     workingDays?: UserUpdateworkingDaysInput | string[]
-    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
@@ -18547,6 +19281,14 @@ export namespace Prisma {
     jobId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
   }
 
   export type ReviewCreateManyAuthorInput = {
@@ -18697,6 +19439,14 @@ export namespace Prisma {
     status?: EnumProposalStatusFieldUpdateOperationsInput | $Enums.ProposalStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
     job?: JobUpdateOneRequiredWithoutProposalsNestedInput
   }
 
@@ -18710,6 +19460,14 @@ export namespace Prisma {
     jobId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProposalUncheckedUpdateManyWithoutFreelancerInput = {
@@ -18722,6 +19480,14 @@ export namespace Prisma {
     jobId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ReviewUpdateWithoutAuthorInput = {
@@ -18895,6 +19661,14 @@ export namespace Prisma {
     freelancerId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: string | null
+    clientViewed?: boolean
+    rating?: number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: number | null
+    isShortlisted?: boolean
   }
 
   export type ReviewCreateManyJobInput = {
@@ -18948,6 +19722,14 @@ export namespace Prisma {
     status?: EnumProposalStatusFieldUpdateOperationsInput | $Enums.ProposalStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
     freelancer?: UserUpdateOneRequiredWithoutProposalsNestedInput
   }
 
@@ -18961,6 +19743,14 @@ export namespace Prisma {
     freelancerId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProposalUncheckedUpdateManyWithoutJobInput = {
@@ -18973,6 +19763,14 @@ export namespace Prisma {
     freelancerId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questionResponses?: NullableJsonNullValueInput | InputJsonValue
+    milestones?: NullableJsonNullValueInput | InputJsonValue
+    clientNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    clientViewed?: BoolFieldUpdateOperationsInput | boolean
+    rating?: NullableIntFieldUpdateOperationsInput | number | null
+    interview?: NullableJsonNullValueInput | InputJsonValue
+    originalBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    isShortlisted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ReviewUpdateWithoutJobInput = {

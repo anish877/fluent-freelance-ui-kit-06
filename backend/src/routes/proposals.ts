@@ -41,7 +41,18 @@ router.get('/job/:jobId', protect, (async (req: AuthRequest, res: Response): Pro
             portfolio: true,
             experience: true,
             education: true,
-            certifications: true
+            certifications: true,
+            languages: true,
+            topSkills: true,
+            experienceLevel: true,
+            totalEarnings: true,
+            successRate: true,
+            completedJobs: true,
+            onTime: true,
+            responseTime: true,
+            lastActive: true,
+            topRatedPlus: true,
+            verified: true
           }
         }
       },
@@ -131,7 +142,10 @@ router.post('/', protect, authorize('FREELANCER'), [
   body('coverLetter').notEmpty().withMessage('Cover letter is required'),
   body('bidAmount').isFloat({ min: 0 }).withMessage('Bid amount must be a positive number'),
   body('estimatedDuration').notEmpty().withMessage('Estimated duration is required'),
-  body('attachments').optional().isArray().withMessage('Attachments must be an array')
+  body('attachments').optional().isArray().withMessage('Attachments must be an array'),
+  body('questionResponses').optional().isArray().withMessage('Question responses must be an array'),
+  body('milestones').optional().isArray().withMessage('Milestones must be an array'),
+  body('originalBudget').optional().isFloat({ min: 0 }).withMessage('Original budget must be a positive number')
 ], (async (req: AuthRequest, res: Response): Promise<void> => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -170,7 +184,14 @@ router.post('/', protect, authorize('FREELANCER'), [
 
     const proposal = await prisma.proposal.create({
       data: {
-        ...req.body,
+        jobId: req.body.jobId,
+        coverLetter: req.body.coverLetter,
+        bidAmount: req.body.bidAmount,
+        estimatedDuration: req.body.estimatedDuration,
+        attachments: req.body.attachments || [],
+        questionResponses: req.body.questionResponses || [],
+        milestones: req.body.milestones || [],
+        originalBudget: req.body.originalBudget,
         freelancerId: req.user!.id
       },
       include: {
@@ -278,6 +299,92 @@ router.put('/:id/status', protect, authorize('CLIENT'), [
         data: { status: 'IN_PROGRESS' }
       });
     }
+
+    res.json({
+      success: true,
+      data: updatedProposal
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
+// @desc    Update proposal (client notes, rating, interview details, etc.)
+// @route   PUT /api/proposals/:id
+// @access  Private (Job owner only)
+router.put('/:id', protect, authorize('CLIENT'), (async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    // Check if proposal exists
+    const proposal = await prisma.proposal.findUnique({
+      where: { id: req.params.id },
+      include: {
+        job: true
+      }
+    });
+
+    if (!proposal) {
+      res.status(404).json({ message: 'Proposal not found' });
+      return;
+    }
+
+    // Check if user owns the job
+    if (proposal.job.clientId !== req.user!.id) {
+      res.status(403).json({ message: 'Not authorized to update this proposal' });
+      return;
+    }
+
+    // Update proposal with allowed fields
+    const updateData: any = {};
+    
+    if (req.body.clientNotes !== undefined) {
+      updateData.clientNotes = req.body.clientNotes;
+    }
+    
+    if (req.body.rating !== undefined) {
+      updateData.rating = req.body.rating;
+    }
+    
+    if (req.body.interview !== undefined) {
+      updateData.interview = req.body.interview;
+    }
+    
+    if (req.body.isShortlisted !== undefined) {
+      updateData.isShortlisted = req.body.isShortlisted;
+    }
+    
+    if (req.body.clientViewed !== undefined) {
+      updateData.clientViewed = req.body.clientViewed;
+    }
+
+    const updatedProposal = await prisma.proposal.update({
+      where: { id: req.params.id },
+      data: updateData,
+      include: {
+        job: {
+          select: {
+            id: true,
+            title: true,
+            client: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                companyName: true
+              }
+            }
+          }
+        },
+        freelancer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true
+          }
+        }
+      }
+    });
 
     res.json({
       success: true,

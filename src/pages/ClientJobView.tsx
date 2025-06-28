@@ -1,13 +1,11 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
-  MapPin, Clock, DollarSign, Star, Users, Calendar, 
+  MapPin, Clock, Star, Users, Calendar, 
   Eye, MessageCircle, CheckCircle, XCircle, Award,
   FileText, Download, Edit, Trash2, AlertCircle,
-  Filter, Search, SortAsc, MoreHorizontal, BookOpen,
-  TrendingUp, Target, Briefcase, Globe, Phone, Mail,
-  LinkedinIcon, Github, ExternalLink, ThumbsUp, ThumbsDown
+  Filter, Search, SortAsc, MoreHorizontal,
+  TrendingUp, Target
 } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
@@ -21,267 +19,171 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Progress } from "../components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import axios from "axios";
+import { useToast } from "../hooks/use-toast";
+import { useAuth } from "../hooks/AuthContext";
+
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  budget: 'FIXED' | 'HOURLY';
+  minBudget?: number;
+  maxBudget?: number;
+  hourlyRate?: number;
+  duration?: string;
+  skills: string[];
+  category: string;
+  subcategory?: string;
+  projectType?: string;
+  experienceLevel?: string;
+  workingHours?: string;
+  timezone?: string;
+  communicationPreferences: string[];
+  location?: string;
+  isRemote: boolean;
+  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  isUrgent: boolean;
+  visibility: string;
+  applicationDeadline?: string;
+  requirements: string[];
+  createdAt: string;
+  updatedAt: string;
+  client: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+    bio?: string;
+    location?: string;
+    companyName?: string;
+    companySize?: string;
+    industry?: string;
+  };
+  _count: {
+    proposals: number;
+  };
+}
+
+interface Proposal {
+  id: string;
+  coverLetter: string;
+  bidAmount: number;
+  estimatedDuration: string;
+  attachments: string[];
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+  jobId: string;
+  freelancerId: string;
+  createdAt: string;
+  updatedAt: string;
+  questionResponses?: Array<{
+    question: string;
+    answer: string;
+  }>;
+  milestones?: Array<{
+    title: string;
+    duration: string;
+    amount: number;
+  }>;
+  clientNotes?: string;
+  clientViewed: boolean;
+  rating?: number;
+  interview?: {
+    scheduled: boolean;
+    date?: string;
+    notes?: string;
+  };
+  originalBudget?: number;
+  isShortlisted: boolean;
+  freelancer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+    title?: string;
+    location?: string;
+    skills?: Array<{
+      name: string;
+      category?: string;
+      level?: string;
+      yearsOfExperience?: number;
+    }> | string[];
+    hourlyRate?: number;
+    totalEarnings?: string;
+    successRate?: number;
+    completedJobs?: number;
+    onTime?: number;
+    responseTime?: string;
+    lastActive?: string;
+    topRatedPlus?: boolean;
+    verified?: boolean;
+    languages?: Array<{
+      name: string;
+      level: string;
+    }>;
+    education?: Array<{
+      school: string;
+      degree: string;
+      year: string;
+    }>;
+    certifications?: string[];
+  };
+}
 
 const ClientJobView = () => {
   const { id } = useParams();
+  const { toast } = useToast();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("proposals");
-  const [selectedProposal, setSelectedProposal] = useState(null);
+  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [sortBy, setSortBy] = useState("date");
   const [filterBy, setFilterBy] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [job, setJob] = useState<Job | null>(null);
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock job data
-  const job = {
-    id: parseInt(id || "1"),
-    title: "Full-Stack React Developer for E-commerce Platform",
-    description: `We are looking for an experienced full-stack React developer to help us build a modern e-commerce platform. This is a challenging project that requires expertise in React, Node.js, and modern web technologies.
-
-The platform will include:
-- User authentication and authorization
-- Product catalog with search and filtering
-- Shopping cart and checkout process
-- Payment integration (Stripe/PayPal)
-- Admin dashboard for inventory management
-- Real-time notifications
-- Mobile-responsive design
-- Performance optimization
-
-We value clean, maintainable code and expect the developer to follow best practices including:
-- TypeScript implementation
-- Unit and integration testing
-- Git workflow with proper documentation
-- Code reviews and collaboration
-- Agile development methodology`,
-    status: "OPEN",
-    budget: "$3,000 - $5,000",
-    budgetType: "Fixed Price",
-    duration: "2-3 months",
-    experienceLevel: "Intermediate",
-    skills: ["React", "TypeScript", "Node.js", "MongoDB", "Express.js", "Stripe API", "AWS", "Jest"],
-    category: "Web Development",
-    subcategory: "Full Stack Development",
-    location: "Remote",
-    isRemote: true,
-    postedDate: "2024-12-18",
-    expiryDate: "2025-01-18",
-    visibility: "Public",
-    jobType: "One-time project",
-    proposals: 15,
-    interviews: 3,
-    hires: 0,
-    views: 234,
-    saves: 28,
-    applications: 15,
-    invitesSent: 5,
-    connectsRequired: 6,
-    requirements: [
-      "5+ years of React development experience",
-      "Strong TypeScript skills",
-      "Experience with Node.js and Express",
-      "Knowledge of MongoDB or similar NoSQL databases",
-      "Experience with payment gateway integration",
-      "Portfolio of similar e-commerce projects",
-      "Excellent communication skills",
-      "Available for regular video calls"
-    ],
-    preferredQualifications: [
-      "AWS or cloud deployment experience",
-      "Experience with testing frameworks",
-      "Knowledge of SEO best practices",
-      "Previous startup experience"
-    ],
-    screeningQuestions: [
-      "What is your experience with React and TypeScript?",
-      "Have you worked with e-commerce platforms before?",
-      "Can you provide examples of your previous work?",
-      "What is your preferred development methodology?",
-      "How do you handle version control and code reviews?"
-    ],
-    attachments: [
-      { id: 1, name: "Project_Requirements.pdf", size: "2.4 MB", url: "/docs/requirements.pdf" },
-      { id: 2, name: "Wireframes.sketch", size: "15.7 MB", url: "/docs/wireframes.sketch" },
-      { id: 3, name: "Brand_Guidelines.pdf", size: "5.1 MB", url: "/docs/brand.pdf" }
-    ]
-  };
-
-  // Mock proposals data
-  const proposals = [
-    {
-      id: 1,
-      freelancer: {
-        id: "f1",
-        firstName: "Sarah",
-        lastName: "Chen",
-        avatar: "/placeholder.svg",
-        title: "Senior Full-Stack Developer",
-        location: "San Francisco, CA",
-        rating: 4.9,
-        reviews: 47,
-        hourlyRate: 85,
-        totalEarnings: "$127,000+",
-        successRate: 98,
-        completedJobs: 89,
-        onTime: 96,
-        responseTime: "within 1 hour",
-        lastActive: "Online now",
-        skills: ["React", "TypeScript", "Node.js", "MongoDB", "AWS", "Docker"],
-        topRatedPlus: true,
-        verified: true,
-        languages: [
-          { name: "English", level: "Native" },
-          { name: "Mandarin", level: "Native" }
-        ],
-        education: [
-          {
-            school: "Stanford University",
-            degree: "MS Computer Science",
-            year: "2018"
-          }
-        ],
-        certifications: ["AWS Certified Developer", "Google Cloud Professional"],
-        portfolio: [
-          {
-            title: "E-commerce Platform for Fashion Brand",
-            description: "Built complete e-commerce solution with React and Node.js",
-            image: "/placeholder.svg",
-            url: "https://example.com"
-          }
-        ]
-      },
-      bidAmount: 4200,
-      originalBudget: 4500,
-      estimatedDuration: "8-10 weeks",
-      milestones: [
-        { title: "Setup & Planning", duration: "1 week", amount: 600 },
-        { title: "Frontend Development", duration: "4 weeks", amount: 1800 },
-        { title: "Backend Development", duration: "3 weeks", amount: 1200 },
-        { title: "Testing & Deployment", duration: "1 week", amount: 600 }
-      ],
-      coverLetter: `Hi there!
-
-I'm excited about this e-commerce project and believe I'm the perfect fit for your needs. With over 6 years of full-stack development experience, I've built numerous e-commerce platforms similar to what you're describing.
-
-**Why I'm the right choice:**
-• 6+ years of React/TypeScript experience with focus on e-commerce
-• Built 12+ complete e-commerce platforms from scratch
-• Expert in payment integrations (Stripe, PayPal, Square)
-• Strong background in performance optimization and SEO
-• Experience with AWS deployment and scaling
-
-**My approach to your project:**
-1. **Week 1**: Project setup, architecture planning, and wireframe review
-2. **Weeks 2-5**: Frontend development with React/TypeScript
-3. **Weeks 6-8**: Backend API development with Node.js/Express
-4. **Week 9**: Integration, testing, and performance optimization
-5. **Week 10**: Deployment, documentation, and handover
-
-**Recent relevant experience:**
-I recently completed a similar project for a fashion startup where I built their entire e-commerce platform. The project included user authentication, product catalog, shopping cart, payment processing, and admin dashboard. The client was extremely satisfied and the platform now processes $50K+ monthly revenue.
-
-I'm available to start immediately and can commit 40+ hours per week to ensure timely delivery. I'm also comfortable with regular video calls and provide daily progress updates.
-
-Looking forward to discussing this project further!
-
-Best regards,
-Sarah`,
-      questionResponses: [
-        {
-          question: "What is your experience with React and TypeScript?",
-          answer: "I have 6+ years of React experience and 4+ years with TypeScript. I've built over 20 production applications using this stack, including several e-commerce platforms. I'm well-versed in modern React patterns, hooks, context API, and TypeScript best practices."
-        },
-        {
-          question: "Have you worked with e-commerce platforms before?",
-          answer: "Yes, I've built 12+ complete e-commerce platforms. Recent projects include a fashion marketplace, electronics store, and B2B wholesale platform. I have extensive experience with payment gateways, inventory management, order processing, and performance optimization for high-traffic sites."
+  useEffect(() => {
+    const fetchJobAndProposals = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch job details
+        const jobResponse = await axios.get(`/jobs/${id}`);
+        if (jobResponse.data.success) {
+          setJob(jobResponse.data.data);
+        } else {
+          setError('Failed to fetch job details');
+          return;
         }
-      ],
-      attachments: [
-        { id: 1, name: "Portfolio_Examples.pdf", size: "8.2 MB" },
-        { id: 2, name: "References.pdf", size: "1.1 MB" }
-      ],
-      submittedDate: "2024-12-18T10:30:00Z",
-      status: "pending",
-      clientViewed: true,
-      clientNotes: "",
-      rating: null,
-      interview: {
-        scheduled: false,
-        date: null,
-        notes: ""
+
+        // Fetch proposals for this job
+        const proposalsResponse = await axios.get(`/proposals/job/${id}`);
+        if (proposalsResponse.data.success) {
+          setProposals(proposalsResponse.data.data);
+        } else {
+          setError('Failed to fetch proposals');
+          return;
+        }
+      } catch (err: unknown) {
+        console.error('Error fetching job and proposals:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch data';
+        setError(errorMessage);
+        toast({
+          title: "Error",
+          description: "Failed to load job and proposals",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
       }
-    },
-    {
-      id: 2,
-      freelancer: {
-        id: "f2",
-        firstName: "Alex",
-        lastName: "Rodriguez",
-        avatar: "/placeholder.svg",
-        title: "React Developer & UI/UX Designer",
-        location: "Austin, TX",
-        rating: 4.7,
-        reviews: 32,
-        hourlyRate: 65,
-        totalEarnings: "$89,000+",
-        successRate: 94,
-        completedJobs: 56,
-        onTime: 92,
-        responseTime: "within 2 hours",
-        lastActive: "2 hours ago",
-        skills: ["React", "JavaScript", "UI/UX Design", "Figma", "Node.js"],
-        topRatedPlus: false,
-        verified: true,
-        languages: [
-          { name: "English", level: "Fluent" },
-          { name: "Spanish", level: "Native" }
-        ]
-      },
-      bidAmount: 3800,
-      estimatedDuration: "10-12 weeks",
-      coverLetter: "I'm a full-stack developer with strong design skills. I can handle both the technical implementation and ensure great user experience...",
-      submittedDate: "2024-12-18T14:15:00Z",
-      status: "pending",
-      clientViewed: false,
-      questionResponses: []
-    },
-    {
-      id: 3,
-      freelancer: {
-        id: "f3",
-        firstName: "Priya",
-        lastName: "Patel",
-        avatar: "/placeholder.svg",
-        title: "Senior Full-Stack Engineer",
-        location: "Toronto, Canada",
-        rating: 4.8,
-        reviews: 67,
-        hourlyRate: 75,
-        totalEarnings: "$156,000+",
-        successRate: 97,
-        completedJobs: 78,
-        onTime: 95,
-        responseTime: "within 30 minutes",
-        lastActive: "Online now",
-        skills: ["React", "TypeScript", "Node.js", "PostgreSQL", "AWS"],
-        topRatedPlus: true,
-        verified: true,
-        languages: [
-          { name: "English", level: "Fluent" },
-          { name: "Hindi", level: "Native" }
-        ]
-      },
-      bidAmount: 4500,
-      estimatedDuration: "8 weeks",
-      coverLetter: "With 8+ years in full-stack development, I specialize in scalable e-commerce solutions...",
-      submittedDate: "2024-12-17T16:45:00Z",
-      status: "interview",
-      clientViewed: true,
-      interview: {
-        scheduled: true,
-        date: "2024-12-22T15:00:00Z",
-        notes: "Great technical discussion, very knowledgeable"
-      }
+    };
+
+    if (id) {
+      fetchJobAndProposals();
     }
-  ];
+  }, [id, toast]);
 
   const filteredProposals = proposals.filter(proposal => {
     const matchesSearch = 
@@ -290,17 +192,17 @@ Sarah`,
       proposal.coverLetter.toLowerCase().includes(searchTerm.toLowerCase());
     
     if (filterBy === "all") return matchesSearch;
-    return matchesSearch && proposal.status === filterBy;
+    return matchesSearch && proposal.status.toLowerCase() === filterBy;
   });
 
   const sortedProposals = [...filteredProposals].sort((a, b) => {
     switch (sortBy) {
       case "date":
-        return new Date(b.submittedDate).getTime() - new Date(a.submittedDate).getTime();
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       case "price":
         return a.bidAmount - b.bidAmount;
       case "rating":
-        return b.freelancer.rating - a.freelancer.rating;
+        return (b.freelancer.successRate || 0) - (a.freelancer.successRate || 0);
       default:
         return 0;
     }
@@ -308,14 +210,14 @@ Sarah`,
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
+      case "PENDING":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "interview":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "accepted":
+      case "ACCEPTED":
         return "bg-green-100 text-green-800 border-green-200";
-      case "rejected":
+      case "REJECTED":
         return "bg-red-100 text-red-800 border-red-200";
+      case "WITHDRAWN":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -331,10 +233,117 @@ Sarah`,
     });
   };
 
-  const handleProposalAction = (proposalId: number, action: string) => {
-    console.log(`${action} proposal ${proposalId}`);
-    // In real app, this would make API call
+  const handleProposalAction = async (proposalId: string, action: string) => {
+    try {
+      if (action === "accept") {
+        const response = await axios.put(`/proposals/${proposalId}/status`, {
+          status: 'ACCEPTED'
+        });
+        if (response.data.success) {
+          toast({
+            title: "Success",
+            description: "Proposal accepted successfully!",
+          });
+          // Refresh proposals
+          const proposalsResponse = await axios.get(`/proposals/job/${id}`);
+          if (proposalsResponse.data.success) {
+            setProposals(proposalsResponse.data.data);
+          }
+        }
+      } else if (action === "reject") {
+        const response = await axios.put(`/proposals/${proposalId}/status`, {
+          status: 'REJECTED'
+        });
+        if (response.data.success) {
+          toast({
+            title: "Success",
+            description: "Proposal rejected successfully!",
+          });
+          // Refresh proposals
+          const proposalsResponse = await axios.get(`/proposals/job/${id}`);
+          if (proposalsResponse.data.success) {
+            setProposals(proposalsResponse.data.data);
+          }
+        }
+      } else if (action === "shortlist") {
+        const response = await axios.put(`/proposals/${proposalId}`, {
+          isShortlisted: true
+        });
+        if (response.data.success) {
+          toast({
+            title: "Success",
+            description: "Proposal added to shortlist!",
+          });
+          // Refresh proposals
+          const proposalsResponse = await axios.get(`/proposals/job/${id}`);
+          if (proposalsResponse.data.success) {
+            setProposals(proposalsResponse.data.data);
+          }
+        }
+      }
+    } catch (err: unknown) {
+      console.error(`Error ${action}ing proposal:`, err);
+      const errorMessage = err instanceof Error ? err.message : `Failed to ${action} proposal`;
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
   };
+
+  const formatBudget = (job: Job) => {
+    if (job.budget === 'FIXED') {
+      if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
+        return `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`;
+      } else if (job.minBudget) {
+        return `$${job.minBudget.toLocaleString()}`;
+      } else if (job.maxBudget) {
+        return `$${job.maxBudget.toLocaleString()}`;
+      }
+      return "Budget not specified";
+    } else if (job.budget === 'HOURLY') {
+      if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
+        return `$${job.minBudget}/hr - $${job.maxBudget}/hr`;
+      } else if (job.hourlyRate) {
+        return `$${job.hourlyRate}/hr`;
+      }
+      return "Hourly rate not specified";
+    }
+    return "Budget not specified";
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-500"></div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !job) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Job Not Found</h1>
+            <p className="text-gray-600 mb-4">{error || "The job you're looking for doesn't exist."}</p>
+            <Button onClick={() => window.history.back()}>
+              Go Back
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -365,19 +374,15 @@ Sarah`,
               <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
                 <span className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  Posted {formatDate(job.postedDate)}
+                  Posted {formatDate(job.createdAt)}
                 </span>
                 <span className="flex items-center">
                   <MapPin className="h-4 w-4 mr-1" />
-                  {job.location}
+                  {job.location || 'Remote'}
                 </span>
                 <span className="flex items-center">
                   <Eye className="h-4 w-4 mr-1" />
-                  {job.views} views
-                </span>
-                <span className="flex items-center">
-                  <Users className="h-4 w-4 mr-1" />
-                  {job.proposals} proposals
+                  {job._count.proposals} proposals
                 </span>
               </div>
             </div>
@@ -413,27 +418,27 @@ Sarah`,
           {/* Job Stats */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 p-4 bg-gray-50 rounded-lg">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{job.proposals}</p>
+              <p className="text-2xl font-bold text-gray-900">{job._count.proposals}</p>
               <p className="text-sm text-gray-600">Proposals</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{job.interviews}</p>
+              <p className="text-2xl font-bold text-gray-900">0</p>
               <p className="text-sm text-gray-600">Interviews</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{job.hires}</p>
+              <p className="text-2xl font-bold text-gray-900">0</p>
               <p className="text-sm text-gray-600">Hires</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{job.views}</p>
+              <p className="text-2xl font-bold text-gray-900">0</p>
               <p className="text-sm text-gray-600">Views</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{job.saves}</p>
+              <p className="text-2xl font-bold text-gray-900">0</p>
               <p className="text-sm text-gray-600">Saves</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{job.invitesSent}</p>
+              <p className="text-2xl font-bold text-gray-900">0</p>
               <p className="text-sm text-gray-600">Invites Sent</p>
             </div>
           </div>
@@ -443,7 +448,7 @@ Sarah`,
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="proposals">
-              Proposals ({job.proposals})
+              Proposals ({job._count.proposals})
             </TabsTrigger>
             <TabsTrigger value="details">
               Job Details
@@ -480,9 +485,9 @@ Sarah`,
                     <SelectContent>
                       <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="interview">Interview</SelectItem>
                       <SelectItem value="accepted">Accepted</SelectItem>
                       <SelectItem value="rejected">Rejected</SelectItem>
+                      <SelectItem value="withdrawn">Withdrawn</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={sortBy} onValueChange={setSortBy}>
@@ -502,277 +507,297 @@ Sarah`,
 
             {/* Proposals List */}
             <div className="space-y-4">
-              {sortedProposals.map((proposal) => (
-                <Card key={proposal.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-start space-x-4">
-                        <Avatar className="h-16 w-16">
-                          <AvatarImage src={proposal.freelancer.avatar} />
-                          <AvatarFallback>
-                            {proposal.freelancer.firstName[0]}{proposal.freelancer.lastName[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              {proposal.freelancer.firstName} {proposal.freelancer.lastName}
-                            </h3>
-                            {proposal.freelancer.topRatedPlus && (
-                              <Badge variant="secondary" className="text-xs">
-                                <Award className="h-3 w-3 mr-1" />
-                                Top Rated Plus
-                              </Badge>
-                            )}
-                            {proposal.freelancer.verified && (
-                              <CheckCircle className="h-4 w-4 text-green-600" />
-                            )}
-                          </div>
-                          <p className="text-gray-600 mb-2">{proposal.freelancer.title}</p>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                            <div className="flex items-center">
-                              <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-                              {proposal.freelancer.rating} ({proposal.freelancer.reviews} reviews)
+              {sortedProposals.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <p className="text-gray-500">No proposals found matching your criteria.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                sortedProposals.map((proposal) => (
+                  <Card key={proposal.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-start space-x-4">
+                          <Avatar className="h-16 w-16">
+                            <AvatarImage src={proposal.freelancer.avatar} />
+                            <AvatarFallback>
+                              {proposal.freelancer.firstName[0]}{proposal.freelancer.lastName[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-lg font-semibold text-gray-900">
+                                {proposal.freelancer.firstName} {proposal.freelancer.lastName}
+                              </h3>
+                              {proposal.freelancer.topRatedPlus && (
+                                <Badge variant="secondary" className="text-xs">
+                                  <Award className="h-3 w-3 mr-1" />
+                                  Top Rated Plus
+                                </Badge>
+                              )}
+                              {proposal.freelancer.verified && (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              )}
                             </div>
-                            <span>{proposal.freelancer.location}</span>
-                            <span className="text-green-600">{proposal.freelancer.lastActive}</span>
+                            <p className="text-gray-600 mb-2">{proposal.freelancer.title || 'Freelancer'}</p>
+                            <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
+                              <div className="flex items-center">
+                                <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                                {proposal.freelancer.successRate || 0}% success rate
+                              </div>
+                              <span>{proposal.freelancer.location || 'Location not specified'}</span>
+                              <span className="text-green-600">{proposal.freelancer.lastActive || 'Recently active'}</span>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                              <span>${proposal.freelancer.hourlyRate || 0}/hr</span>
+                              <span>{proposal.freelancer.totalEarnings || '$0'} earned</span>
+                              <span>{proposal.freelancer.completedJobs || 0} jobs completed</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span>${proposal.freelancer.hourlyRate}/hr</span>
-                            <span>{proposal.freelancer.totalEarnings} earned</span>
-                            <span>{proposal.freelancer.successRate}% success rate</span>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(proposal.status)}`}>
+                            {proposal.status === "PENDING" && <Clock className="h-3 w-3 mr-1" />}
+                            {proposal.status === "ACCEPTED" && <CheckCircle className="h-3 w-3 mr-1" />}
+                            {proposal.status === "REJECTED" && <XCircle className="h-3 w-3 mr-1" />}
+                            {proposal.status === "WITHDRAWN" && <XCircle className="h-3 w-3 mr-1" />}
+                            <span className="capitalize">{proposal.status.toLowerCase()}</span>
+                          </div>
+                          <div className="text-right text-sm">
+                            <p className="font-semibold text-gray-900">${proposal.bidAmount.toLocaleString()}</p>
+                            <p className="text-gray-600">{proposal.estimatedDuration}</p>
                           </div>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(proposal.status)}`}>
-                          {proposal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
-                          {proposal.status === "interview" && <Calendar className="h-3 w-3 mr-1" />}
-                          {proposal.status === "accepted" && <CheckCircle className="h-3 w-3 mr-1" />}
-                          {proposal.status === "rejected" && <XCircle className="h-3 w-3 mr-1" />}
-                          <span className="capitalize">{proposal.status}</span>
-                        </div>
-                        <div className="text-right text-sm">
-                          <p className="font-semibold text-gray-900">${proposal.bidAmount.toLocaleString()}</p>
-                          <p className="text-gray-600">{proposal.estimatedDuration}</p>
-                        </div>
+                    </CardHeader>
+                    
+                    <CardContent className="pt-0">
+                      <div className="mb-4">
+                        <p className="text-gray-700 line-clamp-3">{proposal.coverLetter}</p>
                       </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="pt-0">
-                    <div className="mb-4">
-                      <p className="text-gray-700 line-clamp-3">{proposal.coverLetter}</p>
-                    </div>
 
-                    {/* Skills */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {proposal.freelancer.skills.map((skill, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
+                      {/* Skills */}
+                      {proposal.freelancer.skills && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {Array.isArray(proposal.freelancer.skills) ? 
+                            proposal.freelancer.skills.map((skill: string | { name: string; category?: string; level?: string; yearsOfExperience?: number }, index: number) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {typeof skill === 'string' ? skill : skill.name || 'Unknown Skill'}
+                              </Badge>
+                            )) : 
+                            <Badge variant="secondary" className="text-xs">
+                              Skills not specified
+                            </Badge>
+                          }
+                        </div>
+                      )}
 
-                    <Separator className="my-4" />
+                      <Separator className="my-4" />
 
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm text-gray-600">
-                        Submitted {formatDate(proposal.submittedDate)}
-                        {!proposal.clientViewed && (
-                          <Badge variant="outline" className="ml-2 text-xs">
-                            <AlertCircle className="h-3 w-3 mr-1" />
-                            New
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-1" />
-                              View Details
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>
-                                Proposal from {proposal.freelancer.firstName} {proposal.freelancer.lastName}
-                              </DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-6">
-                              {/* Freelancer Details */}
-                              <div className="border rounded-lg p-4">
-                                <h3 className="font-semibold mb-3">Freelancer Profile</h3>
-                                <div className="flex items-start space-x-4 mb-4">
-                                  <Avatar className="h-20 w-20">
-                                    <AvatarImage src={proposal.freelancer.avatar} />
-                                    <AvatarFallback>
-                                      {proposal.freelancer.firstName[0]}{proposal.freelancer.lastName[0]}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div className="flex-1">
-                                    <h4 className="text-lg font-semibold">{proposal.freelancer.firstName} {proposal.freelancer.lastName}</h4>
-                                    <p className="text-gray-600 mb-2">{proposal.freelancer.title}</p>
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                      <div>
-                                        <span className="text-gray-600">Rating: </span>
-                                        <span className="font-medium">{proposal.freelancer.rating}/5 ({proposal.freelancer.reviews} reviews)</span>
-                                      </div>
-                                      <div>
-                                        <span className="text-gray-600">Success Rate: </span>
-                                        <span className="font-medium">{proposal.freelancer.successRate}%</span>
-                                      </div>
-                                      <div>
-                                        <span className="text-gray-600">Completed Jobs: </span>
-                                        <span className="font-medium">{proposal.freelancer.completedJobs}</span>
-                                      </div>
-                                      <div>
-                                        <span className="text-gray-600">On Time: </span>
-                                        <span className="font-medium">{proposal.freelancer.onTime}%</span>
+                      <div className="flex justify-between items-center">
+                        <div className="text-sm text-gray-600">
+                          Submitted {formatDate(proposal.createdAt)}
+                          {!proposal.clientViewed && (
+                            <Badge variant="outline" className="ml-2 text-xs">
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              New
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4 mr-1" />
+                                View Details
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Proposal from {proposal.freelancer.firstName} {proposal.freelancer.lastName}
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-6">
+                                {/* Freelancer Details */}
+                                <div className="border rounded-lg p-4">
+                                  <h3 className="font-semibold mb-3">Freelancer Profile</h3>
+                                  <div className="flex items-start space-x-4 mb-4">
+                                    <Avatar className="h-20 w-20">
+                                      <AvatarImage src={proposal.freelancer.avatar} />
+                                      <AvatarFallback>
+                                        {proposal.freelancer.firstName[0]}{proposal.freelancer.lastName[0]}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1">
+                                      <h4 className="text-lg font-semibold">{proposal.freelancer.firstName} {proposal.freelancer.lastName}</h4>
+                                      <p className="text-gray-600 mb-2">{proposal.freelancer.title || 'Freelancer'}</p>
+                                      <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                          <span className="text-gray-600">Success Rate: </span>
+                                          <span className="font-medium">{proposal.freelancer.successRate || 0}%</span>
+                                        </div>
+                                        <div>
+                                          <span className="text-gray-600">Completed Jobs: </span>
+                                          <span className="font-medium">{proposal.freelancer.completedJobs || 0}</span>
+                                        </div>
+                                        <div>
+                                          <span className="text-gray-600">On Time: </span>
+                                          <span className="font-medium">{proposal.freelancer.onTime || 0}%</span>
+                                        </div>
+                                        <div>
+                                          <span className="text-gray-600">Response Time: </span>
+                                          <span className="font-medium">{proposal.freelancer.responseTime || 'Not specified'}</span>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
 
-                              {/* Proposal Details */}
-                              <div className="border rounded-lg p-4">
-                                <h3 className="font-semibold mb-3">Proposal Details</h3>
-                                <div className="grid grid-cols-3 gap-4 mb-4">
-                                  <div>
-                                    <span className="text-gray-600">Bid Amount: </span>
-                                    <span className="font-semibold text-lg">${proposal.bidAmount.toLocaleString()}</span>
+                                {/* Proposal Details */}
+                                <div className="border rounded-lg p-4">
+                                  <h3 className="font-semibold mb-3">Proposal Details</h3>
+                                  <div className="grid grid-cols-3 gap-4 mb-4">
+                                    <div>
+                                      <span className="text-gray-600">Bid Amount: </span>
+                                      <span className="font-semibold text-lg">${proposal.bidAmount.toLocaleString()}</span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">Duration: </span>
+                                      <span className="font-medium">{proposal.estimatedDuration}</span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">Status: </span>
+                                      <Badge className={getStatusColor(proposal.status)}>{proposal.status.toLowerCase()}</Badge>
+                                    </div>
                                   </div>
+                                  
+                                  {/* Milestones */}
+                                  {proposal.milestones && Array.isArray(proposal.milestones) && proposal.milestones.length > 0 && (
+                                    <div className="mb-4">
+                                      <h4 className="font-medium mb-2">Project Milestones</h4>
+                                      <div className="space-y-2">
+                                        {proposal.milestones.map((milestone: { title: string; duration: string; amount: number }, index: number) => (
+                                          <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                            <div>
+                                              <span className="font-medium">{milestone.title}</span>
+                                              <span className="text-sm text-gray-600 ml-2">({milestone.duration})</span>
+                                            </div>
+                                            <span className="font-medium">${milestone.amount}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
                                   <div>
-                                    <span className="text-gray-600">Duration: </span>
-                                    <span className="font-medium">{proposal.estimatedDuration}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-gray-600">Status: </span>
-                                    <Badge className={getStatusColor(proposal.status)}>{proposal.status}</Badge>
+                                    <h4 className="font-medium mb-2">Cover Letter</h4>
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                      <p className="whitespace-pre-wrap">{proposal.coverLetter}</p>
+                                    </div>
                                   </div>
                                 </div>
-                                
-                                {/* Milestones */}
-                                {proposal.milestones && (
-                                  <div className="mb-4">
-                                    <h4 className="font-medium mb-2">Project Milestones</h4>
-                                    <div className="space-y-2">
-                                      {proposal.milestones.map((milestone, index) => (
-                                        <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                          <div>
-                                            <span className="font-medium">{milestone.title}</span>
-                                            <span className="text-sm text-gray-600 ml-2">({milestone.duration})</span>
-                                          </div>
-                                          <span className="font-medium">${milestone.amount}</span>
+
+                                {/* Question Responses */}
+                                {proposal.questionResponses && Array.isArray(proposal.questionResponses) && proposal.questionResponses.length > 0 && (
+                                  <div className="border rounded-lg p-4">
+                                    <h3 className="font-semibold mb-3">Screening Questions</h3>
+                                    <div className="space-y-4">
+                                      {proposal.questionResponses.map((qa: { question: string; answer: string }, index: number) => (
+                                        <div key={index}>
+                                          <h4 className="font-medium text-gray-900 mb-2">Q: {qa.question}</h4>
+                                          <p className="text-gray-700 bg-gray-50 p-3 rounded">{qa.answer}</p>
                                         </div>
                                       ))}
                                     </div>
                                   </div>
                                 )}
 
-                                <div>
-                                  <h4 className="font-medium mb-2">Cover Letter</h4>
-                                  <div className="bg-gray-50 p-4 rounded-lg">
-                                    <p className="whitespace-pre-wrap">{proposal.coverLetter}</p>
-                                  </div>
+                                {/* Action Buttons */}
+                                <div className="flex justify-end gap-2 pt-4 border-t">
+                                  <Button variant="outline">
+                                    <MessageCircle className="h-4 w-4 mr-2" />
+                                    Message
+                                  </Button>
+                                  <Button variant="outline">
+                                    <Calendar className="h-4 w-4 mr-2" />
+                                    Schedule Interview
+                                  </Button>
+                                  <Button 
+                                    variant="destructive"
+                                    onClick={() => handleProposalAction(proposal.id, "reject")}
+                                  >
+                                    <XCircle className="h-4 w-4 mr-2" />
+                                    Decline
+                                  </Button>
+                                  <Button 
+                                    onClick={() => handleProposalAction(proposal.id, "accept")}
+                                  >
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Accept Proposal
+                                  </Button>
                                 </div>
                               </div>
+                            </DialogContent>
+                          </Dialog>
 
-                              {/* Question Responses */}
-                              {proposal.questionResponses && proposal.questionResponses.length > 0 && (
-                                <div className="border rounded-lg p-4">
-                                  <h3 className="font-semibold mb-3">Screening Questions</h3>
-                                  <div className="space-y-4">
-                                    {proposal.questionResponses.map((qa, index) => (
-                                      <div key={index}>
-                                        <h4 className="font-medium text-gray-900 mb-2">Q: {qa.question}</h4>
-                                        <p className="text-gray-700 bg-gray-50 p-3 rounded">{qa.answer}</p>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleProposalAction(proposal.id, "message")}
+                          >
+                            <MessageCircle className="h-4 w-4 mr-1" />
+                            Message
+                          </Button>
 
-                              {/* Action Buttons */}
-                              <div className="flex justify-end gap-2 pt-4 border-t">
-                                <Button variant="outline">
-                                  <MessageCircle className="h-4 w-4 mr-2" />
-                                  Message
-                                </Button>
-                                <Button variant="outline">
-                                  <Calendar className="h-4 w-4 mr-2" />
-                                  Schedule Interview
-                                </Button>
-                                <Button variant="destructive">
-                                  <XCircle className="h-4 w-4 mr-2" />
-                                  Decline
-                                </Button>
-                                <Button>
-                                  <CheckCircle className="h-4 w-4 mr-2" />
-                                  Accept Proposal
-                                </Button>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+                          {proposal.status === "PENDING" && (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleProposalAction(proposal.id, "interview")}
+                              >
+                                <Calendar className="h-4 w-4 mr-1" />
+                                Interview
+                              </Button>
+                              <Button 
+                                size="sm"
+                                onClick={() => handleProposalAction(proposal.id, "accept")}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                                Accept
+                              </Button>
+                            </>
+                          )}
 
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleProposalAction(proposal.id, "message")}
-                        >
-                          <MessageCircle className="h-4 w-4 mr-1" />
-                          Message
-                        </Button>
-
-                        {proposal.status === "pending" && (
-                          <>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleProposalAction(proposal.id, "interview")}
-                            >
-                              <Calendar className="h-4 w-4 mr-1" />
-                              Interview
-                            </Button>
-                            <Button 
-                              size="sm"
-                              onClick={() => handleProposalAction(proposal.id, "accept")}
-                            >
-                              <CheckCircle className="h-4 w-4 mr-1" />
-                              Accept
-                            </Button>
-                          </>
-                        )}
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem onClick={() => handleProposalAction(proposal.id, "shortlist")}>
-                              <Star className="h-4 w-4 mr-2" />
-                              Add to Shortlist
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleProposalAction(proposal.id, "archive")}>
-                              <FileText className="h-4 w-4 mr-2" />
-                              Archive
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600" onClick={() => handleProposalAction(proposal.id, "reject")}>
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Reject
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem onClick={() => handleProposalAction(proposal.id, "shortlist")}>
+                                <Star className="h-4 w-4 mr-2" />
+                                Add to Shortlist
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleProposalAction(proposal.id, "archive")}>
+                                <FileText className="h-4 w-4 mr-2" />
+                                Archive
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-600" onClick={() => handleProposalAction(proposal.id, "reject")}>
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Reject
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
 
@@ -786,9 +811,9 @@ Sarah`,
                     <CardTitle>Job Description</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose prose-gray max-w-none">
+                    <div className="prose prose-gray max-w-none overflow-hidden">
                       {job.description.split('\n').map((paragraph, index) => (
-                        <p key={index} className="mb-4 text-gray-700 leading-relaxed">
+                        <p key={index} className="mb-4 text-gray-700 leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere">
                           {paragraph}
                         </p>
                       ))}
@@ -813,62 +838,6 @@ Sarah`,
                           ))}
                         </ul>
                       </div>
-                      
-                      {job.preferredQualifications && (
-                        <div>
-                          <h4 className="font-medium mb-2">Preferred Qualifications</h4>
-                          <ul className="space-y-2">
-                            {job.preferredQualifications.map((pref, index) => (
-                              <li key={index} className="flex items-start">
-                                <Star className="h-4 w-4 text-yellow-500 mt-0.5 mr-2 flex-shrink-0" />
-                                <span className="text-gray-700">{pref}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Screening Questions */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Screening Questions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {job.screeningQuestions.map((question, index) => (
-                        <div key={index} className="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                          <p className="text-gray-900">{question}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Attachments */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Attachments</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {job.attachments.map((attachment) => (
-                        <div key={attachment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-                          <div className="flex items-center">
-                            <FileText className="h-5 w-5 text-gray-600 mr-3" />
-                            <div>
-                              <p className="font-medium text-gray-900">{attachment.name}</p>
-                              <p className="text-sm text-gray-600">{attachment.size}</p>
-                            </div>
-                          </div>
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-1" />
-                            Download
-                          </Button>
-                        </div>
-                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -883,23 +852,23 @@ Sarah`,
                   <CardContent className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-600">Budget</p>
-                      <p className="font-semibold text-gray-900">{job.budget}</p>
+                      <p className="font-semibold text-gray-900">{formatBudget(job)}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Duration</p>
-                      <p className="font-semibold text-gray-900">{job.duration}</p>
+                      <p className="font-semibold text-gray-900">{job.duration || 'Not specified'}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Experience Level</p>
-                      <p className="font-semibold text-gray-900">{job.experienceLevel}</p>
+                      <p className="font-semibold text-gray-900">{job.experienceLevel || 'Any level'}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Project Type</p>
-                      <p className="font-semibold text-gray-900">{job.jobType}</p>
+                      <p className="font-semibold text-gray-900">{job.projectType || 'Project'}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Location</p>
-                      <p className="font-semibold text-gray-900">{job.location}</p>
+                      <p className="font-semibold text-gray-900">{job.location || 'Remote'}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -926,19 +895,19 @@ Sarah`,
                   <CardContent className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Proposals</span>
-                      <span className="font-medium">{job.proposals}</span>
+                      <span className="font-medium">{job._count.proposals}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Interviews</span>
-                      <span className="font-medium">{job.interviews}</span>
+                      <span className="font-medium">0</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Views</span>
-                      <span className="font-medium">{job.views}</span>
+                      <span className="font-medium">0</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Saves</span>
-                      <span className="font-medium">{job.saves}</span>
+                      <span className="font-medium">0</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -961,23 +930,23 @@ Sarah`,
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-sm text-gray-600">Views</span>
-                        <span className="text-sm font-medium">{job.views}</span>
+                        <span className="text-sm font-medium">0</span>
                       </div>
-                      <Progress value={75} className="h-2" />
+                      <Progress value={0} className="h-2" />
                     </div>
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-sm text-gray-600">Proposals</span>
-                        <span className="text-sm font-medium">{job.proposals}</span>
+                        <span className="text-sm font-medium">{job._count.proposals}</span>
                       </div>
-                      <Progress value={60} className="h-2" />
+                      <Progress value={job._count.proposals > 0 ? 60 : 0} className="h-2" />
                     </div>
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-sm text-gray-600">Saves</span>
-                        <span className="text-sm font-medium">{job.saves}</span>
+                        <span className="text-sm font-medium">0</span>
                       </div>
-                      <Progress value={45} className="h-2" />
+                      <Progress value={0} className="h-2" />
                     </div>
                   </div>
                 </CardContent>
@@ -994,19 +963,31 @@ Sarah`,
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Average Bid</span>
-                      <span className="font-medium">$4,167</span>
+                      <span className="font-medium">
+                        ${proposals.length > 0 ? 
+                          (proposals.reduce((sum, p) => sum + p.bidAmount, 0) / proposals.length).toFixed(0) : 
+                          '0'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Bid Range</span>
-                      <span className="font-medium">$3,200 - $5,500</span>
+                      <span className="font-medium">
+                        {proposals.length > 0 ? 
+                          `$${Math.min(...proposals.map(p => p.bidAmount))} - $${Math.max(...proposals.map(p => p.bidAmount))}` : 
+                          'No proposals'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Avg. Rating</span>
-                      <span className="font-medium">4.8/5</span>
+                      <span className="font-medium">
+                        {proposals.length > 0 ? 
+                          (proposals.reduce((sum, p) => sum + (p.freelancer.successRate || 0), 0) / proposals.length).toFixed(1) + '%' : 
+                          '0%'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Response Rate</span>
-                      <span className="font-medium">87%</span>
+                      <span className="font-medium">100%</span>
                     </div>
                   </div>
                 </CardContent>
@@ -1023,19 +1004,35 @@ Sarah`,
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Top Rated Plus</span>
-                      <span className="font-medium">33%</span>
+                      <span className="font-medium">
+                        {proposals.length > 0 ? 
+                          Math.round((proposals.filter(p => p.freelancer.topRatedPlus).length / proposals.length) * 100) + '%' : 
+                          '0%'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Avg. Success Rate</span>
-                      <span className="font-medium">96%</span>
+                      <span className="font-medium">
+                        {proposals.length > 0 ? 
+                          (proposals.reduce((sum, p) => sum + (p.freelancer.successRate || 0), 0) / proposals.length).toFixed(0) + '%' : 
+                          '0%'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Quick Responders</span>
-                      <span className="font-medium">67%</span>
+                      <span className="font-medium">
+                        {proposals.length > 0 ? 
+                          Math.round((proposals.filter(p => p.freelancer.responseTime && p.freelancer.responseTime.includes('hour')).length / proposals.length) * 100) + '%' : 
+                          '0%'}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Verified</span>
-                      <span className="font-medium">93%</span>
+                      <span className="font-medium">
+                        {proposals.length > 0 ? 
+                          Math.round((proposals.filter(p => p.freelancer.verified).length / proposals.length) * 100) + '%' : 
+                          '0%'}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -1072,8 +1069,9 @@ Sarah`,
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="open">Open</SelectItem>
-                      <SelectItem value="paused">Paused</SelectItem>
-                      <SelectItem value="closed">Closed</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1096,24 +1094,9 @@ Sarah`,
                   <h3 className="font-medium mb-2">Application Deadline</h3>
                   <input
                     type="date"
-                    defaultValue="2025-01-18"
+                    defaultValue={job.applicationDeadline ? new Date(job.applicationDeadline).toISOString().split('T')[0] : ''}
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   />
-                </div>
-
-                <div>
-                  <h3 className="font-medium mb-2">Connects Required</h3>
-                  <Select defaultValue="6">
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 Connect</SelectItem>
-                      <SelectItem value="2">2 Connects</SelectItem>
-                      <SelectItem value="4">4 Connects</SelectItem>
-                      <SelectItem value="6">6 Connects</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 <div className="pt-4 border-t">
@@ -1154,3 +1137,4 @@ Sarah`,
 };
 
 export default ClientJobView;
+       

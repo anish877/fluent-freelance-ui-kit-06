@@ -12,6 +12,7 @@ import { Badge } from "../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
 import axios from "axios";
 import { useToast } from "../hooks/use-toast";
+ import { useAuth } from "../hooks/AuthContext";
 
 interface Job {
   id: string;
@@ -58,6 +59,7 @@ interface Job {
 const JobDetails = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [proposal, setProposal] = useState("");
   const [proposalBudget, setProposalBudget] = useState("");
@@ -65,6 +67,7 @@ const JobDetails = () => {
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [submittingProposal, setSubmittingProposal] = useState(false);
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -76,9 +79,10 @@ const JobDetails = () => {
         } else {
           setError('Failed to fetch job details');
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching job details:', err);
-        setError(err.response?.data?.message || 'Failed to fetch job details');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch job details';
+        setError(errorMessage);
         toast({
           title: "Error",
           description: "Failed to load job details",
@@ -133,9 +137,62 @@ const JobDetails = () => {
     return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
   };
 
-  const handleProposalSubmit = () => {
-    console.log("Proposal submitted:", { proposal, proposalBudget, proposalDelivery });
-    // In real app, this would submit to API
+  const handleProposalSubmit = async () => {
+    if (!user || user.userType !== 'FREELANCER') {
+      toast({
+        title: "Error",
+        description: "Only freelancers can submit proposals",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!proposal.trim() || !proposalBudget.trim() || !proposalDelivery.trim()) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setSubmittingProposal(true);
+      
+      const proposalData = {
+        jobId: id,
+        coverLetter: proposal,
+        bidAmount: parseFloat(proposalBudget.replace(/[^0-9.]/g, '')),
+        estimatedDuration: proposalDelivery,
+        attachments: []
+      };
+
+      const response = await axios.post('/proposals', proposalData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data.success) {
+        toast({
+          title: "Success",
+          description: "Proposal submitted successfully!",
+        });
+        setProposal("");
+        setProposalBudget("");
+        setProposalDelivery("");
+      }
+    } catch (err: unknown) {
+      console.error('Error submitting proposal:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to submit proposal';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setSubmittingProposal(false);
+    }
   };
 
   if (loading) {
@@ -462,74 +519,115 @@ const JobDetails = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Submit Proposal */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Submit a Proposal</h3>
-              
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="w-full bg-teal-600 hover:bg-teal-700">
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Proposal
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>Submit Your Proposal</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Proposal
-                      </label>
-                      <textarea
-                        value={proposal}
-                        onChange={(e) => setProposal(e.target.value)}
-                        className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        placeholder="Describe your approach to this project..."
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
+            {user && user.userType === 'FREELANCER' && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Submit a Proposal</h3>
+                
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                      <Send className="h-4 w-4 mr-2" />
+                      Send Proposal
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Submit Your Proposal</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Your Budget
+                          Your Proposal
                         </label>
-                        <input
-                          type="text"
-                          value={proposalBudget}
-                          onChange={(e) => setProposalBudget(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                          placeholder="$3,500"
+                        <textarea
+                          value={proposal}
+                          onChange={(e) => setProposal(e.target.value)}
+                          className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                          placeholder="Describe your approach to this project..."
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Delivery Time
-                        </label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                          <option>1 week</option>
-                          <option>2 weeks</option>
-                          <option>1 month</option>
-                          <option>2-3 months</option>
-                        </select>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Your Budget
+                          </label>
+                          <input
+                            type="text"
+                            value={proposalBudget}
+                            onChange={(e) => setProposalBudget(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            placeholder="$3,500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Delivery Time
+                          </label>
+                          <select 
+                            value={proposalDelivery}
+                            onChange={(e) => setProposalDelivery(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                          >
+                            <option value="">Select duration</option>
+                            <option value="1 week">1 week</option>
+                            <option value="2 weeks">2 weeks</option>
+                            <option value="1 month">1 month</option>
+                            <option value="2-3 months">2-3 months</option>
+                          </select>
+                        </div>
                       </div>
+                      <Button 
+                        onClick={handleProposalSubmit} 
+                        className="w-full"
+                        disabled={submittingProposal}
+                      >
+                        {submittingProposal ? "Submitting..." : "Submit Proposal"}
+                      </Button>
                     </div>
-                    <Button onClick={handleProposalSubmit} className="w-full">
-                      Submit Proposal
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                  </DialogContent>
+                </Dialog>
 
-              <div className="mt-4 text-sm text-gray-600">
-                <p className="mb-2">Tips for a great proposal:</p>
-                <ul className="space-y-1 list-disc list-inside">
-                  <li>Address the client's specific needs</li>
-                  <li>Showcase relevant experience</li>
-                  <li>Be clear about your timeline</li>
-                  <li>Ask clarifying questions</li>
-                </ul>
+                <div className="mt-4 text-sm text-gray-600">
+                  <p className="mb-2">Tips for a great proposal:</p>
+                  <ul className="space-y-1 list-disc list-inside">
+                    <li>Address the client's specific needs</li>
+                    <li>Showcase relevant experience</li>
+                    <li>Be clear about your timeline</li>
+                    <li>Ask clarifying questions</li>
+                  </ul>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Show different message for non-freelancers */}
+            {user && user.userType !== 'FREELANCER' && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Submit a Proposal</h3>
+                <p className="text-gray-600 mb-4">
+                  Only freelancers can submit proposals for jobs. Please switch to a freelancer account to submit a proposal.
+                </p>
+                <Button variant="outline" className="w-full" disabled>
+                  <Send className="h-4 w-4 mr-2" />
+                  Send Proposal
+                </Button>
+              </div>
+            )}
+
+            {/* Show login prompt for non-authenticated users */}
+            {!user && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Submit a Proposal</h3>
+                <p className="text-gray-600 mb-4">
+                  Please log in as a freelancer to submit a proposal for this job.
+                </p>
+                <Link to="/login">
+                  <Button className="w-full">
+                    <Send className="h-4 w-4 mr-2" />
+                    Login to Submit Proposal
+                  </Button>
+                </Link>
+              </div>
+            )}
 
             {/* Job Stats */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
