@@ -1841,6 +1841,10 @@ export namespace Prisma {
     repeatHireRate: number | null
     rating: number | null
     reviewCount: number | null
+    coverImage: string | null
+    isOnline: boolean | null
+    hourlyRateRange: string | null
+    availabilityStatus: string | null
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -1904,6 +1908,10 @@ export namespace Prisma {
     repeatHireRate: number | null
     rating: number | null
     reviewCount: number | null
+    coverImage: string | null
+    isOnline: boolean | null
+    hourlyRateRange: string | null
+    availabilityStatus: string | null
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -1978,6 +1986,13 @@ export namespace Prisma {
     repeatHireRate: number
     rating: number
     reviewCount: number
+    portfolioProjects: number
+    workHistory: number
+    employmentHistory: number
+    coverImage: number
+    isOnline: number
+    hourlyRateRange: number
+    availabilityStatus: number
     companyName: number
     companySize: number
     industry: number
@@ -2076,6 +2091,10 @@ export namespace Prisma {
     repeatHireRate?: true
     rating?: true
     reviewCount?: true
+    coverImage?: true
+    isOnline?: true
+    hourlyRateRange?: true
+    availabilityStatus?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -2139,6 +2158,10 @@ export namespace Prisma {
     repeatHireRate?: true
     rating?: true
     reviewCount?: true
+    coverImage?: true
+    isOnline?: true
+    hourlyRateRange?: true
+    availabilityStatus?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -2213,6 +2236,13 @@ export namespace Prisma {
     repeatHireRate?: true
     rating?: true
     reviewCount?: true
+    portfolioProjects?: true
+    workHistory?: true
+    employmentHistory?: true
+    coverImage?: true
+    isOnline?: true
+    hourlyRateRange?: true
+    availabilityStatus?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -2381,6 +2411,13 @@ export namespace Prisma {
     repeatHireRate: number | null
     rating: number | null
     reviewCount: number | null
+    portfolioProjects: JsonValue | null
+    workHistory: JsonValue | null
+    employmentHistory: JsonValue | null
+    coverImage: string | null
+    isOnline: boolean
+    hourlyRateRange: string | null
+    availabilityStatus: string | null
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -2481,6 +2518,13 @@ export namespace Prisma {
     repeatHireRate?: boolean
     rating?: boolean
     reviewCount?: boolean
+    portfolioProjects?: boolean
+    workHistory?: boolean
+    employmentHistory?: boolean
+    coverImage?: boolean
+    isOnline?: boolean
+    hourlyRateRange?: boolean
+    availabilityStatus?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2572,6 +2616,13 @@ export namespace Prisma {
     repeatHireRate?: boolean
     rating?: boolean
     reviewCount?: boolean
+    portfolioProjects?: boolean
+    workHistory?: boolean
+    employmentHistory?: boolean
+    coverImage?: boolean
+    isOnline?: boolean
+    hourlyRateRange?: boolean
+    availabilityStatus?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2653,6 +2704,13 @@ export namespace Prisma {
     repeatHireRate?: boolean
     rating?: boolean
     reviewCount?: boolean
+    portfolioProjects?: boolean
+    workHistory?: boolean
+    employmentHistory?: boolean
+    coverImage?: boolean
+    isOnline?: boolean
+    hourlyRateRange?: boolean
+    availabilityStatus?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2734,6 +2792,13 @@ export namespace Prisma {
     repeatHireRate?: boolean
     rating?: boolean
     reviewCount?: boolean
+    portfolioProjects?: boolean
+    workHistory?: boolean
+    employmentHistory?: boolean
+    coverImage?: boolean
+    isOnline?: boolean
+    hourlyRateRange?: boolean
+    availabilityStatus?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2762,7 +2827,7 @@ export namespace Prisma {
     specialRequirements?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "totalEarnings" | "successRate" | "completedJobs" | "onTime" | "onBudget" | "responseTime" | "lastActive" | "topRatedPlus" | "verified" | "risingTalent" | "portfolioItems" | "testScores" | "specializations" | "memberSince" | "profileStrength" | "repeatHireRate" | "rating" | "reviewCount" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "minimumProjectBudget" | "specialRequirements", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "totalEarnings" | "successRate" | "completedJobs" | "onTime" | "onBudget" | "responseTime" | "lastActive" | "topRatedPlus" | "verified" | "risingTalent" | "portfolioItems" | "testScores" | "specializations" | "memberSince" | "profileStrength" | "repeatHireRate" | "rating" | "reviewCount" | "portfolioProjects" | "workHistory" | "employmentHistory" | "coverImage" | "isOnline" | "hourlyRateRange" | "availabilityStatus" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "minimumProjectBudget" | "specialRequirements", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     jobsPosted?: boolean | User$jobsPostedArgs<ExtArgs>
     proposals?: boolean | User$proposalsArgs<ExtArgs>
@@ -2844,6 +2909,13 @@ export namespace Prisma {
       repeatHireRate: number | null
       rating: number | null
       reviewCount: number | null
+      portfolioProjects: Prisma.JsonValue | null
+      workHistory: Prisma.JsonValue | null
+      employmentHistory: Prisma.JsonValue | null
+      coverImage: string | null
+      isOnline: boolean
+      hourlyRateRange: string | null
+      availabilityStatus: string | null
       companyName: string | null
       companySize: string | null
       industry: string | null
@@ -3354,6 +3426,13 @@ export namespace Prisma {
     readonly repeatHireRate: FieldRef<"User", 'Int'>
     readonly rating: FieldRef<"User", 'Float'>
     readonly reviewCount: FieldRef<"User", 'Int'>
+    readonly portfolioProjects: FieldRef<"User", 'Json'>
+    readonly workHistory: FieldRef<"User", 'Json'>
+    readonly employmentHistory: FieldRef<"User", 'Json'>
+    readonly coverImage: FieldRef<"User", 'String'>
+    readonly isOnline: FieldRef<"User", 'Boolean'>
+    readonly hourlyRateRange: FieldRef<"User", 'String'>
+    readonly availabilityStatus: FieldRef<"User", 'String'>
     readonly companyName: FieldRef<"User", 'String'>
     readonly companySize: FieldRef<"User", 'String'>
     readonly industry: FieldRef<"User", 'String'>
@@ -12366,6 +12445,13 @@ export namespace Prisma {
     repeatHireRate: 'repeatHireRate',
     rating: 'rating',
     reviewCount: 'reviewCount',
+    portfolioProjects: 'portfolioProjects',
+    workHistory: 'workHistory',
+    employmentHistory: 'employmentHistory',
+    coverImage: 'coverImage',
+    isOnline: 'isOnline',
+    hourlyRateRange: 'hourlyRateRange',
+    availabilityStatus: 'availabilityStatus',
     companyName: 'companyName',
     companySize: 'companySize',
     industry: 'industry',
@@ -12770,6 +12856,13 @@ export namespace Prisma {
     repeatHireRate?: IntNullableFilter<"User"> | number | null
     rating?: FloatNullableFilter<"User"> | number | null
     reviewCount?: IntNullableFilter<"User"> | number | null
+    portfolioProjects?: JsonNullableFilter<"User">
+    workHistory?: JsonNullableFilter<"User">
+    employmentHistory?: JsonNullableFilter<"User">
+    coverImage?: StringNullableFilter<"User"> | string | null
+    isOnline?: BoolFilter<"User"> | boolean
+    hourlyRateRange?: StringNullableFilter<"User"> | string | null
+    availabilityStatus?: StringNullableFilter<"User"> | string | null
     companyName?: StringNullableFilter<"User"> | string | null
     companySize?: StringNullableFilter<"User"> | string | null
     industry?: StringNullableFilter<"User"> | string | null
@@ -12860,6 +12953,13 @@ export namespace Prisma {
     repeatHireRate?: SortOrderInput | SortOrder
     rating?: SortOrderInput | SortOrder
     reviewCount?: SortOrderInput | SortOrder
+    portfolioProjects?: SortOrderInput | SortOrder
+    workHistory?: SortOrderInput | SortOrder
+    employmentHistory?: SortOrderInput | SortOrder
+    coverImage?: SortOrderInput | SortOrder
+    isOnline?: SortOrder
+    hourlyRateRange?: SortOrderInput | SortOrder
+    availabilityStatus?: SortOrderInput | SortOrder
     companyName?: SortOrderInput | SortOrder
     companySize?: SortOrderInput | SortOrder
     industry?: SortOrderInput | SortOrder
@@ -12953,6 +13053,13 @@ export namespace Prisma {
     repeatHireRate?: IntNullableFilter<"User"> | number | null
     rating?: FloatNullableFilter<"User"> | number | null
     reviewCount?: IntNullableFilter<"User"> | number | null
+    portfolioProjects?: JsonNullableFilter<"User">
+    workHistory?: JsonNullableFilter<"User">
+    employmentHistory?: JsonNullableFilter<"User">
+    coverImage?: StringNullableFilter<"User"> | string | null
+    isOnline?: BoolFilter<"User"> | boolean
+    hourlyRateRange?: StringNullableFilter<"User"> | string | null
+    availabilityStatus?: StringNullableFilter<"User"> | string | null
     companyName?: StringNullableFilter<"User"> | string | null
     companySize?: StringNullableFilter<"User"> | string | null
     industry?: StringNullableFilter<"User"> | string | null
@@ -13043,6 +13150,13 @@ export namespace Prisma {
     repeatHireRate?: SortOrderInput | SortOrder
     rating?: SortOrderInput | SortOrder
     reviewCount?: SortOrderInput | SortOrder
+    portfolioProjects?: SortOrderInput | SortOrder
+    workHistory?: SortOrderInput | SortOrder
+    employmentHistory?: SortOrderInput | SortOrder
+    coverImage?: SortOrderInput | SortOrder
+    isOnline?: SortOrder
+    hourlyRateRange?: SortOrderInput | SortOrder
+    availabilityStatus?: SortOrderInput | SortOrder
     companyName?: SortOrderInput | SortOrder
     companySize?: SortOrderInput | SortOrder
     industry?: SortOrderInput | SortOrder
@@ -13132,6 +13246,13 @@ export namespace Prisma {
     repeatHireRate?: IntNullableWithAggregatesFilter<"User"> | number | null
     rating?: FloatNullableWithAggregatesFilter<"User"> | number | null
     reviewCount?: IntNullableWithAggregatesFilter<"User"> | number | null
+    portfolioProjects?: JsonNullableWithAggregatesFilter<"User">
+    workHistory?: JsonNullableWithAggregatesFilter<"User">
+    employmentHistory?: JsonNullableWithAggregatesFilter<"User">
+    coverImage?: StringNullableWithAggregatesFilter<"User"> | string | null
+    isOnline?: BoolWithAggregatesFilter<"User"> | boolean
+    hourlyRateRange?: StringNullableWithAggregatesFilter<"User"> | string | null
+    availabilityStatus?: StringNullableWithAggregatesFilter<"User"> | string | null
     companyName?: StringNullableWithAggregatesFilter<"User"> | string | null
     companySize?: StringNullableWithAggregatesFilter<"User"> | string | null
     industry?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -13861,6 +13982,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -13951,6 +14079,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -14041,6 +14176,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14131,6 +14273,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14221,6 +14370,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -14302,6 +14458,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14383,6 +14546,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15352,6 +15522,13 @@ export namespace Prisma {
     repeatHireRate?: SortOrder
     rating?: SortOrder
     reviewCount?: SortOrder
+    portfolioProjects?: SortOrder
+    workHistory?: SortOrder
+    employmentHistory?: SortOrder
+    coverImage?: SortOrder
+    isOnline?: SortOrder
+    hourlyRateRange?: SortOrder
+    availabilityStatus?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -15435,6 +15612,10 @@ export namespace Prisma {
     repeatHireRate?: SortOrder
     rating?: SortOrder
     reviewCount?: SortOrder
+    coverImage?: SortOrder
+    isOnline?: SortOrder
+    hourlyRateRange?: SortOrder
+    availabilityStatus?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -15498,6 +15679,10 @@ export namespace Prisma {
     repeatHireRate?: SortOrder
     rating?: SortOrder
     reviewCount?: SortOrder
+    coverImage?: SortOrder
+    isOnline?: SortOrder
+    hourlyRateRange?: SortOrder
+    availabilityStatus?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -18126,6 +18311,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18215,6 +18407,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18430,6 +18629,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18519,6 +18725,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18707,6 +18920,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18796,6 +19016,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18974,6 +19201,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19063,6 +19297,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19219,6 +19460,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -19308,6 +19556,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -19402,6 +19657,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -19491,6 +19753,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -19669,6 +19938,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19758,6 +20034,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19858,6 +20141,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19947,6 +20237,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20284,6 +20581,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -20373,6 +20677,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -20467,6 +20778,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -20556,6 +20874,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -20715,6 +21040,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20804,6 +21136,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20904,6 +21243,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20993,6 +21339,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21148,6 +21501,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -21237,6 +21597,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -21342,6 +21709,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21431,6 +21805,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21520,6 +21901,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -21609,6 +21997,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -21703,6 +22098,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -21792,6 +22194,13 @@ export namespace Prisma {
     repeatHireRate?: number | null
     rating?: number | null
     reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -21897,6 +22306,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21986,6 +22402,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22086,6 +22509,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22175,6 +22605,13 @@ export namespace Prisma {
     repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
     rating?: NullableFloatFieldUpdateOperationsInput | number | null
     reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null

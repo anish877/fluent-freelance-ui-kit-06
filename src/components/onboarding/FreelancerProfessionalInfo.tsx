@@ -14,6 +14,10 @@ interface WorkExperience {
   endDate: string;
   current: boolean;
   description: string;
+  location: string;
+  industry: string;
+  achievements: string[];
+  technologies: string[];
 }
 
 interface Education {
@@ -23,11 +27,27 @@ interface Education {
   startDate: string;
   endDate: string;
   current: boolean;
+  gpa: string;
+  honors: string;
+  activities: string[];
 }
 
 interface Language {
   language: string;
   proficiency: string;
+}
+
+interface Employment {
+  company: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string;
+  location: string;
+  industry: string;
+  achievements: string[];
+  technologies: string[];
 }
 
 interface FreelancerProfessionalInfoData {
@@ -38,7 +58,8 @@ interface FreelancerProfessionalInfoData {
   education?: Education[];
   certifications?: string[];
   languages?: Language[];
-  [key: string]: string | WorkExperience[] | Education[] | string[] | Language[] | undefined;
+  employment?: Employment[];
+  [key: string]: string | WorkExperience[] | Education[] | string[] | Language[] | Employment[] | undefined;
 }
 
 interface FreelancerProfessionalInfoProps {
@@ -55,6 +76,7 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
     education: data.education || [],
     certifications: data.certifications || [],
     languages: data.languages || [{ language: "English", proficiency: "Native" }],
+    employment: data.employment || [],
     ...data
   });
 
@@ -93,7 +115,11 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
           startDate: "",
           endDate: "",
           current: false,
-          description: ""
+          description: "",
+          location: "",
+          industry: "",
+          achievements: [],
+          technologies: []
         }
       ]
     });
@@ -124,7 +150,10 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
           field: "",
           startDate: "",
           endDate: "",
-          current: false
+          current: false,
+          gpa: "",
+          honors: "",
+          activities: []
         }
       ]
     });
@@ -165,6 +194,41 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
     setFormData({ ...formData, languages: updated });
   };
 
+  const addEmployment = () => {
+    setFormData({
+      ...formData,
+      employment: [
+        ...formData.employment,
+        {
+          company: "",
+          position: "",
+          startDate: "",
+          endDate: "",
+          current: false,
+          description: "",
+          location: "",
+          industry: "",
+          achievements: [],
+          technologies: []
+        }
+      ]
+    });
+  };
+
+  const removeEmployment = (index: number) => {
+    setFormData({
+      ...formData,
+      employment: formData.employment.filter((_, i) => i !== index)
+    });
+  };
+
+  const updateEmployment = (index: number, field: string, value: any) => {
+    const updated = formData.employment.map((emp, i) => 
+      i === index ? { ...emp, [field]: value } : emp
+    );
+    setFormData({ ...formData, employment: updated });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -185,7 +249,8 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
         workExperience: formData.workExperience,
         education: formData.education,
         certifications: formData.certifications,
-        languages: formData.languages
+        languages: formData.languages,
+        employment: formData.employment
       };
       onNext(mappedData);
     }
@@ -312,6 +377,25 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
               
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
+                  <Label>Location</Label>
+                  <Input
+                    value={exp.location}
+                    onChange={(e) => updateWorkExperience(index, "location", e.target.value)}
+                    placeholder="e.g., San Francisco, CA"
+                  />
+                </div>
+                <div>
+                  <Label>Industry</Label>
+                  <Input
+                    value={exp.industry}
+                    onChange={(e) => updateWorkExperience(index, "industry", e.target.value)}
+                    placeholder="e.g., Technology, Healthcare, Finance"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
                   <Label>Start Date</Label>
                   <Input
                     type="month"
@@ -339,13 +423,32 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
                 <Label htmlFor={`current-${index}`}>I currently work here</Label>
               </div>
               
-              <div>
+              <div className="mb-4">
                 <Label>Description</Label>
                 <Textarea
                   value={exp.description}
                   onChange={(e) => updateWorkExperience(index, "description", e.target.value)}
                   placeholder="Describe your responsibilities and achievements..."
                   rows={3}
+                />
+              </div>
+
+              <div className="mb-4">
+                <Label>Key Achievements</Label>
+                <Textarea
+                  value={exp.achievements.join('\n')}
+                  onChange={(e) => updateWorkExperience(index, "achievements", e.target.value.split('\n').filter(item => item.trim()))}
+                  placeholder="List your key achievements, one per line..."
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label>Technologies Used</Label>
+                <Input
+                  value={exp.technologies.join(', ')}
+                  onChange={(e) => updateWorkExperience(index, "technologies", e.target.value.split(',').map(tech => tech.trim()).filter(tech => tech))}
+                  placeholder="e.g., React, Node.js, AWS, Docker (comma separated)"
                 />
               </div>
             </div>
@@ -407,7 +510,7 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4 mb-4">
                 <div>
                   <Label>Start Date</Label>
                   <Input
@@ -425,6 +528,33 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
                     disabled={edu.current}
                   />
                 </div>
+                <div>
+                  <Label>GPA</Label>
+                  <Input
+                    value={edu.gpa}
+                    onChange={(e) => updateEducation(index, "gpa", e.target.value)}
+                    placeholder="e.g., 3.8/4.0"
+                  />
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <Label>Honors & Awards</Label>
+                <Input
+                  value={edu.honors}
+                  onChange={(e) => updateEducation(index, "honors", e.target.value)}
+                  placeholder="e.g., Magna Cum Laude, Dean's List"
+                />
+              </div>
+
+              <div className="mb-4">
+                <Label>Activities & Organizations</Label>
+                <Textarea
+                  value={edu.activities.join('\n')}
+                  onChange={(e) => updateEducation(index, "activities", e.target.value.split('\n').filter(item => item.trim()))}
+                  placeholder="List your activities, clubs, or organizations, one per line..."
+                  rows={2}
+                />
               </div>
               
               <div className="flex items-center space-x-2 mt-4">
@@ -434,6 +564,132 @@ const FreelancerProfessionalInfo = ({ onNext, data }: FreelancerProfessionalInfo
                   onCheckedChange={(checked) => updateEducation(index, "current", checked)}
                 />
                 <Label htmlFor={`current-edu-${index}`}>I currently study here</Label>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Employment History */}
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <Label>Employment History</Label>
+            <Button type="button" variant="outline" size="sm" onClick={addEmployment}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Employment
+            </Button>
+          </div>
+          
+          {formData.employment.map((emp, index) => (
+            <div key={index} className="border rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center">
+                  <Building className="h-5 w-5 text-gray-400 mr-2" />
+                  <h4 className="font-medium">Employment {index + 1}</h4>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeEmployment(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <Label>Position</Label>
+                  <Input
+                    value={emp.position}
+                    onChange={(e) => updateEmployment(index, "position", e.target.value)}
+                    placeholder="e.g., Senior Software Engineer"
+                  />
+                </div>
+                <div>
+                  <Label>Company</Label>
+                  <Input
+                    value={emp.company}
+                    onChange={(e) => updateEmployment(index, "company", e.target.value)}
+                    placeholder="e.g., Tech Innovations Inc"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <Label>Location</Label>
+                  <Input
+                    value={emp.location}
+                    onChange={(e) => updateEmployment(index, "location", e.target.value)}
+                    placeholder="e.g., San Francisco, CA"
+                  />
+                </div>
+                <div>
+                  <Label>Industry</Label>
+                  <Input
+                    value={emp.industry}
+                    onChange={(e) => updateEmployment(index, "industry", e.target.value)}
+                    placeholder="e.g., Technology, Healthcare, Finance"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <Label>Start Date</Label>
+                  <Input
+                    type="month"
+                    value={emp.startDate}
+                    onChange={(e) => updateEmployment(index, "startDate", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>End Date</Label>
+                  <Input
+                    type="month"
+                    value={emp.endDate}
+                    onChange={(e) => updateEmployment(index, "endDate", e.target.value)}
+                    disabled={emp.current}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 mb-4">
+                <Checkbox
+                  id={`current-emp-${index}`}
+                  checked={emp.current}
+                  onCheckedChange={(checked) => updateEmployment(index, "current", checked)}
+                />
+                <Label htmlFor={`current-emp-${index}`}>I currently work here</Label>
+              </div>
+              
+              <div className="mb-4">
+                <Label>Description</Label>
+                <Textarea
+                  value={emp.description}
+                  onChange={(e) => updateEmployment(index, "description", e.target.value)}
+                  placeholder="Describe your role and responsibilities..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="mb-4">
+                <Label>Key Achievements</Label>
+                <Textarea
+                  value={emp.achievements.join('\n')}
+                  onChange={(e) => updateEmployment(index, "achievements", e.target.value.split('\n').filter(item => item.trim()))}
+                  placeholder="List your key achievements, one per line..."
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label>Technologies Used</Label>
+                <Input
+                  value={emp.technologies.join(', ')}
+                  onChange={(e) => updateEmployment(index, "technologies", e.target.value.split(',').map(tech => tech.trim()).filter(tech => tech))}
+                  placeholder="e.g., React, Node.js, AWS, Docker (comma separated)"
+                />
               </div>
             </div>
           ))}

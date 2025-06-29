@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Separator } from "../components/ui/separator";
 import { useAuth } from "../hooks/AuthContext";
+import EditProfileModal from "../components/modals/EditProfileModal";
 
 interface UserProfile {
   id: string;
@@ -29,9 +30,17 @@ interface UserProfile {
   responseTime: string;
   availability: string;
   description: string;
-  skills: string[];
-  languages: string[];
+  skills: (string | { name: string })[];
+  languages: (string | { language: string; proficiency: string })[];
   hourlyRate: string;
+  phone?: string;
+  coverImage?: string;
+  socialLinks?: {
+    linkedin?: string;
+    github?: string;
+    website?: string;
+    twitter?: string;
+  };
   education: Array<{
     degree: string;
     school: string;
@@ -106,6 +115,17 @@ interface PortfolioItem {
   image: string;
   technologies: string[];
   link: string;
+  category?: string;
+}
+
+interface BackendPortfolioItem {
+  title: string;
+  description: string;
+  image: string;
+  technologies: string[];
+  link?: string;
+  url?: string;
+  category?: string;
 }
 
 interface WorkExperience {
@@ -426,7 +446,7 @@ const ProfileHeader = ({ userProfile, onEditClick }: { userProfile: UserProfile;
 );
 
 // 5. Enhanced Tabs with Better Spacing and Animation
-const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
+const ProfileTabs = ({ userProfile, onEditClick }: { userProfile: UserProfile; onEditClick: (tab?: string) => void }) => {
   const navigate = useNavigate();
   
   return (
@@ -453,7 +473,7 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
                 <div className="flex flex-wrap gap-2">
                   {userProfile.skills.map((skill, index) => (
                     <Badge key={index} variant="secondary">
-                      {skill}
+                      {typeof skill === 'string' ? skill : skill.name || 'Unknown Skill'}
                     </Badge>
                   ))}
                 </div>
@@ -463,7 +483,7 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
                   title="No skills added yet"
                   description="Add your skills to help clients find you for relevant projects"
                   actionText="Add Skills"
-                  onAction={() => {}}
+                  onAction={() => onEditClick('skills')}
                 />
               )}
             </CardContent>
@@ -478,7 +498,9 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
               {userProfile.languages.length > 0 ? (
                 <div className="space-y-2">
                   {userProfile.languages.map((language, index) => (
-                    <div key={index} className="text-gray-700">{language}</div>
+                    <div key={index} className="text-gray-700">
+                      {typeof language === 'string' ? language : `${language.language} (${language.proficiency})`}
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -486,8 +508,8 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
                   icon={Users}
                   title="No languages added"
                   description="Add languages you speak to attract international clients"
-                  actionText="Add Languages"
-                  onAction={() => {}}
+                  actionText="Add Skills"
+                  onAction={() => onEditClick('skills')}
                 />
               )}
             </CardContent>
@@ -521,7 +543,7 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
                 title="No certifications added"
                 description="Showcase your professional certifications to build trust with clients"
                 actionText="Add Certification"
-                onAction={() => {}}
+                onAction={() => onEditClick('experience')}
               />
             )}
           </CardContent>
@@ -576,7 +598,7 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
             title="No portfolio projects yet"
             description="Showcase your best work to attract more clients and demonstrate your expertise"
             actionText="Add Project"
-            onAction={() => {}}
+            onAction={() => onEditClick('portfolio')}
           />
         )}
       </TabsContent>
@@ -616,7 +638,7 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
             title="No work experience added"
             description="Add your professional experience to build credibility with potential clients"
             actionText="Add Experience"
-            onAction={() => {}}
+            onAction={() => onEditClick('experience')}
           />
         )}
       </TabsContent>
@@ -730,7 +752,7 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
             title="No education added"
             description="Add your educational background to showcase your qualifications"
             actionText="Add Education"
-            onAction={() => {}}
+            onAction={() => onEditClick('education')}
           />
         )}
       </TabsContent>
@@ -740,6 +762,7 @@ const ProfileTabs = ({ userProfile }: { userProfile: UserProfile }) => {
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editTab, setEditTab] = useState<string>("basic");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -818,8 +841,16 @@ const Profile = () => {
     hourlyRate?: number;
     education?: Education[];
     certifications?: Certification[] | string[];
-    portfolioItems?: PortfolioItem[];
+    portfolioProjects?: BackendPortfolioItem[];
     workExperience?: WorkExperience[];
+    phone?: string;
+    coverImage?: string;
+    socialLinks?: {
+      linkedin?: string;
+      github?: string;
+      website?: string;
+      twitter?: string;
+    };
   }) : UserProfile => {
     return {
       id: userData.id,
@@ -847,6 +878,9 @@ const Profile = () => {
         ? (userData.languages as Language[]).map((l) => `${l.language} (${l.proficiency})`)
         : [],
       hourlyRate: userData.hourlyRate ? `$${userData.hourlyRate}` : '$0',
+      phone: userData.phone,
+      coverImage: userData.coverImage,
+      socialLinks: userData.socialLinks,
       education: Array.isArray(userData.education)
         ? (userData.education as Education[]).map((e) => ({
             degree: e.degree || '',
@@ -861,13 +895,14 @@ const Profile = () => {
               : { name: c.name || '', issuer: c.issuer || 'Unknown', year: c.year || '' }
           )
         : [],
-      portfolio: Array.isArray(userData.portfolioItems)
-        ? (userData.portfolioItems as PortfolioItem[]).map((item) => ({
+      portfolio: Array.isArray(userData.portfolioProjects)
+        ? (userData.portfolioProjects as BackendPortfolioItem[]).map((item) => ({
             title: item.title || '',
             description: item.description || '',
             image: item.image || '/placeholder.svg',
             technologies: item.technologies || [],
-            link: item.link || '#'
+            link: item.link || item.url || '#',
+            category: item.category || 'Web Development'
           }))
         : [],
       workExperience: Array.isArray(userData.workExperience)
@@ -923,6 +958,100 @@ const Profile = () => {
     }
   }, [userProfile]);
 
+  const handleSaveProfile = async (updatedProfile: Partial<UserProfile>) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Transform the data to match backend expectations
+      const transformedData = {
+        firstName: updatedProfile.firstName,
+        lastName: updatedProfile.lastName,
+        title: updatedProfile.title,
+        overview: updatedProfile.description, // Map description to overview
+        location: updatedProfile.location,
+        country: updatedProfile.country,
+        city: updatedProfile.city,
+        timezone: updatedProfile.timezone,
+        phone: updatedProfile.phone,
+        hourlyRate: updatedProfile.hourlyRate 
+          ? (typeof updatedProfile.hourlyRate === 'string' 
+              ? parseFloat(updatedProfile.hourlyRate.replace('$', '')) 
+              : updatedProfile.hourlyRate)
+          : null,
+        availability: updatedProfile.availability || "Available - 30+ hrs/week", // Ensure default value
+        responseTime: updatedProfile.responseTime || "Within 24 hours", // Ensure default value
+        avatar: updatedProfile.profilePicture, // Map profilePicture to avatar
+        coverImage: updatedProfile.coverImage,
+        skills: updatedProfile.skills?.map(skill => 
+          typeof skill === 'string' ? { name: skill } : skill
+        ),
+        languages: updatedProfile.languages?.map(lang => 
+          typeof lang === 'string' ? { language: lang.split(' (')[0], proficiency: lang.split(' (')[1]?.replace(')', '') || 'Fluent' } : lang
+        ),
+        education: updatedProfile.education,
+        certifications: updatedProfile.certifications,
+        // Transform portfolio data to match backend expectations
+        portfolio: updatedProfile.portfolio?.map(item => ({
+          title: item.title || '',
+          description: item.description || '',
+          image: item.image || '/placeholder.svg',
+          technologies: Array.isArray(item.technologies) ? item.technologies : [],
+          link: item.link || '',
+          category: (item as PortfolioItem).category || 'Web Development'
+        })) || [],
+        workExperience: updatedProfile.workExperience,
+        socialLinks: updatedProfile.socialLinks
+      };
+
+      console.log('Profile page sending portfolio data:', transformedData.portfolio);
+      console.log('Portfolio items count:', transformedData.portfolio?.length || 0);
+
+      // Remove undefined values
+      Object.keys(transformedData).forEach(key => {
+        if (transformedData[key as keyof typeof transformedData] === undefined) {
+          delete transformedData[key as keyof typeof transformedData];
+        }
+      });
+
+      console.log('Sending profile update data:', transformedData);
+
+      const response = await fetch("/api/users/profile/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(transformedData),
+      });
+      
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log('Error response:', errorData);
+        throw new Error(errorData.message || errorData.errors?.[0]?.msg || "Failed to update profile");
+      }
+      
+      const successData = await response.json();
+      console.log('Success response:', successData);
+      
+      await fetchProfile();
+    } catch (err) {
+      console.error('Profile update error:', err);
+      setError(err instanceof Error ? err.message : "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditClick = (tab?: string) => {
+    if (tab) {
+      setEditTab(tab);
+    }
+    setIsEditing(true);
+  };
+
   // 6. Replace the loading state in the main component
   if (loading) {
     return <ProfileSkeleton />;
@@ -953,14 +1082,19 @@ const Profile = () => {
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 8. Replace the profile header section in the main component with: */}
-        <ProfileHeader userProfile={userProfile} onEditClick={() => setIsEditing(!isEditing)} />
-
-        {/* 9. Replace the tabs section with: */}
-        <ProfileTabs userProfile={userProfile} />
+        <ProfileHeader userProfile={userProfile} onEditClick={() => handleEditClick()} />
+        <ProfileTabs userProfile={userProfile} onEditClick={handleEditClick} />
       </div>
 
       <Footer />
+      <EditProfileModal
+        key={`edit-modal-${userProfile?.id}-${isEditing}`}
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        userProfile={userProfile}
+        onSave={handleSaveProfile}
+        defaultTab={editTab}
+      />
     </div>
   );
 };

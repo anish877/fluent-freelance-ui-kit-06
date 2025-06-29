@@ -5,7 +5,8 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Checkbox } from "../ui/checkbox";
-import { ArrowRight, Clock, DollarSign, Calendar, Info } from "lucide-react";
+import { ArrowRight, Clock, DollarSign, Calendar, Info, Upload, Camera, Loader2 } from "lucide-react";
+import { uploadService } from "../../lib/uploadService";
 
 interface ProjectBasedRates {
   small: string;
@@ -30,6 +31,9 @@ interface FreelancerRatesAvailabilityData {
   responseTime?: string;
   minimumProjectBudget?: string;
   specialRequirements?: string;
+  coverImage?: string;
+  hourlyRateRange?: string;
+  availabilityStatus?: string;
   [key: string]: string | ProjectBasedRates | WorkingHours | string[] | undefined;
 }
 
@@ -58,10 +62,14 @@ const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabili
     responseTime: data.responseTime || "",
     minimumProjectBudget: data.minimumProjectBudget || "",
     specialRequirements: data.specialRequirements || "",
+    coverImage: data.coverImage || "",
+    hourlyRateRange: data.hourlyRateRange || "",
+    availabilityStatus: data.availabilityStatus || "",
     ...data
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
 
   const availabilityOptions = [
     { value: "full-time", label: "Full-time", description: "30+ hours per week" },
@@ -149,9 +157,43 @@ const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabili
         workingDays: formData.workingDays,
         responseTime: formData.responseTime,
         minimumProjectBudget: formData.minimumProjectBudget,
-        specialRequirements: formData.specialRequirements
+        specialRequirements: formData.specialRequirements,
+        coverImage: formData.coverImage,
+        hourlyRateRange: formData.hourlyRateRange,
+        availabilityStatus: formData.availabilityStatus
       };
       onNext(mappedData);
+    }
+  };
+
+  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const validation = uploadService.validateFile(file);
+    if (!validation.isValid) {
+      setErrors({ coverImage: validation.error });
+      return;
+    }
+
+    setUploading(true);
+    setErrors({});
+
+    try {
+      // Upload to Cloudinary
+      const result = await uploadService.uploadSingle(file);
+      
+      if (result.success) {
+        setFormData({ ...formData, coverImage: result.data.url });
+      } else {
+        setErrors({ coverImage: 'Upload failed. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setErrors({ coverImage: 'Upload failed. Please try again.' });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -167,6 +209,48 @@ const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabili
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Cover Image */}
+        <div>
+          <Label className="text-lg font-semibold">Profile Cover Image</Label>
+          <p className="text-sm text-gray-600 mb-4">
+            Add a cover image to make your profile stand out
+          </p>
+          
+          <div className="text-center">
+            <div className="relative inline-block">
+              {formData.coverImage ? (
+                <img
+                  src={formData.coverImage}
+                  alt="Cover"
+                  className="w-full h-32 object-cover rounded-lg border-2 border-gray-200"
+                />
+              ) : (
+                <div className="w-full h-32 bg-gray-100 border-2 border-gray-200 rounded-lg flex items-center justify-center">
+                  <Camera className="h-8 w-8 text-gray-400" />
+                </div>
+              )}
+              <label className="absolute bottom-2 right-2 bg-teal-600 text-white p-2 rounded-full cursor-pointer hover:bg-teal-700 transition-colors">
+                {uploading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverImageUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </label>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">Upload a cover image (optional)</p>
+            {errors.coverImage && (
+              <p className="text-red-500 text-sm mt-1">{errors.coverImage}</p>
+            )}
+          </div>
+        </div>
+
         {/* Payment Preference */}
         <div>
           <Label className="text-lg font-semibold">Payment Preference *</Label>
@@ -190,6 +274,34 @@ const FreelancerRatesAvailability = ({ onNext, data }: FreelancerRatesAvailabili
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Hourly Rate Range */}
+        <div>
+          <Label>Hourly Rate Range</Label>
+          <p className="text-sm text-gray-600 mb-2">
+            Display your hourly rate range on your profile
+          </p>
+          <Input
+            value={formData.hourlyRateRange}
+            onChange={(e) => setFormData({ ...formData, hourlyRateRange: e.target.value })}
+            placeholder="e.g., $75 - $120"
+            className="max-w-xs"
+          />
+        </div>
+
+        {/* Availability Status */}
+        <div>
+          <Label>Availability Status</Label>
+          <p className="text-sm text-gray-600 mb-2">
+            How would you like to display your availability?
+          </p>
+          <Input
+            value={formData.availabilityStatus}
+            onChange={(e) => setFormData({ ...formData, availabilityStatus: e.target.value })}
+            placeholder="e.g., Available - 30+ hrs/week"
+            className="max-w-xs"
+          />
         </div>
 
         {/* Hourly Rate */}

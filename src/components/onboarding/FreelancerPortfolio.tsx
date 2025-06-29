@@ -19,6 +19,11 @@ interface PortfolioItem {
   clientFeedback: string;
   role: string;
   duration: string;
+  client: string;
+  budget: string;
+  projectType: string;
+  challenges: string;
+  outcomes: string;
 }
 
 interface SocialLinks {
@@ -76,7 +81,12 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
           completionDate: "",
           clientFeedback: "",
           role: "",
-          duration: ""
+          duration: "",
+          client: "",
+          budget: "",
+          projectType: "",
+          challenges: "",
+          outcomes: ""
         }
       ]
     });
@@ -468,6 +478,60 @@ const FreelancerPortfolio = ({ onNext, data }: FreelancerPortfolioProps) => {
                       onChange={(e) => updatePortfolioItem(index, "completionDate", e.target.value)}
                     />
                   </div>
+                </div>
+
+                {/* Additional Project Details */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor={`client_${index}`}>Client/Company</Label>
+                    <Input
+                      id={`client_${index}`}
+                      value={item.client}
+                      onChange={(e) => updatePortfolioItem(index, "client", e.target.value)}
+                      placeholder="e.g., TechCorp Solutions"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`budget_${index}`}>Project Budget</Label>
+                    <Input
+                      id={`budget_${index}`}
+                      value={item.budget}
+                      onChange={(e) => updatePortfolioItem(index, "budget", e.target.value)}
+                      placeholder="e.g., $4,500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor={`projectType_${index}`}>Project Type</Label>
+                  <Input
+                    id={`projectType_${index}`}
+                    value={item.projectType}
+                    onChange={(e) => updatePortfolioItem(index, "projectType", e.target.value)}
+                    placeholder="e.g., E-commerce Platform, SaaS Dashboard, Mobile App"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor={`challenges_${index}`}>Key Challenges</Label>
+                  <Textarea
+                    id={`challenges_${index}`}
+                    value={item.challenges}
+                    onChange={(e) => updatePortfolioItem(index, "challenges", e.target.value)}
+                    placeholder="Describe the main challenges you faced and how you overcame them..."
+                    rows={2}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor={`outcomes_${index}`}>Project Outcomes</Label>
+                  <Textarea
+                    id={`outcomes_${index}`}
+                    value={item.outcomes}
+                    onChange={(e) => updatePortfolioItem(index, "outcomes", e.target.value)}
+                    placeholder="Describe the results and impact of this project..."
+                    rows={2}
+                  />
                 </div>
 
                 {/* Technologies */}

@@ -1,11 +1,10 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
   MapPin, Clock, Star, Users, Award, Eye, MessageCircle, 
   ThumbsUp, Calendar, DollarSign, CheckCircle, Badge as BadgeIcon,
   Download, ExternalLink, Heart, Share2, Flag, Camera,
-  Briefcase, GraduationCap, Globe, Phone, Mail
+  Briefcase, GraduationCap, Globe, Phone, Mail, Loader2
 } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
@@ -13,177 +12,108 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 
+interface FreelancerData {
+  id: string;
+  name: string;
+  title: string;
+  avatar: string;
+  coverImage: string;
+  location: string;
+  timezone: string;
+  rating: number;
+  reviews: number;
+  completedJobs: number;
+  totalEarned: string;
+  successRate: number;
+  responseTime: string;
+  languages: Array<{ name: string; level: string }>;
+  hourlyRate: string;
+  availability: string;
+  memberSince: string;
+  lastActive: string;
+  isOnline: boolean;
+  verified: boolean;
+  topRated: boolean;
+  skills: Array<{ name: string; level: string; yearsOfExperience: number }>;
+  overview: string;
+  portfolio: Array<{
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+    technologies: string[];
+    url: string;
+    client: string;
+    completion: string;
+  }>;
+  workHistory: Array<{
+    id: number;
+    title: string;
+    client: string;
+    clientRating: number;
+    budget: string;
+    duration: string;
+    completedDate: string;
+    feedback: string;
+    skills: string[];
+  }>;
+  education: Array<{
+    school: string;
+    degree: string;
+    period: string;
+    description: string;
+  }>;
+  certifications: Array<{
+    name: string;
+    issuer: string;
+    date: string;
+    url: string;
+  }>;
+  employment: Array<{
+    company: string;
+    position: string;
+    period: string;
+    description: string;
+  }>;
+}
+
 const FreelancerProfile = () => {
   const { id } = useParams();
   const [isFollowing, setIsFollowing] = useState(false);
+  const [freelancer, setFreelancer] = useState<FreelancerData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock freelancer data
-  const freelancer = {
-    id: parseInt(id || "1"),
-    name: "Sarah Chen",
-    title: "Senior Full-Stack Developer",
-    avatar: "/placeholder.svg",
-    coverImage: "/placeholder.svg",
-    location: "San Francisco, CA",
-    timezone: "PST (UTC-8)",
-    rating: 4.9,
-    reviews: 147,
-    completedJobs: 89,
-    totalEarned: "$185,000+",
-    successRate: 98,
-    responseTime: "1 hour",
-    languages: [
-      { name: "English", level: "Native" },
-      { name: "Mandarin", level: "Native" },
-      { name: "Spanish", level: "Conversational" }
-    ],
-    hourlyRate: "$75 - $120",
-    availability: "Available - 30+ hrs/week",
-    memberSince: "March 2020",
-    lastActive: "2 hours ago",
-    isOnline: true,
-    verified: true,
-    topRated: true,
-    skills: [
-      { name: "React", level: "Expert", yearsOfExperience: 5 },
-      { name: "TypeScript", level: "Expert", yearsOfExperience: 4 },
-      { name: "Node.js", level: "Expert", yearsOfExperience: 5 },
-      { name: "Python", level: "Advanced", yearsOfExperience: 6 },
-      { name: "AWS", level: "Advanced", yearsOfExperience: 3 },
-      { name: "MongoDB", level: "Advanced", yearsOfExperience: 4 },
-      { name: "GraphQL", level: "Intermediate", yearsOfExperience: 2 },
-      { name: "Docker", level: "Intermediate", yearsOfExperience: 2 }
-    ],
-    overview: `I am a passionate full-stack developer with over 6 years of experience building scalable web applications. I specialize in React, Node.js, and cloud technologies, helping businesses transform their ideas into robust digital solutions.
+  useEffect(() => {
+    const fetchFreelancerProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/users/profile/${id}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch freelancer profile');
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          console.log('Freelancer data received:', result.data);
+          console.log('Response time:', result.data.responseTime);
+          setFreelancer(result.data);
+        } else {
+          throw new Error(result.message || 'Failed to fetch freelancer profile');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-My expertise includes:
-• Frontend: React, TypeScript, Next.js, Vue.js
-• Backend: Node.js, Python, GraphQL, REST APIs
-• Databases: PostgreSQL, MongoDB, Redis
-• Cloud: AWS, Docker, Kubernetes
-• Testing: Jest, Cypress, pytest
-
-I've successfully delivered 80+ projects ranging from small business websites to enterprise-level applications. My clients appreciate my attention to detail, clear communication, and ability to deliver high-quality code on time.
-
-I'm passionate about staying up-to-date with the latest technologies and best practices. I believe in writing clean, maintainable code and creating solutions that not only meet current requirements but also scale for future growth.
-
-Let's work together to bring your vision to life!`,
-    portfolio: [
-      {
-        id: 1,
-        title: "E-commerce Platform",
-        description: "Modern e-commerce platform built with React and Node.js",
-        image: "/placeholder.svg",
-        technologies: ["React", "Node.js", "MongoDB", "Stripe"],
-        url: "https://example.com",
-        client: "RetailCorp",
-        completion: "2024"
-      },
-      {
-        id: 2,
-        title: "Task Management SaaS",
-        description: "Collaborative task management application with real-time updates",
-        image: "/placeholder.svg",
-        technologies: ["React", "TypeScript", "GraphQL", "PostgreSQL"],
-        url: "https://example.com",
-        client: "ProductivityPro",
-        completion: "2023"
-      },
-      {
-        id: 3,
-        title: "Healthcare Dashboard",
-        description: "Analytics dashboard for healthcare providers",
-        image: "/placeholder.svg",
-        technologies: ["Vue.js", "Python", "D3.js", "AWS"],
-        url: "https://example.com",
-        client: "MedTech Solutions",
-        completion: "2023"
-      }
-    ],
-    workHistory: [
-      {
-        id: 1,
-        title: "E-commerce Platform Development",
-        client: "TechCorp Solutions",
-        clientRating: 5.0,
-        budget: "$4,500",
-        duration: "3 months",
-        completedDate: "December 2024",
-        feedback: "Sarah delivered an exceptional e-commerce platform that exceeded our expectations. Her code quality is outstanding, and she was very responsive throughout the project. Highly recommended!",
-        skills: ["React", "Node.js", "MongoDB", "Stripe API"]
-      },
-      {
-        id: 2,
-        title: "SaaS Dashboard Redesign",
-        client: "StartupHub Inc",
-        clientRating: 5.0,
-        budget: "$3,200",
-        duration: "2 months",
-        completedDate: "October 2024",
-        feedback: "Working with Sarah was a pleasure. She understood our requirements perfectly and delivered a beautiful, functional dashboard. The new design has significantly improved our user engagement.",
-        skills: ["React", "TypeScript", "Chart.js", "Tailwind CSS"]
-      },
-      {
-        id: 3,
-        title: "API Development and Integration",
-        client: "DataFlow Systems",
-        clientRating: 4.8,
-        budget: "$2,800",
-        duration: "6 weeks",
-        completedDate: "September 2024",
-        feedback: "Sarah built a robust API that handles our complex data processing needs. Her documentation was excellent and the code is very maintainable.",
-        skills: ["Node.js", "GraphQL", "PostgreSQL", "AWS"]
-      }
-    ],
-    education: [
-      {
-        school: "Stanford University",
-        degree: "Master of Science in Computer Science",
-        period: "2016 - 2018",
-        description: "Specialized in software engineering and distributed systems"
-      },
-      {
-        school: "UC Berkeley",
-        degree: "Bachelor of Science in Computer Science",
-        period: "2012 - 2016",
-        description: "Graduated Magna Cum Laude"
-      }
-    ],
-    certifications: [
-      {
-        name: "AWS Certified Solutions Architect",
-        issuer: "Amazon Web Services",
-        date: "2023",
-        url: "https://aws.amazon.com"
-      },
-      {
-        name: "Google Cloud Professional Developer",
-        issuer: "Google Cloud",
-        date: "2022",
-        url: "https://cloud.google.com"
-      },
-      {
-        name: "Meta React Developer",
-        issuer: "Meta",
-        date: "2021",
-        url: "https://developers.facebook.com"
-      }
-    ],
-    employment: [
-      {
-        company: "Tech Innovations Inc",
-        position: "Senior Software Engineer",
-        period: "2019 - 2022",
-        description: "Led development of microservices architecture serving 1M+ users"
-      },
-      {
-        company: "StartupXYZ",
-        position: "Full-Stack Developer",
-        period: "2018 - 2019",
-        description: "Built MVP and core features for B2B SaaS platform"
-      }
-    ]
-  };
+    if (id) {
+      fetchFreelancerProfile();
+    }
+  }, [id]);
 
   const handleContact = () => {
     console.log("Contact freelancer");
@@ -193,6 +123,30 @@ Let's work together to bring your vision to life!`,
     console.log("Hire freelancer");
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-teal-600" />
+          <p className="text-gray-600">Loading freelancer profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !freelancer) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error || 'Freelancer not found'}</p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -201,7 +155,16 @@ Let's work together to bring your vision to life!`,
         {/* Profile Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-8">
           {/* Cover Image */}
-          <div className="h-32 bg-gradient-to-r from-teal-500 to-blue-600 relative">
+          <div 
+            className="h-32 relative"
+            style={{
+              backgroundImage: freelancer.coverImage && freelancer.coverImage !== '/placeholder.svg' 
+                ? `url(${freelancer.coverImage})` 
+                : 'linear-gradient(to right, #14b8a6, #2563eb)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
             <div className="absolute top-4 right-4 flex space-x-2">
               <Button variant="outline" size="sm" className="bg-white/90">
                 <Share2 className="h-4 w-4 mr-1" />
@@ -296,20 +259,22 @@ Let's work together to bring your vision to life!`,
             {/* Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{freelancer.totalEarned}</p>
-                <p className="text-sm text-gray-600">Total Earned</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900 break-words">{freelancer.totalEarned}</p>
+                <p className="text-xs md:text-sm text-gray-600">Total Earned</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{freelancer.successRate}%</p>
-                <p className="text-sm text-gray-600">Success Rate</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900">{freelancer.successRate}%</p>
+                <p className="text-xs md:text-sm text-gray-600">Success Rate</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{freelancer.responseTime}</p>
-                <p className="text-sm text-gray-600">Response Time</p>
+                <p className="text-lg md:text-2xl font-bold text-gray-900 break-words">
+                  {freelancer.responseTime || 'N/A'}
+                </p>
+                <p className="text-xs md:text-sm text-gray-600">Response Time</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{freelancer.memberSince}</p>
-                <p className="text-sm text-gray-600">Member Since</p>
+                <p className="text-lg md:text-2xl font-bold text-gray-900 break-words">{freelancer.memberSince}</p>
+                <p className="text-xs md:text-sm text-gray-600">Member Since</p>
               </div>
             </div>
           </div>
@@ -332,7 +297,7 @@ Let's work together to bring your vision to life!`,
                   <h3 className="text-xl font-bold text-gray-900 mb-4">About</h3>
                   <div className="prose prose-gray max-w-none">
                     {freelancer.overview.split('\n').map((paragraph, index) => (
-                      <p key={index} className="mb-4 text-gray-700 leading-relaxed">
+                      <p key={index} className="mb-4 text-gray-700 leading-relaxed break-words overflow-hidden whitespace-pre-wrap">
                         {paragraph}
                       </p>
                     ))}
@@ -379,17 +344,25 @@ Let's work together to bring your vision to life!`,
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Certifications</h3>
                   <div className="space-y-3">
-                    {freelancer.certifications.map((cert, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <h4 className="font-medium text-gray-900">{cert.name}</h4>
-                          <p className="text-sm text-gray-600">{cert.issuer} • {cert.date}</p>
+                    {Array.isArray(freelancer.certifications) ? (
+                      freelancer.certifications.map((cert, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-900 break-words">{typeof cert === 'string' ? cert : cert.name || 'Unknown Certification'}</h4>
+                            {typeof cert === 'object' && cert.issuer && (
+                              <p className="text-sm text-gray-600">{cert.issuer} • {cert.date}</p>
+                            )}
+                          </div>
+                          {typeof cert === 'object' && cert.url && (
+                            <Button variant="outline" size="sm" className="ml-2 flex-shrink-0">
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
-                        <Button variant="outline" size="sm">
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-gray-600">No certifications available</p>
+                    )}
                   </div>
                 </div>
               </TabsContent>

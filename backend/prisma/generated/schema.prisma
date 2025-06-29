@@ -72,6 +72,15 @@ model User {
   rating          Float? // Average rating
   reviewCount     Int? // Number of reviews
 
+  // Enhanced portfolio fields for FreelancerProfile
+  portfolioProjects  Json? // Array of portfolio projects with detailed info
+  workHistory        Json? // Array of completed work history with client feedback
+  employmentHistory  Json? // Array of employment history
+  coverImage         String? // Profile cover image
+  isOnline           Boolean @default(false) // Online status
+  hourlyRateRange    String? // Hourly rate range (e.g., "$75 - $120")
+  availabilityStatus String? // Availability status (e.g., "Available - 30+ hrs/week")
+
   // Client specific fields
   companyName        String?
   companySize        String?

@@ -289,6 +289,7 @@ router.get('/profile/me', protect, (async (req: AuthRequest, res: Response): Pro
         verified: true,
         risingTalent: true,
         portfolioItems: true,
+        portfolioProjects: true,
         testScores: true,
         specializations: true,
         memberSince: true,
@@ -416,11 +417,12 @@ router.put('/profile/me', protect, [
   body('languages').optional().isArray().withMessage('Languages must be an array'),
   body('education').optional().isArray().withMessage('Education must be an array'),
   body('certifications').optional().isArray().withMessage('Certifications must be an array'),
-  body('portfolioItems').optional().isArray().withMessage('Portfolio items must be an array'),
+  body('portfolio').optional().isArray().withMessage('Portfolio must be an array'),
+  body('workExperience').optional().isArray().withMessage('Work experience must be an array'),
   body('socialLinks').optional().isObject().withMessage('Social links must be an object'),
   body('responseTime').optional().notEmpty().withMessage('Response time cannot be empty'),
-  body('minimumProjectBudget').optional().notEmpty().withMessage('Minimum project budget cannot be empty'),
-  body('specialRequirements').optional().isString().withMessage('Special requirements must be a string')
+  body('avatar').optional().isString().withMessage('Avatar must be a string'),
+  body('coverImage').optional().isString().withMessage('Cover image must be a string')
 ], (async (req: AuthRequest, res: Response): Promise<void> => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -429,9 +431,58 @@ router.put('/profile/me', protect, [
   }
 
   try {
+    console.log('Updating profile for user:', req.user!.id);
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+
+    // Transform the data to match database field names
+    const updateData: Record<string, unknown> = {};
+    
+    // Basic fields
+    if (req.body.firstName !== undefined) updateData.firstName = req.body.firstName;
+    if (req.body.lastName !== undefined) updateData.lastName = req.body.lastName;
+    if (req.body.title !== undefined) updateData.title = req.body.title;
+    if (req.body.overview !== undefined) updateData.overview = req.body.overview;
+    if (req.body.location !== undefined) updateData.location = req.body.location;
+    if (req.body.country !== undefined) updateData.country = req.body.country;
+    if (req.body.city !== undefined) updateData.city = req.body.city;
+    if (req.body.timezone !== undefined) updateData.timezone = req.body.timezone;
+    if (req.body.phone !== undefined) updateData.phone = req.body.phone;
+    if (req.body.hourlyRate !== undefined) updateData.hourlyRate = req.body.hourlyRate;
+    if (req.body.availability !== undefined) updateData.availability = req.body.availability;
+    if (req.body.responseTime !== undefined) updateData.responseTime = req.body.responseTime;
+    if (req.body.avatar !== undefined) updateData.avatar = req.body.avatar;
+    if (req.body.coverImage !== undefined) updateData.coverImage = req.body.coverImage;
+    
+    // Complex fields
+    if (req.body.skills !== undefined) updateData.skills = req.body.skills;
+    if (req.body.languages !== undefined) updateData.languages = req.body.languages;
+    if (req.body.education !== undefined) updateData.education = req.body.education;
+    if (req.body.certifications !== undefined) updateData.certifications = req.body.certifications;
+    
+    // Handle portfolio mapping - frontend sends 'portfolio' but backend expects 'portfolioProjects'
+    if (req.body.portfolio !== undefined) {
+      // Transform portfolio items to match backend structure
+      const portfolioItems = Array.isArray(req.body.portfolio) ? req.body.portfolio.map((item: Record<string, unknown>) => ({
+        title: (item.title as string) || '',
+        description: (item.description as string) || '',
+        image: (item.image as string) || '/placeholder.svg',
+        technologies: Array.isArray(item.technologies) ? (item.technologies as string[]) : [],
+        link: (item.link as string) || (item.url as string) || '',
+        category: (item.category as string) || 'Web Development'
+      })) : [];
+      
+      updateData.portfolioProjects = portfolioItems;
+      console.log('Transformed portfolio items:', portfolioItems);
+    }
+    
+    if (req.body.workExperience !== undefined) updateData.workExperience = req.body.workExperience;
+    if (req.body.socialLinks !== undefined) updateData.socialLinks = req.body.socialLinks;
+
+    console.log('Transformed update data:', JSON.stringify(updateData, null, 2));
+
     const updatedUser = await prisma.user.update({
       where: { id: req.user!.id },
-      data: req.body,
+      data: updateData,
       select: {
         id: true,
         email: true,
@@ -473,6 +524,7 @@ router.put('/profile/me', protect, [
         verified: true,
         risingTalent: true,
         portfolioItems: true,
+        portfolioProjects: true,
         testScores: true,
         specializations: true,
         memberSince: true,
@@ -480,13 +532,184 @@ router.put('/profile/me', protect, [
         repeatHireRate: true,
         rating: true,
         reviewCount: true,
+        coverImage: true,
         updatedAt: true
+      }
+    });
+
+    console.log('Profile updated successfully for user:', req.user!.id);
+
+    res.json({
+      success: true,
+      data: updatedUser
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Server error', error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+}) as RequestHandler);
+
+// @desc    Create sample freelancer for testing
+// @route   POST /api/users/sample-freelancer
+// @access  Public (for testing only)
+router.post('/sample-freelancer', (async (req: Request, res: Response): Promise<void> => {
+  try {
+    const sampleFreelancer = await prisma.user.create({
+      data: {
+        email: 'sarah.chen@example.com',
+        password: '$2b$10$example.hash', // This would be hashed in real app
+        firstName: 'Sarah',
+        lastName: 'Chen',
+        userType: 'FREELANCER',
+        isOnboarded: true,
+        title: 'Senior Full-Stack Developer',
+        overview: 'I am a passionate full-stack developer with over 6 years of experience building scalable web applications. I specialize in React, Node.js, and cloud technologies, helping businesses transform their ideas into robust digital solutions.',
+        avatar: '/placeholder.svg',
+        coverImage: '/placeholder.svg',
+        location: 'San Francisco, CA',
+        timezone: 'PST (UTC-8)',
+        rating: 4.9,
+        reviewCount: 147,
+        completedJobs: 89,
+        totalEarnings: '$185,000+',
+        successRate: 98,
+        responseTime: '1 hour',
+        hourlyRate: 75,
+        hourlyRateRange: '$75 - $120',
+        availability: 'Available - 30+ hrs/week',
+        availabilityStatus: 'Available',
+        memberSince: 'March 2020',
+        lastActive: '2 hours ago',
+        isOnline: true,
+        verified: true,
+        topRatedPlus: true,
+        skills: [
+          { name: 'React', level: 'Expert', yearsOfExperience: 5 },
+          { name: 'TypeScript', level: 'Expert', yearsOfExperience: 4 },
+          { name: 'Node.js', level: 'Expert', yearsOfExperience: 5 },
+          { name: 'Python', level: 'Advanced', yearsOfExperience: 6 },
+          { name: 'AWS', level: 'Advanced', yearsOfExperience: 3 },
+          { name: 'MongoDB', level: 'Advanced', yearsOfExperience: 4 },
+          { name: 'GraphQL', level: 'Intermediate', yearsOfExperience: 2 },
+          { name: 'Docker', level: 'Intermediate', yearsOfExperience: 2 }
+        ],
+        languages: [
+          { name: 'English', level: 'Native' },
+          { name: 'Mandarin', level: 'Native' },
+          { name: 'Spanish', level: 'Conversational' }
+        ],
+        portfolioProjects: [
+          {
+            id: 1,
+            title: 'E-commerce Platform',
+            description: 'Modern e-commerce platform built with React and Node.js',
+            image: '/placeholder.svg',
+            technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
+            url: 'https://example.com',
+            client: 'RetailCorp',
+            completion: '2024'
+          },
+          {
+            id: 2,
+            title: 'Task Management SaaS',
+            description: 'Collaborative task management application with real-time updates',
+            image: '/placeholder.svg',
+            technologies: ['React', 'TypeScript', 'GraphQL', 'PostgreSQL'],
+            url: 'https://example.com',
+            client: 'ProductivityPro',
+            completion: '2023'
+          },
+          {
+            id: 3,
+            title: 'Healthcare Dashboard',
+            description: 'Analytics dashboard for healthcare providers',
+            image: '/placeholder.svg',
+            technologies: ['Vue.js', 'Python', 'D3.js', 'AWS'],
+            url: 'https://example.com',
+            client: 'MedTech Solutions',
+            completion: '2023'
+          }
+        ],
+        workHistory: [
+          {
+            id: 1,
+            title: 'E-commerce Platform Development',
+            client: 'TechCorp Solutions',
+            clientRating: 5.0,
+            budget: '$4,500',
+            duration: '3 months',
+            completedDate: 'December 2024',
+            feedback: 'Sarah delivered an exceptional e-commerce platform that exceeded our expectations. Her code quality is outstanding, and she was very responsive throughout the project. Highly recommended!',
+            skills: ['React', 'Node.js', 'MongoDB', 'Stripe API']
+          },
+          {
+            id: 2,
+            title: 'SaaS Dashboard Redesign',
+            client: 'StartupHub Inc',
+            clientRating: 5.0,
+            budget: '$3,200',
+            duration: '2 months',
+            completedDate: 'October 2024',
+            feedback: 'Working with Sarah was a pleasure. She understood our requirements perfectly and delivered a beautiful, functional dashboard. The new design has significantly improved our user engagement.',
+            skills: ['React', 'TypeScript', 'Chart.js', 'Tailwind CSS']
+          },
+          {
+            id: 3,
+            title: 'API Development and Integration',
+            client: 'DataFlow Systems',
+            clientRating: 4.8,
+            budget: '$2,800',
+            duration: '6 weeks',
+            completedDate: 'September 2024',
+            feedback: 'Sarah built a robust API that handles our complex data processing needs. Her documentation was excellent and the code is very maintainable.',
+            skills: ['Node.js', 'GraphQL', 'PostgreSQL', 'AWS']
+          }
+        ],
+        education: [
+          {
+            school: 'Stanford University',
+            degree: 'Master of Science in Computer Science',
+            period: '2016 - 2018',
+            description: 'Specialized in software engineering and distributed systems'
+          },
+          {
+            school: 'UC Berkeley',
+            degree: 'Bachelor of Science in Computer Science',
+            period: '2012 - 2016',
+            description: 'Graduated Magna Cum Laude'
+          }
+        ],
+        certifications: [
+          'AWS Certified Solutions Architect',
+          'Google Cloud Professional Developer',
+          'Meta React Developer'
+        ],
+        employmentHistory: [
+          {
+            company: 'Tech Innovations Inc',
+            position: 'Senior Software Engineer',
+            period: '2019 - 2022',
+            description: 'Led development of microservices architecture serving 1M+ users'
+          },
+          {
+            company: 'StartupXYZ',
+            position: 'Full-Stack Developer',
+            period: '2018 - 2019',
+            description: 'Built MVP and core features for B2B SaaS platform'
+          }
+        ],
+        category: 'Programming & Tech',
+        subcategory: 'Web Development',
+        experienceLevel: 'Expert'
       }
     });
 
     res.json({
       success: true,
-      data: updatedUser
+      data: {
+        id: sampleFreelancer.id,
+        message: 'Sample freelancer created successfully'
+      }
     });
   } catch (error) {
     console.error(error);
@@ -494,165 +717,101 @@ router.put('/profile/me', protect, [
   }
 }) as RequestHandler);
 
-// @desc    Create sample freelancer profile (for testing)
-// @route   POST /api/users/sample-freelancer
+// @desc    Get freelancer's public profile by ID (for FreelancerProfile page)
+// @route   GET /api/users/profile/:id
 // @access  Public
-router.post('/sample-freelancer', (async (req: Request, res: Response): Promise<void> => {
+router.get('/profile/:id', (async (req: Request, res: Response): Promise<void> => {
   try {
-    // Hash password
-    const hashPassword = (password: string): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        const salt = crypto.randomBytes(16).toString('hex');
-        crypto.scrypt(password, salt, 64, (err: Error | null, derivedKey: Buffer) => {
-          if (err) reject(err);
-          resolve(salt + ':' + derivedKey.toString('hex'));
-        });
-      });
-    };
-
-    const hashedPassword = await hashPassword('password123');
-
-    // Create sample freelancer
-    const user = await prisma.user.create({
-      data: {
-        email: 'alex.thompson@example.com',
-        password: hashedPassword,
-        firstName: 'Alex',
-        lastName: 'Thompson',
-        userType: 'FREELANCER',
-        isOnboarded: true,
-        onboardingStep: 8,
-        avatar: '/placeholder.svg',
-        title: 'Senior Full-Stack Developer & Technical Consultant',
-        overview: 'Passionate full-stack developer with 10+ years of experience building scalable web applications and leading development teams. Specialized in React, Node.js, and cloud architecture. I help startups and enterprises transform their ideas into robust, user-friendly digital solutions.',
-        location: 'Austin, Texas, USA',
-        country: 'USA',
-        city: 'Austin',
-        timezone: 'America/Chicago',
-        phone: '+1-555-0123',
-        skills: [
-          { name: 'React', category: 'Frontend', level: 'Expert', yearsOfExperience: 8 },
-          { name: 'Node.js', category: 'Backend', level: 'Expert', yearsOfExperience: 8 },
-          { name: 'TypeScript', category: 'Language', level: 'Expert', yearsOfExperience: 6 },
-          { name: 'Python', category: 'Language', level: 'Advanced', yearsOfExperience: 5 },
-          { name: 'AWS', category: 'Cloud', level: 'Expert', yearsOfExperience: 7 },
-          { name: 'Docker', category: 'DevOps', level: 'Advanced', yearsOfExperience: 6 },
-          { name: 'MongoDB', category: 'Database', level: 'Advanced', yearsOfExperience: 5 },
-          { name: 'PostgreSQL', category: 'Database', level: 'Advanced', yearsOfExperience: 5 },
-          { name: 'GraphQL', category: 'API', level: 'Advanced', yearsOfExperience: 4 },
-          { name: 'REST APIs', category: 'API', level: 'Expert', yearsOfExperience: 8 },
-          { name: 'Microservices', category: 'Architecture', level: 'Advanced', yearsOfExperience: 6 },
-          { name: 'DevOps', category: 'Infrastructure', level: 'Advanced', yearsOfExperience: 5 },
-          { name: 'CI/CD', category: 'Infrastructure', level: 'Advanced', yearsOfExperience: 5 },
-          { name: 'Kubernetes', category: 'Infrastructure', level: 'Intermediate', yearsOfExperience: 3 }
-        ],
-        topSkills: ['React', 'Node.js', 'TypeScript', 'AWS', 'Docker'],
-        serviceOfferings: ['Web Development', 'Mobile Development', 'API Development', 'Cloud Architecture', 'DevOps'],
-        hourlyRate: 95,
-        availability: 'Available for new projects',
-        languages: [
-          { language: 'English', proficiency: 'Native' },
-          { language: 'Spanish', proficiency: 'Fluent' },
-          { language: 'French', proficiency: 'Conversational' }
-        ],
-        education: [
-          { degree: 'Master of Science in Computer Science', institution: 'University of Texas at Austin', year: '2014-2016' },
-          { degree: 'Bachelor of Science in Software Engineering', institution: 'Texas Tech University', year: '2010-2014' }
-        ],
-        certifications: [
-          'AWS Solutions Architect Professional',
-          'Google Cloud Professional Developer',
-          'Certified Kubernetes Administrator'
-        ],
-        category: 'web-development',
-        subcategory: 'full-stack-development',
-        experienceLevel: 'expert',
-        totalEarnings: '$185,500',
-        successRate: 98,
-        completedJobs: 234,
-        onTime: 96,
-        onBudget: 94,
-        responseTime: 'Within 1 hour',
-        lastActive: 'Online now',
-        topRatedPlus: true,
-        verified: true,
-        risingTalent: false,
-        rating: 4.9,
-        reviewCount: 156,
-        memberSince: '2020',
-        profileStrength: 95,
-        repeatHireRate: 87,
-        portfolioItems: [
-          {
-            title: 'E-commerce Platform Redesign',
-            description: 'Complete redesign and development of a multi-vendor e-commerce platform serving 100K+ users',
-            image: '/placeholder.svg',
-            technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-            link: 'https://example.com'
-          },
-          {
-            title: 'SaaS Analytics Dashboard',
-            description: 'Real-time analytics dashboard for B2B SaaS company with advanced data visualization',
-            image: '/placeholder.svg',
-            technologies: ['React', 'D3.js', 'Python', 'PostgreSQL'],
-            link: 'https://example.com'
-          },
-          {
-            title: 'Mobile Banking App',
-            description: 'Secure mobile banking application with biometric authentication and real-time transactions',
-            image: '/placeholder.svg',
-            technologies: ['React Native', 'Node.js', 'AWS', 'Docker'],
-            link: 'https://example.com'
-          }
-        ],
-        testScores: [
-          { name: 'JavaScript', score: 95 },
-          { name: 'React', score: 98 },
-          { name: 'Node.js', score: 92 },
-          { name: 'AWS', score: 89 }
-        ],
-        specializations: ['Full-Stack Development', 'Cloud Architecture', 'API Design', 'Performance Optimization'],
-        socialLinks: {
-          linkedin: 'https://linkedin.com/in/alexthompson',
-          github: 'https://github.com/alexthompson',
-          website: 'https://alexthompson.dev',
-          twitter: 'https://twitter.com/alexthompson'
-        },
-        minimumProjectBudget: '$1000',
-        specialRequirements: 'I prefer to work with clients who have clear project requirements and are open to collaboration.'
-      },
+    const user = await prisma.user.findUnique({
+      where: { id: req.params.id },
       select: {
         id: true,
-        email: true,
         firstName: true,
         lastName: true,
-        userType: true,
-        isOnboarded: true
+        title: true,
+        overview: true,
+        avatar: true,
+        coverImage: true,
+        location: true,
+        timezone: true,
+        rating: true,
+        reviewCount: true,
+        completedJobs: true,
+        totalEarnings: true,
+        successRate: true,
+        responseTime: true,
+        languages: true,
+        hourlyRate: true,
+        hourlyRateRange: true,
+        availability: true,
+        availabilityStatus: true,
+        memberSince: true,
+        lastActive: true,
+        isOnline: true,
+        verified: true,
+        topRatedPlus: true,
+        skills: true,
+        portfolioProjects: true,
+        workHistory: true,
+        employmentHistory: true,
+        education: true,
+        certifications: true,
+        socialLinks: true,
+        category: true,
+        subcategory: true,
+        experienceLevel: true,
+        createdAt: true,
+        _count: {
+          select: {
+            receivedReviews: true
+          }
+        }
       }
     });
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET!,
-      { expiresIn: '30d' }
-    );
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
 
-    // Set cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-    });
+    // Transform the data to match FreelancerProfile expectations
+    const transformedUser = {
+      id: user.id,
+      name: `${user.firstName} ${user.lastName}`,
+      title: user.title || '',
+      avatar: user.avatar || '/placeholder.svg',
+      coverImage: user.coverImage || '/placeholder.svg',
+      location: user.location || '',
+      timezone: user.timezone || '',
+      rating: user.rating || 0,
+      reviews: user.reviewCount || 0,
+      completedJobs: user.completedJobs || 0,
+      totalEarned: user.totalEarnings || '$0',
+      successRate: user.successRate || 0,
+      responseTime: user.responseTime || '',
+      languages: Array.isArray(user.languages) ? user.languages : [],
+      hourlyRate: user.hourlyRateRange || `$${user.hourlyRate || 0}`,
+      availability: user.availabilityStatus || '',
+      memberSince: user.memberSince || new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      lastActive: user.lastActive || 'Recently',
+      isOnline: user.isOnline || false,
+      verified: user.verified || false,
+      topRated: user.topRatedPlus || false,
+      skills: Array.isArray(user.skills) ? user.skills : [],
+      overview: user.overview || '',
+      portfolio: Array.isArray(user.portfolioProjects) ? user.portfolioProjects : [],
+      workHistory: Array.isArray(user.workHistory) ? user.workHistory : [],
+      education: Array.isArray(user.education) ? user.education : [],
+      certifications: Array.isArray(user.certifications) ? user.certifications : [],
+      employment: Array.isArray(user.employmentHistory) ? user.employmentHistory : []
+    };
 
-    res.status(201).json({
+    res.json({
       success: true,
-      data: user,
-      token
+      data: transformedUser
     });
   } catch (error) {
-    console.error('Error creating sample freelancer:', error);
+    console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 }) as RequestHandler);

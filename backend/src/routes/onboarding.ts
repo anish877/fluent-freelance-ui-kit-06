@@ -196,7 +196,7 @@ router.put('/freelancer/professional', protect, [
   try {
     const { 
       category, subcategory, experienceLevel, workExperience, 
-      education, certifications, languages 
+      education, certifications, languages, employment 
     } = req.body;
 
     const updatedUser = await prisma.user.update({
@@ -209,6 +209,7 @@ router.put('/freelancer/professional', protect, [
         education: education || [],
         certifications: certifications || [],
         languages: languages || [],
+        employmentHistory: employment || [],
         onboardingStep: 3
       },
       select: {
@@ -220,6 +221,7 @@ router.put('/freelancer/professional', protect, [
         education: true,
         certifications: true,
         languages: true,
+        employmentHistory: true,
         onboardingStep: true
       }
     });
@@ -288,13 +290,13 @@ router.put('/freelancer/portfolio', protect, (async (req: AuthRequest, res: Resp
     const updatedUser = await prisma.user.update({
       where: { id: req.user!.id },
       data: {
-        portfolio,
+        portfolioProjects: portfolio || [],
         socialLinks,
         onboardingStep: 5
       },
       select: {
         id: true,
-        portfolio: true,
+        portfolioProjects: true,
         socialLinks: true,
         onboardingStep: true
       }
@@ -324,19 +326,43 @@ router.put('/freelancer/rates', protect, [
   }
 
   try {
-    const { hourlyRate, availability } = req.body;
+    const { 
+      hourlyRate, projectBasedRates, availability, hoursPerWeek, 
+      workingHours, workingDays, responseTime, minimumProjectBudget, 
+      specialRequirements, coverImage, hourlyRateRange, availabilityStatus 
+    } = req.body;
 
     const updatedUser = await prisma.user.update({
       where: { id: req.user!.id },
       data: {
-        hourlyRate,
+        hourlyRate: hourlyRate ? parseFloat(hourlyRate.toString()) : null,
+        projectBasedRates,
         availability,
+        hoursPerWeek,
+        workingHours,
+        workingDays,
+        responseTime,
+        minimumProjectBudget,
+        specialRequirements,
+        coverImage,
+        hourlyRateRange,
+        availabilityStatus,
         onboardingStep: 6
       },
       select: {
         id: true,
         hourlyRate: true,
+        projectBasedRates: true,
         availability: true,
+        hoursPerWeek: true,
+        workingHours: true,
+        workingDays: true,
+        responseTime: true,
+        minimumProjectBudget: true,
+        specialRequirements: true,
+        coverImage: true,
+        hourlyRateRange: true,
+        availabilityStatus: true,
         onboardingStep: true
       }
     });
@@ -776,7 +802,7 @@ router.post('/complete-with-data', [
         skills,
         topSkills: topSkills || [],
         serviceOfferings: serviceOfferings || [],
-        portfolio,
+        portfolioProjects: portfolio || [],
         socialLinks,
         hourlyRate: hourlyRate ? parseFloat(hourlyRate.toString()) : null,
         availability,
@@ -827,7 +853,7 @@ router.post('/complete-with-data', [
         overview: true,
         skills: true,
         hourlyRate: true,
-        portfolio: true,
+        portfolioProjects: true,
         companyName: true,
         companySize: true,
         industry: true
