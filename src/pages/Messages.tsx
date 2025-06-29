@@ -10,7 +10,7 @@ import { Badge } from "../components/ui/badge";
 import { useParams, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
-import { useWebSocket } from "@/hooks/socketContext";
+import { Conversation, useWebSocket } from "@/hooks/socketContext";
 import axios from "axios";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/AuthContext";
@@ -31,6 +31,7 @@ const Messages = () => {
     projectName: ''
   });
   const {
+  isConnected,
   conversations: wsConversations,
   messages: wsMessages,
   currentConversationId,
@@ -38,13 +39,33 @@ const Messages = () => {
   sendMessage,
   startTyping,
   stopTyping,
-  typingUsers
+  typingUsers,
+  socketRef,
+  onlineUsers, // Add this line
+  isUserOnline // Add this line
 } = useWebSocket();
 
+const getOtherParticipant = (conversation: Conversation) => {
+  // Assuming conversation has participants array with emails
+  // and you want to show the other participant (not current user)
+  return conversation.participants?.find(email => email !== user?.email) || '';
+};
+console.log("Online users: ", onlineUsers)
 const conversations = useMemo(() => {
-  // Merge or prioritize WebSocket conversations over local ones
-  return wsConversations.length > 0 ? wsConversations : localConversations;
-}, [wsConversations, localConversations]);
+  const baseConversations = wsConversations.length > 0 ? wsConversations : localConversations;
+  
+  // Map conversations and add online status
+  return baseConversations.map(conv => {
+    const otherParticipantEmail = getOtherParticipant(conv);
+    const isOnline = isUserOnline(otherParticipantEmail);
+    
+    return {
+      ...conv,
+      online: isOnline,
+      otherParticipantEmail // Store for reference if needed
+    };
+  });
+}, [wsConversations, localConversations, onlineUsers, user?.email]);
 
   const fetchConversations = async () => {
     try {
@@ -60,7 +81,8 @@ const conversations = useMemo(() => {
   }, [])
 
 useEffect(() => {
-  if (conversationId && conversationId !== currentConversationId) {
+  if (conversationId) {
+    console.log("Join triggered")
     joinConversation(conversationId);
   }
 }, [conversationId, currentConversationId, joinConversation]);
@@ -134,11 +156,33 @@ useEffect(() => {
   );
 
 const handleSendMessage = () => {
-  if (messageText.trim() && conversationId && conversationId === currentConversationId) {
+  if (messageText.trim() && conversationId) {
     sendMessage(messageText.trim());
     setMessageText("");
   }
 };
+
+useEffect(() => {
+  console.log('🔗 Conversation join effect triggered:', {
+    conversationId,
+    isConnected,
+    currentConversationId,
+    socketReadyState: socketRef.current?.readyState // You'll need to expose this from WebSocket context
+  });
+
+  // Only join if:
+  // 1. We have a conversationId from URL
+  // 2. WebSocket is connected and authenticated
+  // 3. We're not already in this conversation
+  if (conversationId && 
+      isConnected && 
+      conversationId !== currentConversationId) {
+    
+    console.log('🔗 Auto-joining conversation:', conversationId);
+    joinConversation(conversationId);
+  }
+}, [conversationId, isConnected, currentConversationId, joinConversation]);
+
 
 // // Add this before your return statement:
 // if (!isConnected) {
@@ -185,44 +229,53 @@ const handleSendMessage = () => {
 
             <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
               {filteredConversations.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors flex-shrink-0 ${
-                    conversationId === conversation.id ? "bg-teal-50 border-r-4 border-r-teal-600" : ""
-                  }`}
-                  onClick={() => handleConversationSelect(conversation.id)}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div className="relative">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={conversation.avatar} alt={conversation.name} />
-                        <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      {conversation.online && (
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                      )}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-gray-900 truncate">{conversation.name}</h3>
-                        <span className="text-xs text-gray-500">{conversation.timestamp}</span>
+                  <div
+                    key={conversation.id}
+                    className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors flex-shrink-0 ${
+                      conversationId === conversation.id ? "bg-teal-50 border-r-4 border-r-teal-600" : ""
+                    }`}
+                    onClick={() => handleConversationSelect(conversation.id)}
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className="relative">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={conversation.avatar} alt={conversation.name} />
+                          <AvatarFallback>{conversation.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        {/* Online indicator dot */}
+                        {conversation.online && (
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                        )}
                       </div>
                       
-                      <p className="text-sm text-gray-600 mb-1">{conversation.project}</p>
-                      
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-500 truncate">{conversation.lastMessage && conversation.lastMessage.content}</p>
-                        {conversation.unread > 0 && (
-                          <Badge variant="default" className="bg-teal-600 text-xs px-2 py-1">
-                            {conversation.unread}
-                          </Badge>
-                        )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-medium text-gray-900 truncate">{conversation.name}</h3>
+                            {/* Small online dot next to name */}
+                            {conversation.online && (
+                              <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-500">{conversation.timestamp}</span>
+                        </div>
+                        
+                        <p className="text-sm text-gray-600 mb-1">{conversation.project}</p>
+                        
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm text-gray-500 truncate">
+                            {conversation.lastMessage && conversation.lastMessage.content}
+                          </p>
+                          {conversation.unread > 0 && (
+                            <Badge variant="default" className="bg-teal-600 text-xs px-2 py-1">
+                              {conversation.unread}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
 
@@ -266,22 +319,30 @@ const handleSendMessage = () => {
                 {/* Header */}
                 <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={selectedConv.avatar} alt={selectedConv.name} />
-                        <AvatarFallback>{selectedConv.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      {selectedConv.online && (
-                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                      )}
-                    </div>
-                    
-                    <div>
-                      <h3 className="font-medium text-gray-900">{selectedConv.name}</h3>
-                      <p className="text-sm text-gray-500">{selectedConv.project}</p>
-                    </div>
+                  <div className="relative">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={selectedConv.avatar} alt={selectedConv.name} />
+                      <AvatarFallback>{selectedConv.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    {/* Header online indicator dot */}
+                    {selectedConv.online && (
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                    )}
                   </div>
                   
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <h3 className="font-medium text-gray-900">{selectedConv.name}</h3>
+                      {/* Small online dot in header */}
+                      {selectedConv.online && (
+                        <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500">{selectedConv.project}</p>
+                  </div>
+                </div>
+                  
+                  {/* Rest of your header buttons remain the same */}
                   <div className="flex items-center space-x-2">
                     <Button variant="outline" size="sm">
                       <Phone className="h-4 w-4" />

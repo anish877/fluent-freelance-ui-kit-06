@@ -25,8 +25,12 @@ const Login = () => {
     try {
       const { success, message } = await login(formData.email, formData.password)
       if(success){
+        setFormData({
+          email: "",
+          password: ""
+        });
         toast.success(message)
-
+        navigate("/jobs")
       }
       else{
         setError(message)

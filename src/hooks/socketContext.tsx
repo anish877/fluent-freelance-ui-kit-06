@@ -9,6 +9,13 @@ interface User {
   avatar?: string;
 }
 
+interface OnlineUser {
+  userEmail: string;
+  userName: string;
+  lastSeen?: string;
+}
+
+
 interface WSMessage {
   type: 'authenticate' | "error" | "user_left" | "user_joined" | "user_stop_typing" | "user_typing" | "messages_loaded" | "new_message" | 'authentication_success' | 'connection_established' | 'join_conversation' | 'send_message' | 'typing' | 'stop_typing' | 'user_online' | 'user_offline';
   payload: any;
@@ -42,12 +49,17 @@ interface WebSocketContextType {
   isConnected: boolean;
   isConnecting: boolean;
   error: string | null;
+
+  socketRef: React.RefObject<WebSocket | null>;
   
   // Data
   conversations: Conversation[];
   messages: Message[];
   currentConversationId: string | null;
   typingUsers: TypingUser[];
+  onlineUsers: OnlineUser[]; // Array for components
+  onlineUsersMap: Map<string, OnlineUser>; // Map for advanced usage
+  isUserOnline: (userEmail: string) => boolean;
   
   // Actions
   joinConversation: (conversationId: string) => void;
@@ -78,7 +90,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const { user } = useAuth()
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [onlineUsers, setOnlineUsers] = useState<Map<string, OnlineUser>>(new Map());
   // Data state
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -109,14 +121,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
   }, []);
 
-  useEffect(() => {
-    console.log('👤 User effect triggered:', {
-      providerId,
-      userEmail: user?.email,
-      userName: user?.firstName,
-      userType: user?.userType
-    });
-  }, [user?.email, user?.firstName, user?.userType, providerId]);
+  const isUserOnline = useCallback((userEmail: string) => {
+    return onlineUsers.has(userEmail);
+  }, [onlineUsers]);
+
+  const onlineUsersArray = Array.from(onlineUsers.values());
+
+  
 
   // Message handlers
   const handleMessage = useCallback((event: MessageEvent) => {
@@ -125,57 +136,79 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       
       switch (wsMessage.type) {
           
-    case 'messages_loaded':
-      // Sort messages by timestamp on initial load
-      const loadedMessages = wsMessage.payload.messages
-        .map(msg => ({
-          id: msg.id,
-          conversationId: msg.conversationId,
-          senderEmail: msg.senderEmail,
-          content: String(msg.content || ''),
-          timestamp: msg.timestamp || msg.createdAt,
-          type: msg.type || 'text'
-        }))
-        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-      
-      setMessages(loadedMessages);
-      setCurrentConversationId(wsMessage.payload.conversationId);
-      break;
-
-    case 'new_message':
-      const newMessage = {
-        id: wsMessage.payload.id,
-        conversationId: wsMessage.payload.conversationId,
-        senderEmail: wsMessage.payload.senderEmail,
-        content: String(wsMessage.payload.content || ''),
-        timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
-        type: wsMessage.payload.type || 'text'
-      };
-
-      // Use functional update with optimized insertion
-      setMessages(prevMessages => {
-        // Check if message already exists
-        const messageExists = prevMessages.some(msg => msg.id === newMessage.id);
-        if (messageExists) {
-          return prevMessages;
-        }
-
-        // Find the correct position to insert the message (binary search could be used for very large arrays)
-        const newTimestamp = new Date(newMessage.timestamp);
-        let insertIndex = prevMessages.length;
+      case 'messages_loaded':
+        // Sort messages by timestamp on initial load
+        const loadedMessages = wsMessage.payload.messages
+          .map(msg => ({
+            id: msg.id,
+            conversationId: msg.conversationId,
+            senderEmail: msg.senderEmail,
+            content: String(msg.content || ''),
+            timestamp: msg.timestamp || msg.createdAt,
+            type: msg.type || 'text'
+          }))
+          .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
         
-        // If the new message is older than the last message, find correct position
-        if (prevMessages.length > 0 && newTimestamp.getTime() < new Date(prevMessages[prevMessages.length - 1].timestamp).getTime()) {
-          insertIndex = prevMessages.findIndex(msg => new Date(msg.timestamp).getTime() > newTimestamp.getTime());
-          if (insertIndex === -1) insertIndex = prevMessages.length;
-        }
+        setMessages(loadedMessages);
+        setCurrentConversationId(wsMessage.payload.conversationId);
+        break;
 
-        // Insert at the correct position
-        const updatedMessages = [...prevMessages];
-        updatedMessages.splice(insertIndex, 0, newMessage);
-        return updatedMessages;
-      });
-      break;
+        case 'new_message':
+          const newMessage = {
+            id: wsMessage.payload.id,
+            conversationId: wsMessage.payload.conversationId,
+            senderEmail: wsMessage.payload.senderEmail,
+            content: String(wsMessage.payload.content || ''),
+            timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
+            type: wsMessage.payload.type || 'text'
+          };
+
+          // Use functional update with optimized insertion
+          setMessages(prevMessages => {
+            // Check if message already exists
+            const messageExists = prevMessages.some(msg => msg.id === newMessage.id);
+            if (messageExists) {
+              return prevMessages;
+            }
+
+            // Find the correct position to insert the message (binary search could be used for very large arrays)
+            const newTimestamp = new Date(newMessage.timestamp);
+            let insertIndex = prevMessages.length;
+            
+            // If the new message is older than the last message, find correct position
+            if (prevMessages.length > 0 && newTimestamp.getTime() < new Date(prevMessages[prevMessages.length - 1].timestamp).getTime()) {
+              insertIndex = prevMessages.findIndex(msg => new Date(msg.timestamp).getTime() > newTimestamp.getTime());
+              if (insertIndex === -1) insertIndex = prevMessages.length;
+            }
+
+            // Insert at the correct position
+            const updatedMessages = [...prevMessages];
+              updatedMessages.splice(insertIndex, 0, newMessage);
+              return updatedMessages;
+            });
+            break;
+
+          case 'user_online':
+            console.log("Received online status")
+            setOnlineUsers(prev => {
+              const newMap = new Map(prev);
+              newMap.set(wsMessage.payload.userEmail, {
+                userEmail: wsMessage.payload.userEmail,
+                userName: wsMessage.payload.userName,
+                lastSeen: wsMessage.payload.lastSeen || new Date().toISOString()
+              });
+              return newMap;
+            });
+          break;
+
+        case 'user_offline':
+          setOnlineUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(wsMessage.payload.userEmail);
+            return newMap;
+          });
+        break;
+
           
         case 'user_typing':
           setTypingUsers(prev => {
@@ -207,7 +240,19 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
         case 'connection_established':
           console.log('Connected to server, waiting for authentication...');
-
+          if (socketRef.current && user) {
+            console.log("uegfowq")
+            socketRef.current.send(JSON.stringify({
+              type: 'authenticate',
+              payload: {
+                userEmail: user.email,
+                userName: user.firstName,
+                conversationId: currentConversationId,
+                type: user.userType,
+                avatar: user.avatar
+              }
+            }))
+          }
           break;
           
         case 'authentication_success':
@@ -315,6 +360,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     connectionStateRef.current = 'disconnected';
   }, []);
 
+  useEffect(() => {
+  if (socketRef.current?.readyState === WebSocket.OPEN && user) {
+    // WebSocket is already open, and user just became available
+    handleOpen(); // or just directly send the authenticate message
+  }
+}, [user]);
+
   // Connect function - moved outside to avoid dependency issues
   const connect = useCallback(() => {
     // Don't connect if already connected or connecting
@@ -405,7 +457,9 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Action functions
   const joinConversation = useCallback((conversationId: string) => {
+    console.log(1)
     if (socketRef.current?.readyState === WebSocket.OPEN) {
+      console.log(1)
       socketRef.current.send(JSON.stringify({
         type: 'join_conversation',
         payload: { conversationId }
@@ -415,7 +469,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   const sendMessage = useCallback((content: string, type: 'text' | 'file' | 'image' = 'text') => {
     console.log(socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim())
-    if (socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim()) {
+    if (socketRef.current?.readyState === WebSocket.OPEN && content.trim()) {
       console.log("Sending message")
       socketRef.current.send(JSON.stringify({
         type: 'send_message',
@@ -498,7 +552,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     messages,
     currentConversationId,
     typingUsers,
-    
+    socketRef,
+    onlineUsers: onlineUsersArray, // Export as array for components
+    onlineUsersMap: onlineUsers,   // Export Map for advanced usage
+    isUserOnline,
     // Actions
     joinConversation,
     sendMessage,

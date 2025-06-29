@@ -2,6 +2,7 @@ import WebSocket from "ws";
 import { createServer } from "http";
 import prisma from "./lib/prisma";
 
+console.log("🚀 Starting WebSocket server initialization...");
 
 interface Message {
   id: string;
@@ -45,60 +46,194 @@ interface ClientConnection {
 const connections = new Map<string, ClientConnection>();
 const conversationRooms = new Map<string, Set<string>>();
 
+console.log("📊 Initialized connection maps and room management");
+
 // WebSocket Server
 const server = createServer();
 const wss = new WebSocket.Server({ server });
 
+console.log("🌐 WebSocket server instance created");
+
 // Utility functions
+// Enhanced broadcast function with switch for global/room broadcasting
 const broadcast = (
+  message: any,
+  options: {
+    type: 'room' | 'global' | 'users';
+    conversationId?: string;
+    excludeUserEmail?: string;
+    targetUsers?: string[]; // For broadcasting to specific users
+  }
+) => {
+  const { type, conversationId, excludeUserEmail, targetUsers } = options;
+  
+  console.log(`📢 Broadcasting message type: ${message.type} with mode: ${type}`);
+  
+  let targetUserEmails: string[] = [];
+  
+  switch (type) {
+    case 'room':
+      // Original room-based broadcasting
+      if (!conversationId) {
+        console.log(`❌ Room broadcast requires conversationId`);
+        return;
+      }
+      
+      const room = conversationRooms.get(conversationId);
+      if (!room) {
+        console.log(`❌ No room found for conversation ${conversationId}`);
+        return;
+      }
+      
+      targetUserEmails = Array.from(room);
+      console.log(`👥 Room ${conversationId} has ${targetUserEmails.length} participants: ${targetUserEmails.join(', ')}`);
+      break;
+      
+    case 'global':
+      // Broadcast to all connected users
+      targetUserEmails = Array.from(connections.keys());
+      console.log(`🌍 Global broadcast to ${targetUserEmails.length} connected users`);
+      break;
+      
+    case 'users':
+      // Broadcast to specific users
+      if (!targetUsers || targetUsers.length === 0) {
+        console.log(`❌ Users broadcast requires targetUsers array`);
+        return;
+      }
+      
+      targetUserEmails = targetUsers;
+      console.log(`🎯 Targeted broadcast to ${targetUserEmails.length} specific users: ${targetUserEmails.join(', ')}`);
+      break;
+      
+    default:
+      console.log(`❌ Unknown broadcast type: ${type}`);
+      return;
+  }
+  
+  // Filter out excluded user
+  if (excludeUserEmail) {
+    targetUserEmails = targetUserEmails.filter(email => email !== excludeUserEmail);
+    console.log(`⏭️ Excluding user: ${excludeUserEmail}`);
+  }
+  
+  console.log(`📤 Sending to ${targetUserEmails.length} users`);
+  
+  // Send message to all target users
+  let successCount = 0;
+  let failCount = 0;
+  
+  targetUserEmails.forEach((userEmail) => {
+    const connection = connections.get(userEmail);
+    if (connection && connection.ws.readyState === WebSocket.OPEN) {
+      try {
+        connection.ws.send(JSON.stringify(message));
+        successCount++;
+        console.log(`✅ Message sent to ${userEmail}`);
+      } catch (error) {
+        failCount++;
+        console.log(`❌ Failed to send to ${userEmail}:`, error);
+      }
+    } else {
+      failCount++;
+      console.log(`❌ Cannot send to ${userEmail} - connection not available or closed`);
+    }
+  });
+  
+  console.log(`📊 Broadcast complete: ${successCount} successful, ${failCount} failed`);
+};
+
+// Helper function for room broadcasting (backward compatibility)
+const broadcastToRoom = (
   conversationId: string,
   message: any,
   excludeUserEmail?: string
 ) => {
-  const room = conversationRooms.get(conversationId);
-  if (!room) return;
+  broadcast(message, {
+    type: 'room',
+    conversationId,
+    excludeUserEmail
+  });
+};
 
-  room.forEach((userEmail) => {
-    if (userEmail === excludeUserEmail) return;
+// Helper function for global broadcasting
+const broadcastGlobal = (
+  message: any,
+  excludeUserEmail?: string
+) => {
+  broadcast(message, {
+    type: 'global',
+    excludeUserEmail
+  });
+};
 
-    const connection = connections.get(userEmail);
-    if (connection && connection.ws.readyState === WebSocket.OPEN) {
-      connection.ws.send(JSON.stringify(message));
-    }
+// Helper function for broadcasting to specific users
+const broadcastToUsers = (
+  userEmails: string[],
+  message: any,
+  excludeUserEmail?: string
+) => {
+  broadcast(message, {
+    type: 'users',
+    targetUsers: userEmails,
+    excludeUserEmail
   });
 };
 
 const addUserToRoom = (conversationId: string, userEmail: string) => {
+  console.log(`➕ Adding user ${userEmail} to room ${conversationId}`);
+  
   if (!conversationRooms.has(conversationId)) {
+    console.log(`🆕 Creating new room for conversation ${conversationId}`);
     conversationRooms.set(conversationId, new Set());
   }
+  
   conversationRooms.get(conversationId)!.add(userEmail);
+  console.log(`✅ User ${userEmail} added to room. Room size: ${conversationRooms.get(conversationId)!.size}`);
 };
 
 const removeUserFromRoom = (conversationId: string, userEmail: string) => {
+  console.log(`➖ Removing user ${userEmail} from room ${conversationId}`);
+  
   const room = conversationRooms.get(conversationId);
   if (room) {
     room.delete(userEmail);
+    console.log(`✅ User removed. Room size: ${room.size}`);
+    
     if (room.size === 0) {
+      console.log(`🗑️ Room ${conversationId} is empty, deleting room`);
       conversationRooms.delete(conversationId);
     }
+  } else {
+    console.log(`❌ Room ${conversationId} not found when trying to remove user ${userEmail}`);
   }
 };
 
-
 // Replace getConversationMessages function
 const getConversationMessages = async (conversationId: string) => {
-  return await prisma.message.findMany({
-    where: {
-      conversationId: conversationId,
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-  });
+  console.log(`💬 Fetching messages for conversation ${conversationId}`);
+  
+  try {
+    const messages = await prisma.message.findMany({
+      where: {
+        conversationId: conversationId,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+    
+    console.log(`✅ Found ${messages.length} messages for conversation ${conversationId}`);
+    return messages;
+  } catch (error) {
+    console.error(`❌ Error fetching messages for conversation ${conversationId}:`, error);
+    throw error;
+  }
 };
 
 const sendError = (ws: WebSocket, message: string, code = 4000) => {
+  console.log(`❌ Sending error to client: ${message} (code: ${code})`);
+  
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(
       JSON.stringify({
@@ -106,17 +241,23 @@ const sendError = (ws: WebSocket, message: string, code = 4000) => {
         payload: { message, code },
       })
     );
+    console.log(`✅ Error message sent successfully`);
+  } else {
+    console.log(`❌ Cannot send error - WebSocket is not open`);
   }
 };
 
 // WebSocket connection handler
 wss.on("connection", (ws: WebSocket, req) => {
   const ip = req.socket.remoteAddress;
-  console.log(`New WebSocket connection from ${ip}`);
+  console.log(`🔌 New WebSocket connection from ${ip}`);
+  console.log(`📊 Total active connections: ${connections.size + 1}`);
 
   let currentConnection: ClientConnection | null = null;
   let isAuthenticated = false;
   let heartbeatInterval: NodeJS.Timeout;
+
+  console.log(`📤 Sending connection established message to ${ip}`);
 
   // Send initial connection success
   ws.send(
@@ -126,19 +267,30 @@ wss.on("connection", (ws: WebSocket, req) => {
     })
   );
 
+  console.log(`💓 Starting heartbeat for connection ${ip}`);
+
   // Heartbeat to keep connection alive
   heartbeatInterval = setInterval(() => {
     if (ws.readyState === WebSocket.OPEN) {
+      console.log(`💓 Sending ping to ${currentConnection?.userEmail || ip}`);
       ws.ping();
+    } else {
+      console.log(`💔 Heartbeat failed - connection closed for ${currentConnection?.userEmail || ip}`);
     }
   }, 30000);
 
   ws.on("message", (data: WebSocket.Data) => {
+    console.log(`📨 Received message from ${currentConnection?.userEmail || ip}`);
+    console.log(`📨 Raw message data:`, data.toString());
+    
     try {
       const message: WSMessage = JSON.parse(data.toString());
+      console.log(`📨 Parsed message type: ${message.type}`);
+      console.log(`📨 Message payload:`, message.payload);
 
       // Handle authentication first
       if (!isAuthenticated && message.type !== "authenticate") {
+        console.log(`🚫 Unauthenticated user trying to send ${message.type} message`);
         sendError(
           ws,
           "Authentication required. Please send authenticate message first.",
@@ -147,22 +299,30 @@ wss.on("connection", (ws: WebSocket, req) => {
         return;
       }
 
+      
+
       switch (message.type) {
         case "authenticate":
+          console.log(`🔐 Processing authentication request`);
           (async () => {
-            const { userEmail, userName } = message.payload;
-
+            const { userEmail, userName, conversationId } = message.payload;
+            console.log(`🔐 Authenticating user: ${userEmail} (${userName})`);
 
           try {
+            console.log(`🔍 Looking up user in database: ${userEmail}`);
+            
             // Verify user exists in database
             const user = await prisma.user.findUnique({
               where: { email: userEmail },
             });
 
             if (!user) {
+              console.log(`❌ User not found in database: ${userEmail}`);
               sendError(ws, "User not found", 4004);
               return;
             }
+
+            console.log(`✅ User found in database: ${user.id} - ${user.firstName} ${user.lastName}`);
 
             // Create authenticated connection
             currentConnection = {
@@ -172,72 +332,145 @@ wss.on("connection", (ws: WebSocket, req) => {
               authenticated: true,
             };
             
+            console.log(`💾 Storing connection for user: ${userEmail}`);
             connections.set(userEmail, currentConnection);
             isAuthenticated = true;
 
+            console.log(`✅ Authentication successful for ${userEmail}`);
+            console.log(`📊 Total authenticated connections: ${connections.size}`);
+
+            if(conversationId){
+              try {
+                console.log(`🔍 Fetching conversation from database: ${conversationId}`);
+                
+                // Fetch conversation from database
+                const conversation = await prisma.conversation.findUnique({
+                  where: { id: conversationId },
+                });
+                
+                if (!conversation) {
+                  console.log(`❌ Conversation not found: ${conversationId}`);
+                  sendError(ws, "Conversation not found", 4004);
+                  return;
+                }
+                
+                console.log(`✅ Conversation found, sending user online status: ${conversation.id}`);
+
+                broadcastGlobal(
+                  {
+                    type: "user_online",
+                    payload: {
+                      userEmail: currentConnection.userEmail,
+                      userName: currentConnection.userName
+                    },
+                  }
+                );
+
+              } catch (error){
+                console.log("Error while verifying conversationId: ", error)
+
+              }
+
+            }
+
+            
             // Send success response
             ws.send(JSON.stringify({
               type: "authentication_success",
               payload: { userEmail, message: "Authentication successful" }
             }));
 
+            console.log(`📤 Authentication success message sent to ${userEmail}`);
+
           } catch (error) {
-            console.error("Authentication error:", error);
+            console.error(`❌ Authentication error for ${userEmail}:`, error);
             sendError(ws, "Authentication failed", 4500);
           }
         })();
         break;
         
         case "user_online":
+          console.log(`🟢 User online status request from ${currentConnection?.userEmail}`);
           // This is now handled in register_user, but kept for backward compatibility
           if (currentConnection) {
+            console.log(`📤 Sending online status to ${currentConnection.userEmail}`);
             ws.send(
               JSON.stringify({
                 type: "user_status",
                 payload: { status: "online", userEmail: currentConnection.userEmail },
               })
             );
+          } else {
+            console.log(`❌ No current connection for user_online request`);
           }
           break;
 
         case "join_conversation":
+          console.log(`🚪 Processing join_conversation request`);
           (async () => {
           if (!currentConnection) {
+            console.log(`❌ Join conversation attempted without authentication`);
             sendError(ws, "Not authenticated", 4001);
             return;
           }
+
+          console.log(`🚪 User ${currentConnection.userEmail} attempting to join conversation`);
           
           const { conversationId } = message.payload;
+          console.log(`🚪 Target conversation ID: ${conversationId}`);
           
           try {
+            console.log(`🔍 Fetching conversation from database: ${conversationId}`);
+            
             // Fetch conversation from database
             const conversation = await prisma.conversation.findUnique({
               where: { id: conversationId },
             });
             
-            
             if (!conversation) {
+              console.log(`❌ Conversation not found: ${conversationId}`);
               sendError(ws, "Conversation not found", 4004);
               return;
             }
             
+            console.log(`✅ Conversation found: ${conversation.id}`);
+            console.log(`👥 Conversation participants:`, conversation.participants);
+            
             // Check if user is participant
             if (!conversation.participants.includes(currentConnection.userEmail)) {
+              console.log(`🚫 Access denied - ${currentConnection.userEmail} not in participants list`);
               sendError(ws, "Access denied to this conversation", 4003);
               return;
             }
 
+            console.log(`✅ User ${currentConnection.userEmail} is authorized for conversation ${conversationId}`);
+
+            broadcastGlobal(
+                  {
+                    type: "user_online",
+                    payload: {
+                      userEmail: currentConnection.userEmail,
+                      userName: currentConnection.userName
+                    },
+                  }
+                );
+
             // Leave previous room if any
             if (currentConnection.conversationId) {
+              console.log(`🚪 User leaving previous conversation: ${currentConnection.conversationId}`);
               removeUserFromRoom(currentConnection.conversationId, currentConnection.userEmail);
             }
 
             // Join new room
+            console.log(`🚪 User joining new conversation: ${conversationId}`);
             currentConnection.conversationId = conversationId;
             addUserToRoom(conversationId, currentConnection.userEmail);
 
             // Send recent messages
-            const conversationMessages = await getConversationMessages(conversationId)
+            console.log(`💬 Loading conversation messages for ${conversationId}`);
+            const conversationMessages = await getConversationMessages(conversationId);
+
+            console.log(`📤 Sending ${conversationMessages.length} messages to ${currentConnection.userEmail}`);
 
             ws.send(JSON.stringify({
               type: "messages_loaded",
@@ -250,8 +483,12 @@ wss.on("connection", (ws: WebSocket, req) => {
               },
             }));
 
+            console.log(`✅ Messages sent successfully to ${currentConnection.userEmail}`);
+
             // Mark messages as read
-            await prisma.message.updateMany({
+            console.log(`👁️ Marking messages as read for ${currentConnection.userEmail} in conversation ${conversationId}`);
+            
+            const updateResult = await prisma.message.updateMany({
               where: {
                 conversationId,
                 isRead: false,
@@ -260,8 +497,11 @@ wss.on("connection", (ws: WebSocket, req) => {
               data: { isRead: true }
             });
 
+            console.log(`✅ Marked ${updateResult.count} messages as read`);
+
             // Notify others in the room that user joined
-            broadcast(
+            console.log(`📢 Broadcasting user_joined event for ${currentConnection.userEmail}`);
+            broadcastToRoom(
               conversationId,
               {
                 type: "user_joined",
@@ -271,16 +511,20 @@ wss.on("connection", (ws: WebSocket, req) => {
               }
             );
 
+            console.log(`✅ Join conversation completed successfully for ${currentConnection.userEmail}`);
+
           } catch (error) {
-            console.error("Error joining conversation:", error);
+            console.error(`❌ Error joining conversation ${conversationId}:`, error);
             sendError(ws, "Failed to join conversation", 4500);
           }
         })();
         break;
         
         case "send_message":
+        console.log(`💬 Processing send_message request`);
         (async () => {
           if (!currentConnection) {
+            console.log(`❌ Send message attempted without authentication`);
             sendError(ws, "Not authenticated", 4001);
             return;
           }
@@ -290,16 +534,25 @@ wss.on("connection", (ws: WebSocket, req) => {
             content,
           } = message.payload;
 
+          console.log(`💬 User ${currentConnection.userEmail} sending message to conversation ${msgConvId}`);
+          console.log(`💬 Message content: "${content}"`);
+
           try {
+            console.log(`🔍 Verifying conversation access for ${msgConvId}`);
+            
             // Verify conversation exists and user has access
             const msgConversation = await prisma.conversation.findUnique({
               where: { id: msgConvId },
             });
 
             if (!msgConversation || !msgConversation.participants.includes(currentConnection.userEmail)) {
+              console.log(`🚫 Access denied to conversation ${msgConvId} for user ${currentConnection.userEmail}`);
               sendError(ws, "Access denied to this conversation", 4003);
               return;
             }
+
+            console.log(`✅ Conversation access verified for ${msgConvId}`);
+            console.log(`👥 Conversation participants:`, msgConversation.participants);
 
             // Get receiver ID (the other participant)
             const receiverEmail = msgConversation.participants.find(
@@ -307,11 +560,16 @@ wss.on("connection", (ws: WebSocket, req) => {
             );
 
             if (!receiverEmail) {
+              console.log(`❌ No receiver found in conversation ${msgConvId}`);
               sendError(ws, "Invalid conversation participants", 4400);
               return;
             }
 
+            console.log(`📧 Message receiver: ${receiverEmail}`);
+
             // Create message in database
+            console.log(`💾 Creating message in database...`);
+            
             const newMessage = await prisma.message.create({
               data: {
                 content: content.trim(),
@@ -332,9 +590,19 @@ wss.on("connection", (ws: WebSocket, req) => {
               }
             });
 
-            console.log('New message', newMessage)
+            console.log(`✅ Message created in database with ID: ${newMessage.id}`);
+            console.log(`💬 New message details:`, {
+              id: newMessage.id,
+              content: newMessage.content,
+              senderEmail: newMessage.senderEmail,
+              receiverEmail: newMessage.receiverEmail,
+              conversationId: newMessage.conversationId,
+              createdAt: newMessage.createdAt
+            });
 
             // Update conversation's lastMessage and updatedAt
+            console.log(`🔄 Updating conversation lastMessage for ${msgConvId}`);
+            
             await prisma.conversation.update({
               where: { id: msgConvId },
               data: {
@@ -343,8 +611,12 @@ wss.on("connection", (ws: WebSocket, req) => {
               },
             });
 
+            console.log(`✅ Conversation updated successfully`);
+
             // Broadcast message to all participants in the conversation
-            broadcast(
+            console.log(`📢 Broadcasting new message to conversation participants`);
+            
+            broadcastToRoom(
               msgConvId,
               {
                 type: "new_message",
@@ -355,6 +627,8 @@ wss.on("connection", (ws: WebSocket, req) => {
               }
             );
 
+            console.log(`📤 Sending message confirmation to sender ${currentConnection.userEmail}`);
+
             ws.send(JSON.stringify({
               type: "message_sent",
               payload: {
@@ -363,17 +637,23 @@ wss.on("connection", (ws: WebSocket, req) => {
               },
             }));
 
+            console.log(`✅ Message sent successfully by ${currentConnection.userEmail}`);
+
           } catch (error) {
-            console.error("Error sending message:", error);
+            console.error(`❌ Error sending message from ${currentConnection.userEmail}:`, error);
             sendError(ws, "Failed to send message", 4500);
           }
         })();
         break;
         
         case "typing":
+          console.log(`⌨️ User typing event from ${currentConnection?.userEmail}`);
           const { conversationId: typingConvId } = message.payload;
+          console.log(`⌨️ Typing in conversation: ${typingConvId}`);
+          
           if (currentConnection && typingConvId) {
-            broadcast(
+            console.log(`📢 Broadcasting typing event for ${currentConnection.userName}`);
+            broadcastToRoom(
               typingConvId,
               {
                 type: "user_typing",
@@ -383,13 +663,19 @@ wss.on("connection", (ws: WebSocket, req) => {
               },
               currentConnection.userEmail
             );
+          } else {
+            console.log(`❌ Cannot broadcast typing - missing connection or conversation ID`);
           }
           break;
 
         case "stop_typing":
+          console.log(`⌨️ Stop typing event from ${currentConnection?.userEmail}`);
           const { conversationId: stopTypingConvId } = message.payload;
+          console.log(`⌨️ Stop typing in conversation: ${stopTypingConvId}`);
+          
           if (currentConnection && stopTypingConvId) {
-            broadcast(
+            console.log(`📢 Broadcasting stop typing event for ${currentConnection.userName}`);
+            broadcastToRoom(
               stopTypingConvId,
               {
                 type: "user_stop_typing",
@@ -398,35 +684,43 @@ wss.on("connection", (ws: WebSocket, req) => {
                 },
               }
             );
+          } else {
+            console.log(`❌ Cannot broadcast stop typing - missing connection or conversation ID`);
           }
           break;
 
         default:
+          console.log(`❓ Unknown message type received: ${message.type}`);
           sendError(ws, `Unknown message type: ${message.type}`, 4006);
       }
     } catch (error) {
-      console.error("Error processing message:", error);
+      console.error(`❌ Error processing message from ${currentConnection?.userEmail || ip}:`, error);
+      console.error(`📨 Problematic message data:`, data.toString());
       sendError(ws, "Invalid message format", 4007);
     }
   });
 
   ws.on("close", (code, reason) => {
-    console.log(
-      `WebSocket connection closed. Code: ${code}, Reason: ${reason}`
-    );
+    console.log(`🔌 WebSocket connection closed from ${ip}`);
+    console.log(`🔌 Close code: ${code}, Reason: ${reason}`);
 
     clearInterval(heartbeatInterval);
+    console.log(`💔 Heartbeat cleared for ${currentConnection?.userEmail || ip}`);
 
     if (currentConnection) {
+      console.log(`🧹 Cleaning up connection for ${currentConnection.userEmail}`);
+      
       // Remove from room if in one
       if (currentConnection.conversationId) {
+        console.log(`🚪 Removing user from conversation room: ${currentConnection.conversationId}`);
         removeUserFromRoom(
           currentConnection.conversationId,
           currentConnection.userEmail
         );
 
         // Notify others that user left
-        broadcast(currentConnection.conversationId, {
+        console.log(`📢 Broadcasting user_left event for ${currentConnection.userEmail}`);
+        broadcastToRoom(currentConnection.conversationId, {
           type: "user_left",
           payload: {
             userEmail: currentConnection.userEmail,
@@ -434,23 +728,41 @@ wss.on("connection", (ws: WebSocket, req) => {
         });
       }
 
+      console.log(`🗑️ Removing connection from connections map: ${currentConnection.userEmail}`);
       connections.delete(currentConnection.userEmail);
-      console.log(`User ${currentConnection.userEmail} disconnected`);
+      console.log(`✅ User ${currentConnection.userEmail} disconnected successfully`);
+      broadcastGlobal({
+        type: "user_offline",
+        payload: {
+          userEmail: currentConnection.userEmail,
+          userName: currentConnection.userName
+        }
+      })
+      console.log("Broadcasted user disconnnected");
+      console.log(`📊 Remaining active connections: ${connections.size}`);
+    } else {
+      console.log(`🤷 Connection closed but no currentConnection found for ${ip}`);
     }
   });
 
   ws.on("error", (error) => {
-    console.error("WebSocket error:", error);
+    console.error(`❌ WebSocket error from ${currentConnection?.userEmail || ip}:`, error);
     clearInterval(heartbeatInterval);
+    console.log(`💔 Heartbeat cleared due to error for ${currentConnection?.userEmail || ip}`);
   });
 
   ws.on("pong", () => {
-    // Heartbeat received
+    console.log(`🏓 Pong received from ${currentConnection?.userEmail || ip}`);
   });
 });
 
 const PORT = 8080;
+console.log(`🚀 Starting server on port ${PORT}...`);
+
 server.listen(PORT, () => {
-  console.log(`WebSocket server running on port ${PORT}`);
-  console.log(`WebSocket endpoint: ws://localhost:${PORT}`);
+  console.log(`✅ WebSocket server running on port ${PORT}`);
+  console.log(`🌐 WebSocket endpoint: ws://localhost:${PORT}`);
+  console.log(`📊 Server ready to accept connections`);
 });
+
+console.log(`🎯 WebSocket server setup complete`);
