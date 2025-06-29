@@ -159,10 +159,20 @@ exports.Prisma.UserScalarFieldEnum = {
   successRate: 'successRate',
   completedJobs: 'completedJobs',
   onTime: 'onTime',
+  onBudget: 'onBudget',
   responseTime: 'responseTime',
   lastActive: 'lastActive',
   topRatedPlus: 'topRatedPlus',
   verified: 'verified',
+  risingTalent: 'risingTalent',
+  portfolioItems: 'portfolioItems',
+  testScores: 'testScores',
+  specializations: 'specializations',
+  memberSince: 'memberSince',
+  profileStrength: 'profileStrength',
+  repeatHireRate: 'repeatHireRate',
+  rating: 'rating',
+  reviewCount: 'reviewCount',
   companyName: 'companyName',
   companySize: 'companySize',
   industry: 'industry',
@@ -284,6 +294,13 @@ exports.Prisma.NotificationScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.SavedFreelancerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  freelancerId: 'freelancerId',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -349,7 +366,8 @@ exports.Prisma.ModelName = {
   Review: 'Review',
   Conversation: 'Conversation',
   Message: 'Message',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  SavedFreelancer: 'SavedFreelancer'
 };
 
 /**

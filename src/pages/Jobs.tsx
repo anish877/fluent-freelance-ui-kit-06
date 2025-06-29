@@ -1,6 +1,7 @@
-
-import { useState } from "react";
-import { Search, Filter, MapPin, Clock, DollarSign, Bookmark, Eye, Users, Star, Award, AlertCircle, Calendar, Building, Globe, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Search, Filter, MapPin, Clock, DollarSign, Bookmark, Eye, Users, Star, Award, AlertCircle, Calendar, Building, Globe, ChevronDown, Loader2 } from "lucide-react";
+import axios from "axios";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -10,8 +11,59 @@ import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Separator } from "../components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import JobCard from "../components/cards/JobCard";
+import { useAuth } from "../hooks/AuthContext";
+
+// Types for backend data
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  requirements: string[];
+  budget: 'FIXED' | 'HOURLY';
+  minBudget?: number;
+  maxBudget?: number;
+  hourlyRate?: number;
+  duration?: string;
+  skills: string[];
+  category: string;
+  subcategory?: string;
+  projectType?: string;
+  experienceLevel?: string;
+  workingHours?: string;
+  timezone?: string;
+  communicationPreferences: string[];
+  location?: string;
+  isRemote: boolean;
+  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  isUrgent: boolean;
+  visibility: string;
+  applicationDeadline?: string;
+  clientId: string;
+  createdAt: string;
+  updatedAt: string;
+  client: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+    companyName?: string;
+    location?: string;
+    verified: boolean;
+    createdAt: string;
+  };
+  _count: {
+    proposals: number;
+  };
+}
+
+interface Category {
+  value: string;
+  label: string;
+  count: number;
+}
 
 const Jobs = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedJobType, setSelectedJobType] = useState("all");
@@ -19,18 +71,29 @@ const Jobs = () => {
   const [selectedBudget, setSelectedBudget] = useState("all");
   const [selectedDuration, setSelectedDuration] = useState("all");
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [savedJobs, setSavedJobs] = useState<number[]>([]);
+  const [savedJobs, setSavedJobs] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-
-  const categories = [
-    { value: "all", label: "All Categories", count: 1247 },
-    { value: "web-dev", label: "Web Development", count: 342 },
-    { value: "mobile-dev", label: "Mobile Development", count: 198 },
-    { value: "design", label: "Design & Creative", count: 256 },
-    { value: "writing", label: "Writing & Translation", count: 189 },
-    { value: "marketing", label: "Digital Marketing", count: 167 },
-    { value: "data-science", label: "Data Science & AI", count: 95 }
-  ];
+  
+  // Jobs state
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobsLoading, setJobsLoading] = useState(true);
+  const [jobsError, setJobsError] = useState<string | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalJobs, setTotalJobs] = useState(0);
+  const [jobsPerPage] = useState(10);
+  
+  const [categories, setCategories] = useState<Category[]>([
+    { value: "all", label: "All Categories", count: 0 },
+    { value: "web-dev", label: "Web Development", count: 0 },
+    { value: "mobile-dev", label: "Mobile Development", count: 0 },
+    { value: "design", label: "Design & Creative", count: 0 },
+    { value: "writing", label: "Writing & Translation", count: 0 },
+    { value: "marketing", label: "Digital Marketing", count: 0 },
+    { value: "data-science", label: "Data Science & AI", count: 0 }
+  ]);
 
   const jobTypes = [
     { value: "all", label: "All Types" },
@@ -54,133 +117,169 @@ const Jobs = () => {
     { value: "5000+", label: "$5,000+" }
   ];
 
-  const mockJobs = [
-    {
-      id: 1,
-      title: "Full-Stack E-commerce Platform Development",
-      description: "We're looking for an experienced full-stack developer to build a comprehensive e-commerce platform from scratch. The project involves creating a modern, responsive web application with advanced features including user authentication, payment processing, inventory management, and admin dashboard. The ideal candidate should have expertise in React.js, Node.js, and database management.",
-      budget: "$4,500 - $8,000",
-      budgetType: "fixed",
-      duration: "2-3 months",
-      skills: ["React", "Node.js", "MongoDB", "Stripe", "AWS", "TypeScript", "Redux"],
-      client: {
-        name: "TechCorp Solutions",
-        rating: 4.8,
-        jobsPosted: 23,
-        location: "San Francisco, CA",
-        verified: true,
-        memberSince: "2019",
-        totalSpent: "$125,000+"
-      },
-      postedTime: "2 hours ago",
-      proposals: 12,
-      category: "web-dev",
-      experienceLevel: "expert",
-      paymentVerified: true,
-      urgent: false,
-      featured: true,
-      projectType: "Large Project",
-      estimatedHoursPerWeek: "40+ hrs/week",
-      connectsRequired: 6
-    },
-    {
-      id: 2,
-      title: "Mobile App UI/UX Design - Food Delivery Platform",
-      description: "Need a talented UI/UX designer to create stunning, user-friendly mobile app interfaces for both iOS and Android platforms. The app is a food delivery service similar to UberEats. We need wireframes, high-fidelity mockups, interactive prototypes, and a complete design system. Experience with food delivery or similar marketplace apps is a plus.",
-      budget: "$2,500 - $4,000", 
-      budgetType: "fixed",
-      duration: "1-2 months",
-      skills: ["Figma", "UI/UX Design", "Mobile Design", "Prototyping", "Design Systems", "User Research"],
-      client: {
-        name: "FoodieHub Startup",
-        rating: 4.6,
-        jobsPosted: 8,
-        location: "Austin, TX",
-        verified: true,
-        memberSince: "2021",
-        totalSpent: "$35,000+"
-      },
-      postedTime: "5 hours ago",
-      proposals: 28,
-      category: "design",
-      experienceLevel: "intermediate",
-      paymentVerified: true,
-      urgent: true,
-      featured: false,
-      projectType: "Medium Project",
-      estimatedHoursPerWeek: "20-30 hrs/week",
-      connectsRequired: 4
-    },
-    {
-      id: 3,
-      title: "AI-Powered Content Writing for Tech Blog",
-      description: "Seeking a skilled technical content writer to create engaging, SEO-optimized articles about emerging technologies, AI, blockchain, and software development trends. You'll be working with our marketing team to produce 8-10 high-quality articles per month. Each article should be 2000-3000 words with proper research, citations, and technical accuracy.",
-      budget: "$75 - $150/article",
-      budgetType: "hourly",
-      duration: "3-6 months",
-      skills: ["Technical Writing", "SEO", "AI/ML", "Blockchain", "Content Strategy", "Research"],
-      client: {
-        name: "Digital Insights Media",
-        rating: 4.9,
-        jobsPosted: 45,
-        location: "Remote Worldwide",
-        verified: true,
-        memberSince: "2018",
-        totalSpent: "$85,000+"
-      },
-      postedTime: "1 day ago",
-      proposals: 19,
-      category: "writing",
-      experienceLevel: "intermediate",
-      paymentVerified: true,
-      urgent: false,
-      featured: true,
-      projectType: "Ongoing Project",
-      estimatedHoursPerWeek: "10-20 hrs/week",
-      connectsRequired: 2
-    },
-    {
-      id: 4,
-      title: "React Native App Development - Fitness Tracking",
-      description: "Looking for a React Native developer to build a comprehensive fitness tracking mobile application. The app should include features like workout logging, progress tracking, social features, integration with wearable devices, and real-time analytics. Prior experience with health/fitness apps and third-party API integrations is essential.",
-      budget: "$6,000 - $12,000",
-      budgetType: "fixed",
-      duration: "3-4 months",
-      skills: ["React Native", "JavaScript", "Firebase", "Health APIs", "Redux", "Push Notifications"],
-      client: {
-        name: "FitTech Innovations",
-        rating: 4.7,
-        jobsPosted: 12,
-        location: "London, UK",
-        verified: true,
-        memberSince: "2020",
-        totalSpent: "$75,000+"
-      },
-      postedTime: "3 hours ago",
-      proposals: 8,
-      category: "mobile-dev",
-      experienceLevel: "expert",
-      paymentVerified: true,
-      urgent: false,
-      featured: false,
-      projectType: "Large Project",
-      estimatedHoursPerWeek: "30-40 hrs/week",
-      connectsRequired: 6
+  // Fetch jobs from backend
+  const fetchJobs = async (page = 1) => {
+    try {
+      setJobsLoading(true);
+      setJobsError(null);
+      
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: jobsPerPage.toString(),
+        search: searchTerm,
+        category: selectedCategory !== 'all' ? selectedCategory : '',
+        jobType: selectedJobType !== 'all' ? selectedJobType : '',
+        experience: selectedExperience !== 'all' ? selectedExperience : '',
+        budget: selectedBudget !== 'all' ? selectedBudget : '',
+        duration: selectedDuration !== 'all' ? selectedDuration : ''
+      });
+      
+      const response = await axios.get(`/jobs?${params}`);
+      
+      if (response.data.success) {
+        setJobs(response.data.data);
+        setTotalJobs(response.data.total || response.data.data.length);
+        setTotalPages(response.data.totalPages || Math.ceil((response.data.total || response.data.data.length) / jobsPerPage));
+        setCurrentPage(page);
+        
+        // Update category counts if available
+        if (response.data.categoryCounts) {
+          setCategories(prev => prev.map(cat => ({
+            ...cat,
+            count: cat.value === "all" ? response.data.total : (response.data.categoryCounts[cat.value] || 0)
+          })));
+        } else {
+          // Fallback to calculating from current data
+          const categoryCounts = response.data.data.reduce((acc: Record<string, number>, job: Job) => {
+            const category = job.category.toLowerCase().replace(/\s+/g, '-');
+            acc[category] = (acc[category] || 0) + 1;
+            return acc;
+          }, {});
+          
+          setCategories(prev => prev.map(cat => ({
+            ...cat,
+            count: cat.value === "all" ? response.data.total : (categoryCounts[cat.value] || 0)
+          })));
+        }
+      } else {
+        setJobsError('Failed to fetch jobs');
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      setJobsError('Failed to fetch jobs');
+    } finally {
+      setJobsLoading(false);
     }
-  ];
+  };
 
-  const filteredJobs = mockJobs.filter(job => {
+  // Format budget display
+  const formatBudget = (job: Job) => {
+    if (job.budget === 'FIXED') {
+      if (job.minBudget && job.maxBudget) {
+        return `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`;
+      } else if (job.minBudget) {
+        return `$${job.minBudget.toLocaleString()}`;
+      }
+    } else if (job.budget === 'HOURLY' && job.hourlyRate) {
+      return `$${job.hourlyRate}/hour`;
+    }
+    return 'Budget not specified';
+  };
+
+  // Format posted time
+  const formatPostedTime = (createdAt: string) => {
+    const now = new Date();
+    const posted = new Date(createdAt);
+    const diffInHours = Math.floor((now.getTime() - posted.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) return `${diffInWeeks} week${diffInWeeks > 1 ? 's' : ''} ago`;
+    
+    return posted.toLocaleDateString();
+  };
+
+  // Get client name
+  const getClientName = (job: Job) => {
+    if (job.client.companyName) {
+      return job.client.companyName;
+    }
+    return `${job.client.firstName} ${job.client.lastName}`;
+  };
+
+  // Get client location
+  const getClientLocation = (job: Job) => {
+    if (job.client.location) {
+      return job.client.location;
+    }
+    if (job.location) {
+      return job.location;
+    }
+    return 'Remote';
+  };
+
+  // Filter jobs based on search term and filters
+  const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          job.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === "all" || job.category === selectedCategory;
-    const matchesJobType = selectedJobType === "all" || job.budgetType === selectedJobType;
-    const matchesExperience = selectedExperience === "all" || job.experienceLevel === selectedExperience;
     
-    return matchesSearch && matchesCategory && matchesJobType && matchesExperience;
+    const matchesCategory = selectedCategory === "all" || 
+                           job.category.toLowerCase().replace(/\s+/g, '-') === selectedCategory;
+    
+    const matchesJobType = selectedJobType === "all" || 
+                          (selectedJobType === "fixed" && job.budget === "FIXED") ||
+                          (selectedJobType === "hourly" && job.budget === "HOURLY");
+    
+    const matchesExperience = selectedExperience === "all" || 
+                             job.experienceLevel?.toLowerCase() === selectedExperience;
+    
+    // Budget filtering
+    let matchesBudget = true;
+    if (selectedBudget !== "all") {
+      const jobBudget = job.minBudget || job.maxBudget || 0;
+      switch (selectedBudget) {
+        case "0-500":
+          matchesBudget = jobBudget <= 500;
+          break;
+        case "500-1000":
+          matchesBudget = jobBudget >= 500 && jobBudget <= 1000;
+          break;
+        case "1000-5000":
+          matchesBudget = jobBudget >= 1000 && jobBudget <= 5000;
+          break;
+        case "5000+":
+          matchesBudget = jobBudget >= 5000;
+          break;
+      }
+    }
+    
+    return matchesSearch && matchesCategory && matchesJobType && matchesExperience && matchesBudget;
   });
 
-  const toggleSaveJob = (jobId: number) => {
+  // Load jobs on component mount
+  useEffect(() => {
+    fetchJobs(1);
+  }, []);
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      fetchJobs(page);
+    }
+  };
+
+  // Handle filter changes
+  useEffect(() => {
+    fetchJobs(1); // Reset to first page when filters change
+  }, [searchTerm, selectedCategory, selectedJobType, selectedExperience, selectedBudget, selectedDuration]);
+
+  const toggleSaveJob = (jobId: string) => {
     setSavedJobs(prev => 
       prev.includes(jobId) 
         ? prev.filter(id => id !== jobId)
@@ -209,10 +308,10 @@ const Jobs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-hidden">
         {/* Header with Enhanced Stats */}
         <div className="mb-8">
           <div className="flex justify-between items-start mb-4">
@@ -222,7 +321,7 @@ const Jobs = () => {
             </div>
             <div className="text-right">
               <div className="bg-white p-4 rounded-lg shadow-sm border">
-                <div className="text-2xl font-bold text-teal-600">1,247</div>
+                <div className="text-2xl font-bold text-teal-600">{jobs.length}</div>
                 <div className="text-sm text-gray-600">Active Jobs</div>
               </div>
             </div>
@@ -447,173 +546,262 @@ const Jobs = () => {
               </select>
             </div>
 
-            <div className={viewMode === "grid" ? "grid grid-cols-1 xl:grid-cols-2 gap-6" : "space-y-6"}>
-              {filteredJobs.map(job => (
-                <Card key={job.id} className="hover:shadow-lg transition-all duration-200 border hover:border-teal-200">
-                  <CardHeader className="pb-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="text-xl font-semibold text-gray-900 hover:text-teal-600 cursor-pointer line-clamp-2">
-                            {job.title}
-                          </h3>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleSaveJob(job.id)}
-                            className="ml-2 text-gray-400 hover:text-teal-600"
-                          >
-                            <Bookmark className={`h-5 w-5 ${savedJobs.includes(job.id) ? 'fill-teal-600 text-teal-600' : ''}`} />
-                          </Button>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2 mb-3">
-                          <Badge className="bg-teal-100 text-teal-800 border-teal-200">
-                            {job.budgetType === 'fixed' ? 'Fixed Price' : 'Hourly Rate'}
-                          </Badge>
-                          <Badge variant="outline">
-                            {job.experienceLevel.charAt(0).toUpperCase() + job.experienceLevel.slice(1)}
-                          </Badge>
-                          {getFeaturedBadge(job.featured)}
-                          {getUrgencyBadge(job.urgent)}
-                        </div>
-
-                        <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-                          {job.description}
-                        </p>
-
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {job.skills.slice(0, 6).map((skill, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {skill}
-                            </Badge>
-                          ))}
-                          {job.skills.length > 6 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{job.skills.length - 6} more
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="pt-0">
-                    <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                      <div className="flex items-center text-gray-600">
-                        <DollarSign className="h-4 w-4 mr-1 text-green-600" />
-                        <span className="font-semibold text-gray-900">{job.budget}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <Clock className="h-4 w-4 mr-1 text-blue-600" />
-                        <span>{job.duration}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <Users className="h-4 w-4 mr-1 text-purple-600" />
-                        <span>{job.proposals} proposals</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <Calendar className="h-4 w-4 mr-1 text-orange-600" />
-                        <span>{job.postedTime}</span>
-                      </div>
-                    </div>
-
-                    <Separator className="my-4" />
-
-                    {/* Client Information */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center mr-3">
-                            <Building className="h-4 w-4 text-teal-600" />
+            <div className={viewMode === "grid" ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : "space-y-6"}>
+              {jobsLoading ? (
+                <div className="col-span-full flex items-center justify-center py-16">
+                  <div className="text-center">
+                    <Loader2 className="h-12 w-12 animate-spin text-teal-600 mx-auto mb-4" />
+                    <p className="text-gray-600">Loading jobs...</p>
+                  </div>
+                </div>
+              ) : jobsError ? (
+                <div className="col-span-full text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <AlertCircle className="h-16 w-16 text-red-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading jobs</h3>
+                    <p className="text-gray-500 mb-6">{jobsError}</p>
+                    <Button onClick={() => fetchJobs(currentPage)} variant="outline">
+                      Try Again
+                    </Button>
+                  </div>
+                </div>
+              ) : filteredJobs.length === 0 ? (
+                <div className="col-span-full text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
+                    <p className="text-gray-500 mb-6">
+                      Try adjusting your search criteria or filters to find more opportunities.
+                    </p>
+                    <Button onClick={() => {
+                      setSearchTerm("");
+                      setSelectedCategory("all");
+                      setSelectedJobType("all");
+                      setSelectedExperience("all");
+                    }}>
+                      Clear All Filters
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                filteredJobs.map(job => (
+                  <Card key={job.id} className="hover:shadow-lg transition-all duration-200 border hover:border-teal-200 overflow-hidden">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between mb-2">
+                            <Link to={`/jobs/${job.id}`} className="flex-1 min-w-0">
+                              <h3 className="text-xl font-semibold text-gray-900 hover:text-teal-600 cursor-pointer leading-tight mb-2 break-words hyphens-auto">
+                                {job.title}
+                              </h3>
+                            </Link>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleSaveJob(job.id)}
+                              className="text-gray-400 hover:text-teal-600 flex-shrink-0 ml-2"
+                            >
+                              <Bookmark className={`h-5 w-5 ${savedJobs.includes(job.id) ? 'fill-teal-600 text-teal-600' : ''}`} />
+                            </Button>
                           </div>
-                          <div>
-                            <h4 className="font-medium text-gray-900 text-sm">{job.client.name}</h4>
-                            <div className="flex items-center text-xs text-gray-600">
-                              <Star className="h-3 w-3 text-yellow-500 mr-1 fill-current" />
-                              <span>{job.client.rating}</span>
-                              <span className="mx-1">•</span>
-                              <span>{job.client.jobsPosted} jobs posted</span>
-                              {job.client.verified && (
-                                <>
-                                  <span className="mx-1">•</span>
-                                  <Badge variant="outline" className="text-xs px-1 py-0">
-                                    Verified
-                                  </Badge>
-                                </>
-                              )}
+                          
+                          <div className="flex items-center flex-wrap gap-2 mb-3">
+                            <Badge className="bg-teal-100 text-teal-800 border-teal-200">
+                              {job.budget === 'FIXED' ? 'Fixed Price' : 'Hourly Rate'}
+                            </Badge>
+                            {job.experienceLevel && (
+                              <Badge variant="outline">
+                                {job.experienceLevel.charAt(0).toUpperCase() + job.experienceLevel.slice(1)}
+                              </Badge>
+                            )}
+                            {job.isUrgent && (
+                              <Badge variant="destructive">
+                                <AlertCircle className="h-3 w-3 mr-1" />
+                                Urgent
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Enhanced description handling */}
+                          <div className="mb-4">
+                            <p className="text-gray-600 text-sm leading-relaxed break-words hyphens-auto">
+                              {job.description.length > 200 
+                                ? `${job.description.substring(0, 200)}...` 
+                                : job.description
+                              }
+                            </p>
+                            {job.description.length > 200 && (
+                              <Link to={`/jobs/${job.id}`} className="text-teal-600 hover:text-teal-700 text-sm font-medium">
+                                Read more
+                              </Link>
+                            )}
+                          </div>
+
+                          {/* Skills with better wrapping */}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {job.skills.slice(0, 5).map((skill, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs whitespace-nowrap">
+                                {skill.length > 15 ? `${skill.substring(0, 15)}...` : skill}
+                              </Badge>
+                            ))}
+                            {job.skills.length > 5 && (
+                              <Badge variant="outline" className="text-xs whitespace-nowrap">
+                                +{job.skills.length - 5} more
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pt-0">
+                      {/* Improved grid layout for job details */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-sm">
+                        <div className="flex items-center text-gray-600 min-w-0">
+                          <DollarSign className="h-4 w-4 mr-2 text-green-600 flex-shrink-0" />
+                          <span className="font-semibold text-gray-900 truncate">
+                            {formatBudget(job)}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-gray-600 min-w-0">
+                          <Clock className="h-4 w-4 mr-2 text-blue-600 flex-shrink-0" />
+                          <span className="truncate">{job.duration || 'Not specified'}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <Users className="h-4 w-4 mr-2 text-purple-600 flex-shrink-0" />
+                          <span>{job._count.proposals} proposal{job._count.proposals !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600 min-w-0">
+                          <Calendar className="h-4 w-4 mr-2 text-orange-600 flex-shrink-0" />
+                          <span className="truncate">{formatPostedTime(job.createdAt)}</span>
+                        </div>
+                      </div>
+
+                      <Separator className="my-4" />
+
+                      {/* Client Information with better alignment */}
+                      <div className="mb-4">
+                        <div className="flex items-start gap-3 mb-2">
+                          <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            {job.client.avatar ? (
+                              <img 
+                                src={job.client.avatar} 
+                                alt={getClientName(job)} 
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <Building className="h-5 w-5 text-teal-600" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between">
+                              <div className="min-w-0 flex-1">
+                                <h4 className="font-medium text-gray-900 text-sm break-words leading-tight">
+                                  {getClientName(job)}
+                                </h4>
+                                <div className="flex items-center flex-wrap gap-1 text-xs text-gray-600 mt-1">
+                                  <div className="flex items-center">
+                                    <Star className="h-3 w-3 text-yellow-500 mr-1 fill-current flex-shrink-0" />
+                                    <span>4.5</span>
+                                  </div>
+                                  <span>•</span>
+                                  <span>{job._count.proposals} reviews</span>
+                                  {job.client.verified && (
+                                    <>
+                                      <span>•</span>
+                                      <Badge variant="outline" className="text-xs px-1 py-0 h-4">
+                                        ✓ Verified
+                                      </Badge>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-xs text-gray-500 text-right flex-shrink-0 ml-2">
+                                <div>Since {new Date(job.client.createdAt).getFullYear()}</div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="text-xs text-gray-500 text-right">
-                          <div>Member since {job.client.memberSince}</div>
-                          <div>{job.client.totalSpent} spent</div>
+                        
+                        <div className="flex items-center text-xs text-gray-600 ml-13">
+                          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                          <span className="break-words">{getClientLocation(job)}</span>
+                          {job.isRemote && (
+                            <>
+                              <span className="mx-2">•</span>
+                              <span className="text-blue-600 font-medium">Remote OK</span>
+                            </>
+                          )}
                         </div>
                       </div>
-                      
-                      <div className="flex items-center text-xs text-gray-600">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        <span>{job.client.location}</span>
-                        {job.paymentVerified && (
-                          <>
-                            <span className="mx-2">•</span>
-                            <span className="text-green-600 font-medium">Payment Verified</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="text-xs text-gray-500">
-                        <span>{job.connectsRequired} connects required</span>
+                      {/* Action buttons with better responsive layout */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="text-xs text-gray-500">
+                          <span>Connects required: {Math.max(1, Math.ceil(job._count.proposals / 10))}</span>
+                        </div>
+                        <div className="flex gap-2 w-full sm:w-auto">
+                          <Link to={`/jobs/${job.id}`} className="flex-1 sm:flex-none">
+                          <Button size="sm" className="bg-teal-600 hover:bg-teal-700 flex-1 sm:flex-none">
+                            <Eye className="h-4 w-4 mr-1" />
+                              View Details
+                          </Button>
+                          </Link>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-1" />
-                          View Details
-                        </Button>
-                        <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
-                          Submit Proposal
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
-
-            {filteredJobs.length === 0 && (
-              <div className="text-center py-16">
-                <div className="max-w-md mx-auto">
-                  <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
-                  <p className="text-gray-500 mb-6">
-                    Try adjusting your search criteria or filters to find more opportunities.
-                  </p>
-                  <Button onClick={() => {
-                    setSearchTerm("");
-                    setSelectedCategory("all");
-                    setSelectedJobType("all");
-                    setSelectedExperience("all");
-                  }}>
-                    Clear All Filters
-                  </Button>
-                </div>
-              </div>
-            )}
 
             {/* Pagination */}
             <div className="mt-12 flex justify-center">
               <div className="flex items-center space-x-2">
-                <Button variant="outline" disabled>
+                <Button 
+                  variant="outline" 
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
                   Previous
                 </Button>
-                <Button variant="default">1</Button>
-                <Button variant="outline">2</Button>
-                <Button variant="outline">3</Button>
-                <Button variant="outline">
+                
+                {/* Page numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      onClick={() => handlePageChange(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+                
+                <Button 
+                  variant="outline"
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
                   Next
                 </Button>
+              </div>
+              
+              {/* Page info */}
+              <div className="ml-6 text-sm text-gray-600">
+                Page {currentPage} of {totalPages} • {totalJobs} total jobs
               </div>
             </div>
           </div>

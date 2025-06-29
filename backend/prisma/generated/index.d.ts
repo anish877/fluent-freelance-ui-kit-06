@@ -48,6 +48,11 @@ export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
  * 
  */
 export type Notification = $Result.DefaultSelection<Prisma.$NotificationPayload>
+/**
+ * Model SavedFreelancer
+ * 
+ */
+export type SavedFreelancer = $Result.DefaultSelection<Prisma.$SavedFreelancerPayload>
 
 /**
  * Enums
@@ -316,6 +321,16 @@ export class PrismaClient<
     * ```
     */
   get notification(): Prisma.NotificationDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.savedFreelancer`: Exposes CRUD operations for the **SavedFreelancer** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SavedFreelancers
+    * const savedFreelancers = await prisma.savedFreelancer.findMany()
+    * ```
+    */
+  get savedFreelancer(): Prisma.SavedFreelancerDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -762,7 +777,8 @@ export namespace Prisma {
     Review: 'Review',
     Conversation: 'Conversation',
     Message: 'Message',
-    Notification: 'Notification'
+    Notification: 'Notification',
+    SavedFreelancer: 'SavedFreelancer'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -781,7 +797,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "job" | "proposal" | "review" | "conversation" | "message" | "notification"
+      modelProps: "user" | "job" | "proposal" | "review" | "conversation" | "message" | "notification" | "savedFreelancer"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1303,6 +1319,80 @@ export namespace Prisma {
           }
         }
       }
+      SavedFreelancer: {
+        payload: Prisma.$SavedFreelancerPayload<ExtArgs>
+        fields: Prisma.SavedFreelancerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SavedFreelancerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SavedFreelancerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>
+          }
+          findFirst: {
+            args: Prisma.SavedFreelancerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SavedFreelancerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>
+          }
+          findMany: {
+            args: Prisma.SavedFreelancerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>[]
+          }
+          create: {
+            args: Prisma.SavedFreelancerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>
+          }
+          createMany: {
+            args: Prisma.SavedFreelancerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SavedFreelancerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>[]
+          }
+          delete: {
+            args: Prisma.SavedFreelancerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>
+          }
+          update: {
+            args: Prisma.SavedFreelancerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>
+          }
+          deleteMany: {
+            args: Prisma.SavedFreelancerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SavedFreelancerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SavedFreelancerUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>[]
+          }
+          upsert: {
+            args: Prisma.SavedFreelancerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFreelancerPayload>
+          }
+          aggregate: {
+            args: Prisma.SavedFreelancerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSavedFreelancer>
+          }
+          groupBy: {
+            args: Prisma.SavedFreelancerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SavedFreelancerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SavedFreelancerCountArgs<ExtArgs>
+            result: $Utils.Optional<SavedFreelancerCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1394,6 +1484,7 @@ export namespace Prisma {
     conversation?: ConversationOmit
     message?: MessageOmit
     notification?: NotificationOmit
+    savedFreelancer?: SavedFreelancerOmit
   }
 
   /* Types for Logging */
@@ -1495,6 +1586,8 @@ export namespace Prisma {
     messages: number
     receivedMessages: number
     notifications: number
+    savedFreelancers: number
+    savedByUsers: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1505,6 +1598,8 @@ export namespace Prisma {
     messages?: boolean | UserCountOutputTypeCountMessagesArgs
     receivedMessages?: boolean | UserCountOutputTypeCountReceivedMessagesArgs
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
+    savedFreelancers?: boolean | UserCountOutputTypeCountSavedFreelancersArgs
+    savedByUsers?: boolean | UserCountOutputTypeCountSavedByUsersArgs
   }
 
   // Custom InputTypes
@@ -1565,6 +1660,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: NotificationWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSavedFreelancersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SavedFreelancerWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSavedByUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SavedFreelancerWhereInput
   }
 
 
@@ -1670,6 +1779,11 @@ export namespace Prisma {
     successRate: number | null
     completedJobs: number | null
     onTime: number | null
+    onBudget: number | null
+    profileStrength: number | null
+    repeatHireRate: number | null
+    rating: number | null
+    reviewCount: number | null
   }
 
   export type UserSumAggregateOutputType = {
@@ -1678,6 +1792,11 @@ export namespace Prisma {
     successRate: number | null
     completedJobs: number | null
     onTime: number | null
+    onBudget: number | null
+    profileStrength: number | null
+    repeatHireRate: number | null
+    rating: number | null
+    reviewCount: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -1711,10 +1830,17 @@ export namespace Prisma {
     successRate: number | null
     completedJobs: number | null
     onTime: number | null
+    onBudget: number | null
     responseTime: string | null
     lastActive: string | null
     topRatedPlus: boolean | null
     verified: boolean | null
+    risingTalent: boolean | null
+    memberSince: string | null
+    profileStrength: number | null
+    repeatHireRate: number | null
+    rating: number | null
+    reviewCount: number | null
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -1767,10 +1893,17 @@ export namespace Prisma {
     successRate: number | null
     completedJobs: number | null
     onTime: number | null
+    onBudget: number | null
     responseTime: string | null
     lastActive: string | null
     topRatedPlus: boolean | null
     verified: boolean | null
+    risingTalent: boolean | null
+    memberSince: string | null
+    profileStrength: number | null
+    repeatHireRate: number | null
+    rating: number | null
+    reviewCount: number | null
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -1831,10 +1964,20 @@ export namespace Prisma {
     successRate: number
     completedJobs: number
     onTime: number
+    onBudget: number
     responseTime: number
     lastActive: number
     topRatedPlus: number
     verified: number
+    risingTalent: number
+    portfolioItems: number
+    testScores: number
+    specializations: number
+    memberSince: number
+    profileStrength: number
+    repeatHireRate: number
+    rating: number
+    reviewCount: number
     companyName: number
     companySize: number
     industry: number
@@ -1871,6 +2014,11 @@ export namespace Prisma {
     successRate?: true
     completedJobs?: true
     onTime?: true
+    onBudget?: true
+    profileStrength?: true
+    repeatHireRate?: true
+    rating?: true
+    reviewCount?: true
   }
 
   export type UserSumAggregateInputType = {
@@ -1879,6 +2027,11 @@ export namespace Prisma {
     successRate?: true
     completedJobs?: true
     onTime?: true
+    onBudget?: true
+    profileStrength?: true
+    repeatHireRate?: true
+    rating?: true
+    reviewCount?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -1912,10 +2065,17 @@ export namespace Prisma {
     successRate?: true
     completedJobs?: true
     onTime?: true
+    onBudget?: true
     responseTime?: true
     lastActive?: true
     topRatedPlus?: true
     verified?: true
+    risingTalent?: true
+    memberSince?: true
+    profileStrength?: true
+    repeatHireRate?: true
+    rating?: true
+    reviewCount?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -1968,10 +2128,17 @@ export namespace Prisma {
     successRate?: true
     completedJobs?: true
     onTime?: true
+    onBudget?: true
     responseTime?: true
     lastActive?: true
     topRatedPlus?: true
     verified?: true
+    risingTalent?: true
+    memberSince?: true
+    profileStrength?: true
+    repeatHireRate?: true
+    rating?: true
+    reviewCount?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -2032,10 +2199,20 @@ export namespace Prisma {
     successRate?: true
     completedJobs?: true
     onTime?: true
+    onBudget?: true
     responseTime?: true
     lastActive?: true
     topRatedPlus?: true
     verified?: true
+    risingTalent?: true
+    portfolioItems?: true
+    testScores?: true
+    specializations?: true
+    memberSince?: true
+    profileStrength?: true
+    repeatHireRate?: true
+    rating?: true
+    reviewCount?: true
     companyName?: true
     companySize?: true
     industry?: true
@@ -2190,10 +2367,20 @@ export namespace Prisma {
     successRate: number | null
     completedJobs: number | null
     onTime: number | null
+    onBudget: number | null
     responseTime: string | null
     lastActive: string | null
     topRatedPlus: boolean
     verified: boolean
+    risingTalent: boolean
+    portfolioItems: JsonValue | null
+    testScores: JsonValue | null
+    specializations: string[]
+    memberSince: string | null
+    profileStrength: number | null
+    repeatHireRate: number | null
+    rating: number | null
+    reviewCount: number | null
     companyName: string | null
     companySize: string | null
     industry: string | null
@@ -2280,10 +2467,20 @@ export namespace Prisma {
     successRate?: boolean
     completedJobs?: boolean
     onTime?: boolean
+    onBudget?: boolean
     responseTime?: boolean
     lastActive?: boolean
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: boolean
+    testScores?: boolean
+    specializations?: boolean
+    memberSince?: boolean
+    profileStrength?: boolean
+    repeatHireRate?: boolean
+    rating?: boolean
+    reviewCount?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2317,6 +2514,8 @@ export namespace Prisma {
     messages?: boolean | User$messagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
+    savedFreelancers?: boolean | User$savedFreelancersArgs<ExtArgs>
+    savedByUsers?: boolean | User$savedByUsersArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2359,10 +2558,20 @@ export namespace Prisma {
     successRate?: boolean
     completedJobs?: boolean
     onTime?: boolean
+    onBudget?: boolean
     responseTime?: boolean
     lastActive?: boolean
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: boolean
+    testScores?: boolean
+    specializations?: boolean
+    memberSince?: boolean
+    profileStrength?: boolean
+    repeatHireRate?: boolean
+    rating?: boolean
+    reviewCount?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2430,10 +2639,20 @@ export namespace Prisma {
     successRate?: boolean
     completedJobs?: boolean
     onTime?: boolean
+    onBudget?: boolean
     responseTime?: boolean
     lastActive?: boolean
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: boolean
+    testScores?: boolean
+    specializations?: boolean
+    memberSince?: boolean
+    profileStrength?: boolean
+    repeatHireRate?: boolean
+    rating?: boolean
+    reviewCount?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2501,10 +2720,20 @@ export namespace Prisma {
     successRate?: boolean
     completedJobs?: boolean
     onTime?: boolean
+    onBudget?: boolean
     responseTime?: boolean
     lastActive?: boolean
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: boolean
+    testScores?: boolean
+    specializations?: boolean
+    memberSince?: boolean
+    profileStrength?: boolean
+    repeatHireRate?: boolean
+    rating?: boolean
+    reviewCount?: boolean
     companyName?: boolean
     companySize?: boolean
     industry?: boolean
@@ -2533,7 +2762,7 @@ export namespace Prisma {
     specialRequirements?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "totalEarnings" | "successRate" | "completedJobs" | "onTime" | "responseTime" | "lastActive" | "topRatedPlus" | "verified" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "minimumProjectBudget" | "specialRequirements", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "totalEarnings" | "successRate" | "completedJobs" | "onTime" | "onBudget" | "responseTime" | "lastActive" | "topRatedPlus" | "verified" | "risingTalent" | "portfolioItems" | "testScores" | "specializations" | "memberSince" | "profileStrength" | "repeatHireRate" | "rating" | "reviewCount" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "minimumProjectBudget" | "specialRequirements", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     jobsPosted?: boolean | User$jobsPostedArgs<ExtArgs>
     proposals?: boolean | User$proposalsArgs<ExtArgs>
@@ -2542,6 +2771,8 @@ export namespace Prisma {
     messages?: boolean | User$messagesArgs<ExtArgs>
     receivedMessages?: boolean | User$receivedMessagesArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
+    savedFreelancers?: boolean | User$savedFreelancersArgs<ExtArgs>
+    savedByUsers?: boolean | User$savedByUsersArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2557,6 +2788,8 @@ export namespace Prisma {
       messages: Prisma.$MessagePayload<ExtArgs>[]
       receivedMessages: Prisma.$MessagePayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
+      savedFreelancers: Prisma.$SavedFreelancerPayload<ExtArgs>[]
+      savedByUsers: Prisma.$SavedFreelancerPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2597,10 +2830,20 @@ export namespace Prisma {
       successRate: number | null
       completedJobs: number | null
       onTime: number | null
+      onBudget: number | null
       responseTime: string | null
       lastActive: string | null
       topRatedPlus: boolean
       verified: boolean
+      risingTalent: boolean
+      portfolioItems: Prisma.JsonValue | null
+      testScores: Prisma.JsonValue | null
+      specializations: string[]
+      memberSince: string | null
+      profileStrength: number | null
+      repeatHireRate: number | null
+      rating: number | null
+      reviewCount: number | null
       companyName: string | null
       companySize: string | null
       industry: string | null
@@ -3028,6 +3271,8 @@ export namespace Prisma {
     messages<T extends User$messagesArgs<ExtArgs> = {}>(args?: Subset<T, User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     receivedMessages<T extends User$receivedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    savedFreelancers<T extends User$savedFreelancersArgs<ExtArgs> = {}>(args?: Subset<T, User$savedFreelancersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    savedByUsers<T extends User$savedByUsersArgs<ExtArgs> = {}>(args?: Subset<T, User$savedByUsersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3095,10 +3340,20 @@ export namespace Prisma {
     readonly successRate: FieldRef<"User", 'Int'>
     readonly completedJobs: FieldRef<"User", 'Int'>
     readonly onTime: FieldRef<"User", 'Int'>
+    readonly onBudget: FieldRef<"User", 'Int'>
     readonly responseTime: FieldRef<"User", 'String'>
     readonly lastActive: FieldRef<"User", 'String'>
     readonly topRatedPlus: FieldRef<"User", 'Boolean'>
     readonly verified: FieldRef<"User", 'Boolean'>
+    readonly risingTalent: FieldRef<"User", 'Boolean'>
+    readonly portfolioItems: FieldRef<"User", 'Json'>
+    readonly testScores: FieldRef<"User", 'Json'>
+    readonly specializations: FieldRef<"User", 'String[]'>
+    readonly memberSince: FieldRef<"User", 'String'>
+    readonly profileStrength: FieldRef<"User", 'Int'>
+    readonly repeatHireRate: FieldRef<"User", 'Int'>
+    readonly rating: FieldRef<"User", 'Float'>
+    readonly reviewCount: FieldRef<"User", 'Int'>
     readonly companyName: FieldRef<"User", 'String'>
     readonly companySize: FieldRef<"User", 'String'>
     readonly industry: FieldRef<"User", 'String'>
@@ -3678,6 +3933,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
+   * User.savedFreelancers
+   */
+  export type User$savedFreelancersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    where?: SavedFreelancerWhereInput
+    orderBy?: SavedFreelancerOrderByWithRelationInput | SavedFreelancerOrderByWithRelationInput[]
+    cursor?: SavedFreelancerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SavedFreelancerScalarFieldEnum | SavedFreelancerScalarFieldEnum[]
+  }
+
+  /**
+   * User.savedByUsers
+   */
+  export type User$savedByUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    where?: SavedFreelancerWhereInput
+    orderBy?: SavedFreelancerOrderByWithRelationInput | SavedFreelancerOrderByWithRelationInput[]
+    cursor?: SavedFreelancerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SavedFreelancerScalarFieldEnum | SavedFreelancerScalarFieldEnum[]
   }
 
   /**
@@ -10944,6 +11247,1059 @@ export namespace Prisma {
 
 
   /**
+   * Model SavedFreelancer
+   */
+
+  export type AggregateSavedFreelancer = {
+    _count: SavedFreelancerCountAggregateOutputType | null
+    _min: SavedFreelancerMinAggregateOutputType | null
+    _max: SavedFreelancerMaxAggregateOutputType | null
+  }
+
+  export type SavedFreelancerMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    freelancerId: string | null
+    createdAt: Date | null
+  }
+
+  export type SavedFreelancerMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    freelancerId: string | null
+    createdAt: Date | null
+  }
+
+  export type SavedFreelancerCountAggregateOutputType = {
+    id: number
+    userId: number
+    freelancerId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type SavedFreelancerMinAggregateInputType = {
+    id?: true
+    userId?: true
+    freelancerId?: true
+    createdAt?: true
+  }
+
+  export type SavedFreelancerMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    freelancerId?: true
+    createdAt?: true
+  }
+
+  export type SavedFreelancerCountAggregateInputType = {
+    id?: true
+    userId?: true
+    freelancerId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type SavedFreelancerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SavedFreelancer to aggregate.
+     */
+    where?: SavedFreelancerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedFreelancers to fetch.
+     */
+    orderBy?: SavedFreelancerOrderByWithRelationInput | SavedFreelancerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SavedFreelancerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedFreelancers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedFreelancers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SavedFreelancers
+    **/
+    _count?: true | SavedFreelancerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SavedFreelancerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SavedFreelancerMaxAggregateInputType
+  }
+
+  export type GetSavedFreelancerAggregateType<T extends SavedFreelancerAggregateArgs> = {
+        [P in keyof T & keyof AggregateSavedFreelancer]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSavedFreelancer[P]>
+      : GetScalarType<T[P], AggregateSavedFreelancer[P]>
+  }
+
+
+
+
+  export type SavedFreelancerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SavedFreelancerWhereInput
+    orderBy?: SavedFreelancerOrderByWithAggregationInput | SavedFreelancerOrderByWithAggregationInput[]
+    by: SavedFreelancerScalarFieldEnum[] | SavedFreelancerScalarFieldEnum
+    having?: SavedFreelancerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SavedFreelancerCountAggregateInputType | true
+    _min?: SavedFreelancerMinAggregateInputType
+    _max?: SavedFreelancerMaxAggregateInputType
+  }
+
+  export type SavedFreelancerGroupByOutputType = {
+    id: string
+    userId: string
+    freelancerId: string
+    createdAt: Date
+    _count: SavedFreelancerCountAggregateOutputType | null
+    _min: SavedFreelancerMinAggregateOutputType | null
+    _max: SavedFreelancerMaxAggregateOutputType | null
+  }
+
+  type GetSavedFreelancerGroupByPayload<T extends SavedFreelancerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SavedFreelancerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SavedFreelancerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SavedFreelancerGroupByOutputType[P]>
+            : GetScalarType<T[P], SavedFreelancerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SavedFreelancerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    freelancerId?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["savedFreelancer"]>
+
+  export type SavedFreelancerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    freelancerId?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["savedFreelancer"]>
+
+  export type SavedFreelancerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    freelancerId?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["savedFreelancer"]>
+
+  export type SavedFreelancerSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    freelancerId?: boolean
+    createdAt?: boolean
+  }
+
+  export type SavedFreelancerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "freelancerId" | "createdAt", ExtArgs["result"]["savedFreelancer"]>
+  export type SavedFreelancerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SavedFreelancerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SavedFreelancerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SavedFreelancerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SavedFreelancer"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      freelancer: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      freelancerId: string
+      createdAt: Date
+    }, ExtArgs["result"]["savedFreelancer"]>
+    composites: {}
+  }
+
+  type SavedFreelancerGetPayload<S extends boolean | null | undefined | SavedFreelancerDefaultArgs> = $Result.GetResult<Prisma.$SavedFreelancerPayload, S>
+
+  type SavedFreelancerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SavedFreelancerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SavedFreelancerCountAggregateInputType | true
+    }
+
+  export interface SavedFreelancerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SavedFreelancer'], meta: { name: 'SavedFreelancer' } }
+    /**
+     * Find zero or one SavedFreelancer that matches the filter.
+     * @param {SavedFreelancerFindUniqueArgs} args - Arguments to find a SavedFreelancer
+     * @example
+     * // Get one SavedFreelancer
+     * const savedFreelancer = await prisma.savedFreelancer.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SavedFreelancerFindUniqueArgs>(args: SelectSubset<T, SavedFreelancerFindUniqueArgs<ExtArgs>>): Prisma__SavedFreelancerClient<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SavedFreelancer that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SavedFreelancerFindUniqueOrThrowArgs} args - Arguments to find a SavedFreelancer
+     * @example
+     * // Get one SavedFreelancer
+     * const savedFreelancer = await prisma.savedFreelancer.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SavedFreelancerFindUniqueOrThrowArgs>(args: SelectSubset<T, SavedFreelancerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SavedFreelancerClient<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SavedFreelancer that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFreelancerFindFirstArgs} args - Arguments to find a SavedFreelancer
+     * @example
+     * // Get one SavedFreelancer
+     * const savedFreelancer = await prisma.savedFreelancer.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SavedFreelancerFindFirstArgs>(args?: SelectSubset<T, SavedFreelancerFindFirstArgs<ExtArgs>>): Prisma__SavedFreelancerClient<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SavedFreelancer that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFreelancerFindFirstOrThrowArgs} args - Arguments to find a SavedFreelancer
+     * @example
+     * // Get one SavedFreelancer
+     * const savedFreelancer = await prisma.savedFreelancer.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SavedFreelancerFindFirstOrThrowArgs>(args?: SelectSubset<T, SavedFreelancerFindFirstOrThrowArgs<ExtArgs>>): Prisma__SavedFreelancerClient<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SavedFreelancers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFreelancerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SavedFreelancers
+     * const savedFreelancers = await prisma.savedFreelancer.findMany()
+     * 
+     * // Get first 10 SavedFreelancers
+     * const savedFreelancers = await prisma.savedFreelancer.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const savedFreelancerWithIdOnly = await prisma.savedFreelancer.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SavedFreelancerFindManyArgs>(args?: SelectSubset<T, SavedFreelancerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SavedFreelancer.
+     * @param {SavedFreelancerCreateArgs} args - Arguments to create a SavedFreelancer.
+     * @example
+     * // Create one SavedFreelancer
+     * const SavedFreelancer = await prisma.savedFreelancer.create({
+     *   data: {
+     *     // ... data to create a SavedFreelancer
+     *   }
+     * })
+     * 
+     */
+    create<T extends SavedFreelancerCreateArgs>(args: SelectSubset<T, SavedFreelancerCreateArgs<ExtArgs>>): Prisma__SavedFreelancerClient<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SavedFreelancers.
+     * @param {SavedFreelancerCreateManyArgs} args - Arguments to create many SavedFreelancers.
+     * @example
+     * // Create many SavedFreelancers
+     * const savedFreelancer = await prisma.savedFreelancer.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SavedFreelancerCreateManyArgs>(args?: SelectSubset<T, SavedFreelancerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SavedFreelancers and returns the data saved in the database.
+     * @param {SavedFreelancerCreateManyAndReturnArgs} args - Arguments to create many SavedFreelancers.
+     * @example
+     * // Create many SavedFreelancers
+     * const savedFreelancer = await prisma.savedFreelancer.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SavedFreelancers and only return the `id`
+     * const savedFreelancerWithIdOnly = await prisma.savedFreelancer.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SavedFreelancerCreateManyAndReturnArgs>(args?: SelectSubset<T, SavedFreelancerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SavedFreelancer.
+     * @param {SavedFreelancerDeleteArgs} args - Arguments to delete one SavedFreelancer.
+     * @example
+     * // Delete one SavedFreelancer
+     * const SavedFreelancer = await prisma.savedFreelancer.delete({
+     *   where: {
+     *     // ... filter to delete one SavedFreelancer
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SavedFreelancerDeleteArgs>(args: SelectSubset<T, SavedFreelancerDeleteArgs<ExtArgs>>): Prisma__SavedFreelancerClient<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SavedFreelancer.
+     * @param {SavedFreelancerUpdateArgs} args - Arguments to update one SavedFreelancer.
+     * @example
+     * // Update one SavedFreelancer
+     * const savedFreelancer = await prisma.savedFreelancer.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SavedFreelancerUpdateArgs>(args: SelectSubset<T, SavedFreelancerUpdateArgs<ExtArgs>>): Prisma__SavedFreelancerClient<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SavedFreelancers.
+     * @param {SavedFreelancerDeleteManyArgs} args - Arguments to filter SavedFreelancers to delete.
+     * @example
+     * // Delete a few SavedFreelancers
+     * const { count } = await prisma.savedFreelancer.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SavedFreelancerDeleteManyArgs>(args?: SelectSubset<T, SavedFreelancerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SavedFreelancers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFreelancerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SavedFreelancers
+     * const savedFreelancer = await prisma.savedFreelancer.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SavedFreelancerUpdateManyArgs>(args: SelectSubset<T, SavedFreelancerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SavedFreelancers and returns the data updated in the database.
+     * @param {SavedFreelancerUpdateManyAndReturnArgs} args - Arguments to update many SavedFreelancers.
+     * @example
+     * // Update many SavedFreelancers
+     * const savedFreelancer = await prisma.savedFreelancer.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SavedFreelancers and only return the `id`
+     * const savedFreelancerWithIdOnly = await prisma.savedFreelancer.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SavedFreelancerUpdateManyAndReturnArgs>(args: SelectSubset<T, SavedFreelancerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SavedFreelancer.
+     * @param {SavedFreelancerUpsertArgs} args - Arguments to update or create a SavedFreelancer.
+     * @example
+     * // Update or create a SavedFreelancer
+     * const savedFreelancer = await prisma.savedFreelancer.upsert({
+     *   create: {
+     *     // ... data to create a SavedFreelancer
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SavedFreelancer we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SavedFreelancerUpsertArgs>(args: SelectSubset<T, SavedFreelancerUpsertArgs<ExtArgs>>): Prisma__SavedFreelancerClient<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SavedFreelancers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFreelancerCountArgs} args - Arguments to filter SavedFreelancers to count.
+     * @example
+     * // Count the number of SavedFreelancers
+     * const count = await prisma.savedFreelancer.count({
+     *   where: {
+     *     // ... the filter for the SavedFreelancers we want to count
+     *   }
+     * })
+    **/
+    count<T extends SavedFreelancerCountArgs>(
+      args?: Subset<T, SavedFreelancerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SavedFreelancerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SavedFreelancer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFreelancerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SavedFreelancerAggregateArgs>(args: Subset<T, SavedFreelancerAggregateArgs>): Prisma.PrismaPromise<GetSavedFreelancerAggregateType<T>>
+
+    /**
+     * Group by SavedFreelancer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFreelancerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SavedFreelancerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SavedFreelancerGroupByArgs['orderBy'] }
+        : { orderBy?: SavedFreelancerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SavedFreelancerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSavedFreelancerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SavedFreelancer model
+   */
+  readonly fields: SavedFreelancerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SavedFreelancer.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SavedFreelancerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    freelancer<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SavedFreelancer model
+   */
+  interface SavedFreelancerFieldRefs {
+    readonly id: FieldRef<"SavedFreelancer", 'String'>
+    readonly userId: FieldRef<"SavedFreelancer", 'String'>
+    readonly freelancerId: FieldRef<"SavedFreelancer", 'String'>
+    readonly createdAt: FieldRef<"SavedFreelancer", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SavedFreelancer findUnique
+   */
+  export type SavedFreelancerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFreelancer to fetch.
+     */
+    where: SavedFreelancerWhereUniqueInput
+  }
+
+  /**
+   * SavedFreelancer findUniqueOrThrow
+   */
+  export type SavedFreelancerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFreelancer to fetch.
+     */
+    where: SavedFreelancerWhereUniqueInput
+  }
+
+  /**
+   * SavedFreelancer findFirst
+   */
+  export type SavedFreelancerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFreelancer to fetch.
+     */
+    where?: SavedFreelancerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedFreelancers to fetch.
+     */
+    orderBy?: SavedFreelancerOrderByWithRelationInput | SavedFreelancerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SavedFreelancers.
+     */
+    cursor?: SavedFreelancerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedFreelancers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedFreelancers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SavedFreelancers.
+     */
+    distinct?: SavedFreelancerScalarFieldEnum | SavedFreelancerScalarFieldEnum[]
+  }
+
+  /**
+   * SavedFreelancer findFirstOrThrow
+   */
+  export type SavedFreelancerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFreelancer to fetch.
+     */
+    where?: SavedFreelancerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedFreelancers to fetch.
+     */
+    orderBy?: SavedFreelancerOrderByWithRelationInput | SavedFreelancerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SavedFreelancers.
+     */
+    cursor?: SavedFreelancerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedFreelancers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedFreelancers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SavedFreelancers.
+     */
+    distinct?: SavedFreelancerScalarFieldEnum | SavedFreelancerScalarFieldEnum[]
+  }
+
+  /**
+   * SavedFreelancer findMany
+   */
+  export type SavedFreelancerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFreelancers to fetch.
+     */
+    where?: SavedFreelancerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedFreelancers to fetch.
+     */
+    orderBy?: SavedFreelancerOrderByWithRelationInput | SavedFreelancerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SavedFreelancers.
+     */
+    cursor?: SavedFreelancerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedFreelancers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedFreelancers.
+     */
+    skip?: number
+    distinct?: SavedFreelancerScalarFieldEnum | SavedFreelancerScalarFieldEnum[]
+  }
+
+  /**
+   * SavedFreelancer create
+   */
+  export type SavedFreelancerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SavedFreelancer.
+     */
+    data: XOR<SavedFreelancerCreateInput, SavedFreelancerUncheckedCreateInput>
+  }
+
+  /**
+   * SavedFreelancer createMany
+   */
+  export type SavedFreelancerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SavedFreelancers.
+     */
+    data: SavedFreelancerCreateManyInput | SavedFreelancerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SavedFreelancer createManyAndReturn
+   */
+  export type SavedFreelancerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * The data used to create many SavedFreelancers.
+     */
+    data: SavedFreelancerCreateManyInput | SavedFreelancerCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SavedFreelancer update
+   */
+  export type SavedFreelancerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SavedFreelancer.
+     */
+    data: XOR<SavedFreelancerUpdateInput, SavedFreelancerUncheckedUpdateInput>
+    /**
+     * Choose, which SavedFreelancer to update.
+     */
+    where: SavedFreelancerWhereUniqueInput
+  }
+
+  /**
+   * SavedFreelancer updateMany
+   */
+  export type SavedFreelancerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SavedFreelancers.
+     */
+    data: XOR<SavedFreelancerUpdateManyMutationInput, SavedFreelancerUncheckedUpdateManyInput>
+    /**
+     * Filter which SavedFreelancers to update
+     */
+    where?: SavedFreelancerWhereInput
+    /**
+     * Limit how many SavedFreelancers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SavedFreelancer updateManyAndReturn
+   */
+  export type SavedFreelancerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * The data used to update SavedFreelancers.
+     */
+    data: XOR<SavedFreelancerUpdateManyMutationInput, SavedFreelancerUncheckedUpdateManyInput>
+    /**
+     * Filter which SavedFreelancers to update
+     */
+    where?: SavedFreelancerWhereInput
+    /**
+     * Limit how many SavedFreelancers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SavedFreelancer upsert
+   */
+  export type SavedFreelancerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SavedFreelancer to update in case it exists.
+     */
+    where: SavedFreelancerWhereUniqueInput
+    /**
+     * In case the SavedFreelancer found by the `where` argument doesn't exist, create a new SavedFreelancer with this data.
+     */
+    create: XOR<SavedFreelancerCreateInput, SavedFreelancerUncheckedCreateInput>
+    /**
+     * In case the SavedFreelancer was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SavedFreelancerUpdateInput, SavedFreelancerUncheckedUpdateInput>
+  }
+
+  /**
+   * SavedFreelancer delete
+   */
+  export type SavedFreelancerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+    /**
+     * Filter which SavedFreelancer to delete.
+     */
+    where: SavedFreelancerWhereUniqueInput
+  }
+
+  /**
+   * SavedFreelancer deleteMany
+   */
+  export type SavedFreelancerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SavedFreelancers to delete
+     */
+    where?: SavedFreelancerWhereInput
+    /**
+     * Limit how many SavedFreelancers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SavedFreelancer without action
+   */
+  export type SavedFreelancerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFreelancer
+     */
+    select?: SavedFreelancerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFreelancer
+     */
+    omit?: SavedFreelancerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFreelancerInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -10996,10 +12352,20 @@ export namespace Prisma {
     successRate: 'successRate',
     completedJobs: 'completedJobs',
     onTime: 'onTime',
+    onBudget: 'onBudget',
     responseTime: 'responseTime',
     lastActive: 'lastActive',
     topRatedPlus: 'topRatedPlus',
     verified: 'verified',
+    risingTalent: 'risingTalent',
+    portfolioItems: 'portfolioItems',
+    testScores: 'testScores',
+    specializations: 'specializations',
+    memberSince: 'memberSince',
+    profileStrength: 'profileStrength',
+    repeatHireRate: 'repeatHireRate',
+    rating: 'rating',
+    reviewCount: 'reviewCount',
     companyName: 'companyName',
     companySize: 'companySize',
     industry: 'industry',
@@ -11140,6 +12506,16 @@ export namespace Prisma {
   };
 
   export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+  export const SavedFreelancerScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    freelancerId: 'freelancerId',
+    createdAt: 'createdAt'
+  };
+
+  export type SavedFreelancerScalarFieldEnum = (typeof SavedFreelancerScalarFieldEnum)[keyof typeof SavedFreelancerScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -11380,10 +12756,20 @@ export namespace Prisma {
     successRate?: IntNullableFilter<"User"> | number | null
     completedJobs?: IntNullableFilter<"User"> | number | null
     onTime?: IntNullableFilter<"User"> | number | null
+    onBudget?: IntNullableFilter<"User"> | number | null
     responseTime?: StringNullableFilter<"User"> | string | null
     lastActive?: StringNullableFilter<"User"> | string | null
     topRatedPlus?: BoolFilter<"User"> | boolean
     verified?: BoolFilter<"User"> | boolean
+    risingTalent?: BoolFilter<"User"> | boolean
+    portfolioItems?: JsonNullableFilter<"User">
+    testScores?: JsonNullableFilter<"User">
+    specializations?: StringNullableListFilter<"User">
+    memberSince?: StringNullableFilter<"User"> | string | null
+    profileStrength?: IntNullableFilter<"User"> | number | null
+    repeatHireRate?: IntNullableFilter<"User"> | number | null
+    rating?: FloatNullableFilter<"User"> | number | null
+    reviewCount?: IntNullableFilter<"User"> | number | null
     companyName?: StringNullableFilter<"User"> | string | null
     companySize?: StringNullableFilter<"User"> | string | null
     industry?: StringNullableFilter<"User"> | string | null
@@ -11417,6 +12803,8 @@ export namespace Prisma {
     messages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
+    savedFreelancers?: SavedFreelancerListRelationFilter
+    savedByUsers?: SavedFreelancerListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -11458,10 +12846,20 @@ export namespace Prisma {
     successRate?: SortOrderInput | SortOrder
     completedJobs?: SortOrderInput | SortOrder
     onTime?: SortOrderInput | SortOrder
+    onBudget?: SortOrderInput | SortOrder
     responseTime?: SortOrderInput | SortOrder
     lastActive?: SortOrderInput | SortOrder
     topRatedPlus?: SortOrder
     verified?: SortOrder
+    risingTalent?: SortOrder
+    portfolioItems?: SortOrderInput | SortOrder
+    testScores?: SortOrderInput | SortOrder
+    specializations?: SortOrder
+    memberSince?: SortOrderInput | SortOrder
+    profileStrength?: SortOrderInput | SortOrder
+    repeatHireRate?: SortOrderInput | SortOrder
+    rating?: SortOrderInput | SortOrder
+    reviewCount?: SortOrderInput | SortOrder
     companyName?: SortOrderInput | SortOrder
     companySize?: SortOrderInput | SortOrder
     industry?: SortOrderInput | SortOrder
@@ -11495,6 +12893,8 @@ export namespace Prisma {
     messages?: MessageOrderByRelationAggregateInput
     receivedMessages?: MessageOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
+    savedFreelancers?: SavedFreelancerOrderByRelationAggregateInput
+    savedByUsers?: SavedFreelancerOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -11539,10 +12939,20 @@ export namespace Prisma {
     successRate?: IntNullableFilter<"User"> | number | null
     completedJobs?: IntNullableFilter<"User"> | number | null
     onTime?: IntNullableFilter<"User"> | number | null
+    onBudget?: IntNullableFilter<"User"> | number | null
     responseTime?: StringNullableFilter<"User"> | string | null
     lastActive?: StringNullableFilter<"User"> | string | null
     topRatedPlus?: BoolFilter<"User"> | boolean
     verified?: BoolFilter<"User"> | boolean
+    risingTalent?: BoolFilter<"User"> | boolean
+    portfolioItems?: JsonNullableFilter<"User">
+    testScores?: JsonNullableFilter<"User">
+    specializations?: StringNullableListFilter<"User">
+    memberSince?: StringNullableFilter<"User"> | string | null
+    profileStrength?: IntNullableFilter<"User"> | number | null
+    repeatHireRate?: IntNullableFilter<"User"> | number | null
+    rating?: FloatNullableFilter<"User"> | number | null
+    reviewCount?: IntNullableFilter<"User"> | number | null
     companyName?: StringNullableFilter<"User"> | string | null
     companySize?: StringNullableFilter<"User"> | string | null
     industry?: StringNullableFilter<"User"> | string | null
@@ -11576,6 +12986,8 @@ export namespace Prisma {
     messages?: MessageListRelationFilter
     receivedMessages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
+    savedFreelancers?: SavedFreelancerListRelationFilter
+    savedByUsers?: SavedFreelancerListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -11617,10 +13029,20 @@ export namespace Prisma {
     successRate?: SortOrderInput | SortOrder
     completedJobs?: SortOrderInput | SortOrder
     onTime?: SortOrderInput | SortOrder
+    onBudget?: SortOrderInput | SortOrder
     responseTime?: SortOrderInput | SortOrder
     lastActive?: SortOrderInput | SortOrder
     topRatedPlus?: SortOrder
     verified?: SortOrder
+    risingTalent?: SortOrder
+    portfolioItems?: SortOrderInput | SortOrder
+    testScores?: SortOrderInput | SortOrder
+    specializations?: SortOrder
+    memberSince?: SortOrderInput | SortOrder
+    profileStrength?: SortOrderInput | SortOrder
+    repeatHireRate?: SortOrderInput | SortOrder
+    rating?: SortOrderInput | SortOrder
+    reviewCount?: SortOrderInput | SortOrder
     companyName?: SortOrderInput | SortOrder
     companySize?: SortOrderInput | SortOrder
     industry?: SortOrderInput | SortOrder
@@ -11696,10 +13118,20 @@ export namespace Prisma {
     successRate?: IntNullableWithAggregatesFilter<"User"> | number | null
     completedJobs?: IntNullableWithAggregatesFilter<"User"> | number | null
     onTime?: IntNullableWithAggregatesFilter<"User"> | number | null
+    onBudget?: IntNullableWithAggregatesFilter<"User"> | number | null
     responseTime?: StringNullableWithAggregatesFilter<"User"> | string | null
     lastActive?: StringNullableWithAggregatesFilter<"User"> | string | null
     topRatedPlus?: BoolWithAggregatesFilter<"User"> | boolean
     verified?: BoolWithAggregatesFilter<"User"> | boolean
+    risingTalent?: BoolWithAggregatesFilter<"User"> | boolean
+    portfolioItems?: JsonNullableWithAggregatesFilter<"User">
+    testScores?: JsonNullableWithAggregatesFilter<"User">
+    specializations?: StringNullableListFilter<"User">
+    memberSince?: StringNullableWithAggregatesFilter<"User"> | string | null
+    profileStrength?: IntNullableWithAggregatesFilter<"User"> | number | null
+    repeatHireRate?: IntNullableWithAggregatesFilter<"User"> | number | null
+    rating?: FloatNullableWithAggregatesFilter<"User"> | number | null
+    reviewCount?: IntNullableWithAggregatesFilter<"User"> | number | null
     companyName?: StringNullableWithAggregatesFilter<"User"> | string | null
     companySize?: StringNullableWithAggregatesFilter<"User"> | string | null
     industry?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -12322,6 +13754,60 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
   }
 
+  export type SavedFreelancerWhereInput = {
+    AND?: SavedFreelancerWhereInput | SavedFreelancerWhereInput[]
+    OR?: SavedFreelancerWhereInput[]
+    NOT?: SavedFreelancerWhereInput | SavedFreelancerWhereInput[]
+    id?: StringFilter<"SavedFreelancer"> | string
+    userId?: StringFilter<"SavedFreelancer"> | string
+    freelancerId?: StringFilter<"SavedFreelancer"> | string
+    createdAt?: DateTimeFilter<"SavedFreelancer"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    freelancer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SavedFreelancerOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    freelancerId?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    freelancer?: UserOrderByWithRelationInput
+  }
+
+  export type SavedFreelancerWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_freelancerId?: SavedFreelancerUserIdFreelancerIdCompoundUniqueInput
+    AND?: SavedFreelancerWhereInput | SavedFreelancerWhereInput[]
+    OR?: SavedFreelancerWhereInput[]
+    NOT?: SavedFreelancerWhereInput | SavedFreelancerWhereInput[]
+    userId?: StringFilter<"SavedFreelancer"> | string
+    freelancerId?: StringFilter<"SavedFreelancer"> | string
+    createdAt?: DateTimeFilter<"SavedFreelancer"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    freelancer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId_freelancerId">
+
+  export type SavedFreelancerOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    freelancerId?: SortOrder
+    createdAt?: SortOrder
+    _count?: SavedFreelancerCountOrderByAggregateInput
+    _max?: SavedFreelancerMaxOrderByAggregateInput
+    _min?: SavedFreelancerMinOrderByAggregateInput
+  }
+
+  export type SavedFreelancerScalarWhereWithAggregatesInput = {
+    AND?: SavedFreelancerScalarWhereWithAggregatesInput | SavedFreelancerScalarWhereWithAggregatesInput[]
+    OR?: SavedFreelancerScalarWhereWithAggregatesInput[]
+    NOT?: SavedFreelancerScalarWhereWithAggregatesInput | SavedFreelancerScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SavedFreelancer"> | string
+    userId?: StringWithAggregatesFilter<"SavedFreelancer"> | string
+    freelancerId?: StringWithAggregatesFilter<"SavedFreelancer"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SavedFreelancer"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     email: string
@@ -12361,10 +13847,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -12398,6 +13894,8 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -12439,10 +13937,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -12476,6 +13984,8 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUpdateInput = {
@@ -12517,10 +14027,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12554,6 +14074,8 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -12595,10 +14117,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12632,6 +14164,8 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -12673,10 +14207,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -12744,10 +14288,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12815,10 +14369,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13506,6 +15070,53 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SavedFreelancerCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutSavedFreelancersInput
+    freelancer: UserCreateNestedOneWithoutSavedByUsersInput
+  }
+
+  export type SavedFreelancerUncheckedCreateInput = {
+    id?: string
+    userId: string
+    freelancerId: string
+    createdAt?: Date | string
+  }
+
+  export type SavedFreelancerUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSavedFreelancersNestedInput
+    freelancer?: UserUpdateOneRequiredWithoutSavedByUsersNestedInput
+  }
+
+  export type SavedFreelancerUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    freelancerId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFreelancerCreateManyInput = {
+    id?: string
+    userId: string
+    freelancerId: string
+    createdAt?: Date | string
+  }
+
+  export type SavedFreelancerUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFreelancerUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    freelancerId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -13653,6 +15264,12 @@ export namespace Prisma {
     none?: NotificationWhereInput
   }
 
+  export type SavedFreelancerListRelationFilter = {
+    every?: SavedFreelancerWhereInput
+    some?: SavedFreelancerWhereInput
+    none?: SavedFreelancerWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -13675,6 +15292,10 @@ export namespace Prisma {
   }
 
   export type NotificationOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SavedFreelancerOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13717,10 +15338,20 @@ export namespace Prisma {
     successRate?: SortOrder
     completedJobs?: SortOrder
     onTime?: SortOrder
+    onBudget?: SortOrder
     responseTime?: SortOrder
     lastActive?: SortOrder
     topRatedPlus?: SortOrder
     verified?: SortOrder
+    risingTalent?: SortOrder
+    portfolioItems?: SortOrder
+    testScores?: SortOrder
+    specializations?: SortOrder
+    memberSince?: SortOrder
+    profileStrength?: SortOrder
+    repeatHireRate?: SortOrder
+    rating?: SortOrder
+    reviewCount?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -13755,6 +15386,11 @@ export namespace Prisma {
     successRate?: SortOrder
     completedJobs?: SortOrder
     onTime?: SortOrder
+    onBudget?: SortOrder
+    profileStrength?: SortOrder
+    repeatHireRate?: SortOrder
+    rating?: SortOrder
+    reviewCount?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -13788,10 +15424,17 @@ export namespace Prisma {
     successRate?: SortOrder
     completedJobs?: SortOrder
     onTime?: SortOrder
+    onBudget?: SortOrder
     responseTime?: SortOrder
     lastActive?: SortOrder
     topRatedPlus?: SortOrder
     verified?: SortOrder
+    risingTalent?: SortOrder
+    memberSince?: SortOrder
+    profileStrength?: SortOrder
+    repeatHireRate?: SortOrder
+    rating?: SortOrder
+    reviewCount?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -13844,10 +15487,17 @@ export namespace Prisma {
     successRate?: SortOrder
     completedJobs?: SortOrder
     onTime?: SortOrder
+    onBudget?: SortOrder
     responseTime?: SortOrder
     lastActive?: SortOrder
     topRatedPlus?: SortOrder
     verified?: SortOrder
+    risingTalent?: SortOrder
+    memberSince?: SortOrder
+    profileStrength?: SortOrder
+    repeatHireRate?: SortOrder
+    rating?: SortOrder
+    reviewCount?: SortOrder
     companyName?: SortOrder
     companySize?: SortOrder
     industry?: SortOrder
@@ -13875,6 +15525,11 @@ export namespace Prisma {
     successRate?: SortOrder
     completedJobs?: SortOrder
     onTime?: SortOrder
+    onBudget?: SortOrder
+    profileStrength?: SortOrder
+    repeatHireRate?: SortOrder
+    rating?: SortOrder
+    reviewCount?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -14474,6 +16129,32 @@ export namespace Prisma {
     _max?: NestedEnumNotificationTypeFilter<$PrismaModel>
   }
 
+  export type SavedFreelancerUserIdFreelancerIdCompoundUniqueInput = {
+    userId: string
+    freelancerId: string
+  }
+
+  export type SavedFreelancerCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    freelancerId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SavedFreelancerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    freelancerId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SavedFreelancerMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    freelancerId?: SortOrder
+    createdAt?: SortOrder
+  }
+
   export type UserCreatetopSkillsInput = {
     set: string[]
   }
@@ -14483,6 +16164,10 @@ export namespace Prisma {
   }
 
   export type UserCreatecertificationsInput = {
+    set: string[]
+  }
+
+  export type UserCreatespecializationsInput = {
     set: string[]
   }
 
@@ -14555,6 +16240,20 @@ export namespace Prisma {
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
   }
 
+  export type SavedFreelancerCreateNestedManyWithoutUserInput = {
+    create?: XOR<SavedFreelancerCreateWithoutUserInput, SavedFreelancerUncheckedCreateWithoutUserInput> | SavedFreelancerCreateWithoutUserInput[] | SavedFreelancerUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SavedFreelancerCreateOrConnectWithoutUserInput | SavedFreelancerCreateOrConnectWithoutUserInput[]
+    createMany?: SavedFreelancerCreateManyUserInputEnvelope
+    connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+  }
+
+  export type SavedFreelancerCreateNestedManyWithoutFreelancerInput = {
+    create?: XOR<SavedFreelancerCreateWithoutFreelancerInput, SavedFreelancerUncheckedCreateWithoutFreelancerInput> | SavedFreelancerCreateWithoutFreelancerInput[] | SavedFreelancerUncheckedCreateWithoutFreelancerInput[]
+    connectOrCreate?: SavedFreelancerCreateOrConnectWithoutFreelancerInput | SavedFreelancerCreateOrConnectWithoutFreelancerInput[]
+    createMany?: SavedFreelancerCreateManyFreelancerInputEnvelope
+    connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+  }
+
   export type JobUncheckedCreateNestedManyWithoutClientInput = {
     create?: XOR<JobCreateWithoutClientInput, JobUncheckedCreateWithoutClientInput> | JobCreateWithoutClientInput[] | JobUncheckedCreateWithoutClientInput[]
     connectOrCreate?: JobCreateOrConnectWithoutClientInput | JobCreateOrConnectWithoutClientInput[]
@@ -14602,6 +16301,20 @@ export namespace Prisma {
     connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
     createMany?: NotificationCreateManyUserInputEnvelope
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type SavedFreelancerUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SavedFreelancerCreateWithoutUserInput, SavedFreelancerUncheckedCreateWithoutUserInput> | SavedFreelancerCreateWithoutUserInput[] | SavedFreelancerUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SavedFreelancerCreateOrConnectWithoutUserInput | SavedFreelancerCreateOrConnectWithoutUserInput[]
+    createMany?: SavedFreelancerCreateManyUserInputEnvelope
+    connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+  }
+
+  export type SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput = {
+    create?: XOR<SavedFreelancerCreateWithoutFreelancerInput, SavedFreelancerUncheckedCreateWithoutFreelancerInput> | SavedFreelancerCreateWithoutFreelancerInput[] | SavedFreelancerUncheckedCreateWithoutFreelancerInput[]
+    connectOrCreate?: SavedFreelancerCreateOrConnectWithoutFreelancerInput | SavedFreelancerCreateOrConnectWithoutFreelancerInput[]
+    createMany?: SavedFreelancerCreateManyFreelancerInputEnvelope
+    connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -14661,6 +16374,11 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type UserUpdatespecializationsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type UserUpdateprojectTypesInput = {
@@ -14786,6 +16504,34 @@ export namespace Prisma {
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
   }
 
+  export type SavedFreelancerUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SavedFreelancerCreateWithoutUserInput, SavedFreelancerUncheckedCreateWithoutUserInput> | SavedFreelancerCreateWithoutUserInput[] | SavedFreelancerUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SavedFreelancerCreateOrConnectWithoutUserInput | SavedFreelancerCreateOrConnectWithoutUserInput[]
+    upsert?: SavedFreelancerUpsertWithWhereUniqueWithoutUserInput | SavedFreelancerUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SavedFreelancerCreateManyUserInputEnvelope
+    set?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    disconnect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    delete?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    update?: SavedFreelancerUpdateWithWhereUniqueWithoutUserInput | SavedFreelancerUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SavedFreelancerUpdateManyWithWhereWithoutUserInput | SavedFreelancerUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SavedFreelancerScalarWhereInput | SavedFreelancerScalarWhereInput[]
+  }
+
+  export type SavedFreelancerUpdateManyWithoutFreelancerNestedInput = {
+    create?: XOR<SavedFreelancerCreateWithoutFreelancerInput, SavedFreelancerUncheckedCreateWithoutFreelancerInput> | SavedFreelancerCreateWithoutFreelancerInput[] | SavedFreelancerUncheckedCreateWithoutFreelancerInput[]
+    connectOrCreate?: SavedFreelancerCreateOrConnectWithoutFreelancerInput | SavedFreelancerCreateOrConnectWithoutFreelancerInput[]
+    upsert?: SavedFreelancerUpsertWithWhereUniqueWithoutFreelancerInput | SavedFreelancerUpsertWithWhereUniqueWithoutFreelancerInput[]
+    createMany?: SavedFreelancerCreateManyFreelancerInputEnvelope
+    set?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    disconnect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    delete?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    update?: SavedFreelancerUpdateWithWhereUniqueWithoutFreelancerInput | SavedFreelancerUpdateWithWhereUniqueWithoutFreelancerInput[]
+    updateMany?: SavedFreelancerUpdateManyWithWhereWithoutFreelancerInput | SavedFreelancerUpdateManyWithWhereWithoutFreelancerInput[]
+    deleteMany?: SavedFreelancerScalarWhereInput | SavedFreelancerScalarWhereInput[]
+  }
+
   export type JobUncheckedUpdateManyWithoutClientNestedInput = {
     create?: XOR<JobCreateWithoutClientInput, JobUncheckedCreateWithoutClientInput> | JobCreateWithoutClientInput[] | JobUncheckedCreateWithoutClientInput[]
     connectOrCreate?: JobCreateOrConnectWithoutClientInput | JobCreateOrConnectWithoutClientInput[]
@@ -14882,6 +16628,34 @@ export namespace Prisma {
     update?: NotificationUpdateWithWhereUniqueWithoutUserInput | NotificationUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: NotificationUpdateManyWithWhereWithoutUserInput | NotificationUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SavedFreelancerCreateWithoutUserInput, SavedFreelancerUncheckedCreateWithoutUserInput> | SavedFreelancerCreateWithoutUserInput[] | SavedFreelancerUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SavedFreelancerCreateOrConnectWithoutUserInput | SavedFreelancerCreateOrConnectWithoutUserInput[]
+    upsert?: SavedFreelancerUpsertWithWhereUniqueWithoutUserInput | SavedFreelancerUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SavedFreelancerCreateManyUserInputEnvelope
+    set?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    disconnect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    delete?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    update?: SavedFreelancerUpdateWithWhereUniqueWithoutUserInput | SavedFreelancerUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SavedFreelancerUpdateManyWithWhereWithoutUserInput | SavedFreelancerUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SavedFreelancerScalarWhereInput | SavedFreelancerScalarWhereInput[]
+  }
+
+  export type SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput = {
+    create?: XOR<SavedFreelancerCreateWithoutFreelancerInput, SavedFreelancerUncheckedCreateWithoutFreelancerInput> | SavedFreelancerCreateWithoutFreelancerInput[] | SavedFreelancerUncheckedCreateWithoutFreelancerInput[]
+    connectOrCreate?: SavedFreelancerCreateOrConnectWithoutFreelancerInput | SavedFreelancerCreateOrConnectWithoutFreelancerInput[]
+    upsert?: SavedFreelancerUpsertWithWhereUniqueWithoutFreelancerInput | SavedFreelancerUpsertWithWhereUniqueWithoutFreelancerInput[]
+    createMany?: SavedFreelancerCreateManyFreelancerInputEnvelope
+    set?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    disconnect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    delete?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+    update?: SavedFreelancerUpdateWithWhereUniqueWithoutFreelancerInput | SavedFreelancerUpdateWithWhereUniqueWithoutFreelancerInput[]
+    updateMany?: SavedFreelancerUpdateManyWithWhereWithoutFreelancerInput | SavedFreelancerUpdateManyWithWhereWithoutFreelancerInput[]
+    deleteMany?: SavedFreelancerScalarWhereInput | SavedFreelancerScalarWhereInput[]
   }
 
   export type JobCreaterequirementsInput = {
@@ -15327,6 +17101,34 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutNotificationsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutNotificationsInput, UserUpdateWithoutNotificationsInput>, UserUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type UserCreateNestedOneWithoutSavedFreelancersInput = {
+    create?: XOR<UserCreateWithoutSavedFreelancersInput, UserUncheckedCreateWithoutSavedFreelancersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSavedFreelancersInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSavedByUsersInput = {
+    create?: XOR<UserCreateWithoutSavedByUsersInput, UserUncheckedCreateWithoutSavedByUsersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSavedByUsersInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSavedFreelancersNestedInput = {
+    create?: XOR<UserCreateWithoutSavedFreelancersInput, UserUncheckedCreateWithoutSavedFreelancersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSavedFreelancersInput
+    upsert?: UserUpsertWithoutSavedFreelancersInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSavedFreelancersInput, UserUpdateWithoutSavedFreelancersInput>, UserUncheckedUpdateWithoutSavedFreelancersInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutSavedByUsersNestedInput = {
+    create?: XOR<UserCreateWithoutSavedByUsersInput, UserUncheckedCreateWithoutSavedByUsersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSavedByUsersInput
+    upsert?: UserUpsertWithoutSavedByUsersInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSavedByUsersInput, UserUpdateWithoutSavedByUsersInput>, UserUncheckedUpdateWithoutSavedByUsersInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -15944,6 +17746,50 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SavedFreelancerCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    freelancer: UserCreateNestedOneWithoutSavedByUsersInput
+  }
+
+  export type SavedFreelancerUncheckedCreateWithoutUserInput = {
+    id?: string
+    freelancerId: string
+    createdAt?: Date | string
+  }
+
+  export type SavedFreelancerCreateOrConnectWithoutUserInput = {
+    where: SavedFreelancerWhereUniqueInput
+    create: XOR<SavedFreelancerCreateWithoutUserInput, SavedFreelancerUncheckedCreateWithoutUserInput>
+  }
+
+  export type SavedFreelancerCreateManyUserInputEnvelope = {
+    data: SavedFreelancerCreateManyUserInput | SavedFreelancerCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SavedFreelancerCreateWithoutFreelancerInput = {
+    id?: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutSavedFreelancersInput
+  }
+
+  export type SavedFreelancerUncheckedCreateWithoutFreelancerInput = {
+    id?: string
+    userId: string
+    createdAt?: Date | string
+  }
+
+  export type SavedFreelancerCreateOrConnectWithoutFreelancerInput = {
+    where: SavedFreelancerWhereUniqueInput
+    create: XOR<SavedFreelancerCreateWithoutFreelancerInput, SavedFreelancerUncheckedCreateWithoutFreelancerInput>
+  }
+
+  export type SavedFreelancerCreateManyFreelancerInputEnvelope = {
+    data: SavedFreelancerCreateManyFreelancerInput | SavedFreelancerCreateManyFreelancerInput[]
+    skipDuplicates?: boolean
+  }
+
   export type JobUpsertWithWhereUniqueWithoutClientInput = {
     where: JobWhereUniqueInput
     update: XOR<JobUpdateWithoutClientInput, JobUncheckedUpdateWithoutClientInput>
@@ -16153,6 +17999,48 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Notification"> | Date | string
   }
 
+  export type SavedFreelancerUpsertWithWhereUniqueWithoutUserInput = {
+    where: SavedFreelancerWhereUniqueInput
+    update: XOR<SavedFreelancerUpdateWithoutUserInput, SavedFreelancerUncheckedUpdateWithoutUserInput>
+    create: XOR<SavedFreelancerCreateWithoutUserInput, SavedFreelancerUncheckedCreateWithoutUserInput>
+  }
+
+  export type SavedFreelancerUpdateWithWhereUniqueWithoutUserInput = {
+    where: SavedFreelancerWhereUniqueInput
+    data: XOR<SavedFreelancerUpdateWithoutUserInput, SavedFreelancerUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SavedFreelancerUpdateManyWithWhereWithoutUserInput = {
+    where: SavedFreelancerScalarWhereInput
+    data: XOR<SavedFreelancerUpdateManyMutationInput, SavedFreelancerUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SavedFreelancerScalarWhereInput = {
+    AND?: SavedFreelancerScalarWhereInput | SavedFreelancerScalarWhereInput[]
+    OR?: SavedFreelancerScalarWhereInput[]
+    NOT?: SavedFreelancerScalarWhereInput | SavedFreelancerScalarWhereInput[]
+    id?: StringFilter<"SavedFreelancer"> | string
+    userId?: StringFilter<"SavedFreelancer"> | string
+    freelancerId?: StringFilter<"SavedFreelancer"> | string
+    createdAt?: DateTimeFilter<"SavedFreelancer"> | Date | string
+  }
+
+  export type SavedFreelancerUpsertWithWhereUniqueWithoutFreelancerInput = {
+    where: SavedFreelancerWhereUniqueInput
+    update: XOR<SavedFreelancerUpdateWithoutFreelancerInput, SavedFreelancerUncheckedUpdateWithoutFreelancerInput>
+    create: XOR<SavedFreelancerCreateWithoutFreelancerInput, SavedFreelancerUncheckedCreateWithoutFreelancerInput>
+  }
+
+  export type SavedFreelancerUpdateWithWhereUniqueWithoutFreelancerInput = {
+    where: SavedFreelancerWhereUniqueInput
+    data: XOR<SavedFreelancerUpdateWithoutFreelancerInput, SavedFreelancerUncheckedUpdateWithoutFreelancerInput>
+  }
+
+  export type SavedFreelancerUpdateManyWithWhereWithoutFreelancerInput = {
+    where: SavedFreelancerScalarWhereInput
+    data: XOR<SavedFreelancerUpdateManyMutationInput, SavedFreelancerUncheckedUpdateManyWithoutFreelancerInput>
+  }
+
   export type ConversationCreateWithoutJobInput = {
     id?: string
     participants?: ConversationCreateparticipantsInput | string[]
@@ -16224,10 +18112,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16260,6 +18158,8 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutJobsPostedInput = {
@@ -16301,10 +18201,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16337,6 +18247,8 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutJobsPostedInput = {
@@ -16504,10 +18416,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16540,6 +18462,8 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutJobsPostedInput = {
@@ -16581,10 +18505,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16617,6 +18551,8 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type ProposalUpsertWithWhereUniqueWithoutJobInput = {
@@ -16757,10 +18693,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16793,6 +18739,8 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutProposalsInput = {
@@ -16834,10 +18782,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -16870,6 +18828,8 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutProposalsInput = {
@@ -17000,10 +18960,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17036,6 +19006,8 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProposalsInput = {
@@ -17077,10 +19049,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17113,6 +19095,8 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type JobCreateWithoutReviewsInput = {
@@ -17221,10 +19205,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -17257,6 +19251,8 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutReviewsInput = {
@@ -17298,10 +19294,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -17334,6 +19340,8 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutReviewsInput = {
@@ -17380,10 +19388,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -17416,6 +19434,8 @@ export namespace Prisma {
     messages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutReceivedReviewsInput = {
@@ -17457,10 +19477,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -17493,6 +19523,8 @@ export namespace Prisma {
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutReceivedReviewsInput = {
@@ -17623,10 +19655,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17659,6 +19701,8 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviewsInput = {
@@ -17700,10 +19744,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17736,6 +19790,8 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUpsertWithoutReceivedReviewsInput = {
@@ -17788,10 +19844,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17824,6 +19890,8 @@ export namespace Prisma {
     messages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedReviewsInput = {
@@ -17865,10 +19933,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17901,6 +19979,8 @@ export namespace Prisma {
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type MessageCreateWithoutConversationInput = {
@@ -18190,10 +20270,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18226,6 +20316,8 @@ export namespace Prisma {
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -18267,10 +20359,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18303,6 +20405,8 @@ export namespace Prisma {
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -18349,10 +20453,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18385,6 +20499,8 @@ export namespace Prisma {
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
     messages?: MessageCreateNestedManyWithoutSenderInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutReceivedMessagesInput = {
@@ -18426,10 +20542,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18462,6 +20588,8 @@ export namespace Prisma {
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutReceivedMessagesInput = {
@@ -18573,10 +20701,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18609,6 +20747,8 @@ export namespace Prisma {
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -18650,10 +20790,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18686,6 +20836,8 @@ export namespace Prisma {
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUpsertWithoutReceivedMessagesInput = {
@@ -18738,10 +20890,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18774,6 +20936,8 @@ export namespace Prisma {
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
     messages?: MessageUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -18815,10 +20979,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18851,6 +21025,8 @@ export namespace Prisma {
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type ConversationUpsertWithoutMessagesInput = {
@@ -18958,10 +21134,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -18994,6 +21180,8 @@ export namespace Prisma {
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
     messages?: MessageCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -19035,10 +21223,20 @@ export namespace Prisma {
     successRate?: number | null
     completedJobs?: number | null
     onTime?: number | null
+    onBudget?: number | null
     responseTime?: string | null
     lastActive?: string | null
     topRatedPlus?: boolean
     verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
     companyName?: string | null
     companySize?: string | null
     industry?: string | null
@@ -19071,6 +21269,8 @@ export namespace Prisma {
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -19128,10 +21328,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19164,6 +21374,8 @@ export namespace Prisma {
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
     messages?: MessageUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -19205,10 +21417,20 @@ export namespace Prisma {
     successRate?: NullableIntFieldUpdateOperationsInput | number | null
     completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
     onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
     responseTime?: NullableStringFieldUpdateOperationsInput | string | null
     lastActive?: NullableStringFieldUpdateOperationsInput | string | null
     topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
     verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     companySize?: NullableStringFieldUpdateOperationsInput | string | null
     industry?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19241,6 +21463,752 @@ export namespace Prisma {
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+  }
+
+  export type UserCreateWithoutSavedFreelancersInput = {
+    id?: string
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    avatar?: string | null
+    bio?: string | null
+    location?: string | null
+    phone?: string | null
+    userType?: $Enums.UserType
+    isOnboarded?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    country?: string | null
+    city?: string | null
+    timezone?: string | null
+    title?: string | null
+    overview?: string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserCreatetopSkillsInput | string[]
+    serviceOfferings?: UserCreateserviceOfferingsInput | string[]
+    hourlyRate?: number | null
+    portfolio?: string | null
+    experience?: string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserCreatecertificationsInput | string[]
+    availability?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: string | null
+    subcategory?: string | null
+    experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    onBudget?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
+    companyName?: string | null
+    companySize?: string | null
+    industry?: string | null
+    companyWebsite?: string | null
+    companyDescription?: string | null
+    projectTypes?: UserCreateprojectTypesInput | string[]
+    preferredSkills?: UserCreatepreferredSkillsInput | string[]
+    budgetRange?: string | null
+    clientType?: string | null
+    howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
+    jobsPosted?: JobCreateNestedManyWithoutClientInput
+    proposals?: ProposalCreateNestedManyWithoutFreelancerInput
+    reviews?: ReviewCreateNestedManyWithoutAuthorInput
+    receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+  }
+
+  export type UserUncheckedCreateWithoutSavedFreelancersInput = {
+    id?: string
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    avatar?: string | null
+    bio?: string | null
+    location?: string | null
+    phone?: string | null
+    userType?: $Enums.UserType
+    isOnboarded?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    country?: string | null
+    city?: string | null
+    timezone?: string | null
+    title?: string | null
+    overview?: string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserCreatetopSkillsInput | string[]
+    serviceOfferings?: UserCreateserviceOfferingsInput | string[]
+    hourlyRate?: number | null
+    portfolio?: string | null
+    experience?: string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserCreatecertificationsInput | string[]
+    availability?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: string | null
+    subcategory?: string | null
+    experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    onBudget?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
+    companyName?: string | null
+    companySize?: string | null
+    industry?: string | null
+    companyWebsite?: string | null
+    companyDescription?: string | null
+    projectTypes?: UserCreateprojectTypesInput | string[]
+    preferredSkills?: UserCreatepreferredSkillsInput | string[]
+    budgetRange?: string | null
+    clientType?: string | null
+    howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
+    jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
+    proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
+    reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
+    receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+  }
+
+  export type UserCreateOrConnectWithoutSavedFreelancersInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSavedFreelancersInput, UserUncheckedCreateWithoutSavedFreelancersInput>
+  }
+
+  export type UserCreateWithoutSavedByUsersInput = {
+    id?: string
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    avatar?: string | null
+    bio?: string | null
+    location?: string | null
+    phone?: string | null
+    userType?: $Enums.UserType
+    isOnboarded?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    country?: string | null
+    city?: string | null
+    timezone?: string | null
+    title?: string | null
+    overview?: string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserCreatetopSkillsInput | string[]
+    serviceOfferings?: UserCreateserviceOfferingsInput | string[]
+    hourlyRate?: number | null
+    portfolio?: string | null
+    experience?: string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserCreatecertificationsInput | string[]
+    availability?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: string | null
+    subcategory?: string | null
+    experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    onBudget?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
+    companyName?: string | null
+    companySize?: string | null
+    industry?: string | null
+    companyWebsite?: string | null
+    companyDescription?: string | null
+    projectTypes?: UserCreateprojectTypesInput | string[]
+    preferredSkills?: UserCreatepreferredSkillsInput | string[]
+    budgetRange?: string | null
+    clientType?: string | null
+    howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
+    jobsPosted?: JobCreateNestedManyWithoutClientInput
+    proposals?: ProposalCreateNestedManyWithoutFreelancerInput
+    reviews?: ReviewCreateNestedManyWithoutAuthorInput
+    receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSavedByUsersInput = {
+    id?: string
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    avatar?: string | null
+    bio?: string | null
+    location?: string | null
+    phone?: string | null
+    userType?: $Enums.UserType
+    isOnboarded?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    country?: string | null
+    city?: string | null
+    timezone?: string | null
+    title?: string | null
+    overview?: string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserCreatetopSkillsInput | string[]
+    serviceOfferings?: UserCreateserviceOfferingsInput | string[]
+    hourlyRate?: number | null
+    portfolio?: string | null
+    experience?: string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserCreatecertificationsInput | string[]
+    availability?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: string | null
+    subcategory?: string | null
+    experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    onBudget?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
+    companyName?: string | null
+    companySize?: string | null
+    industry?: string | null
+    companyWebsite?: string | null
+    companyDescription?: string | null
+    projectTypes?: UserCreateprojectTypesInput | string[]
+    preferredSkills?: UserCreatepreferredSkillsInput | string[]
+    budgetRange?: string | null
+    clientType?: string | null
+    howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
+    jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
+    proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
+    reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
+    receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSavedByUsersInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSavedByUsersInput, UserUncheckedCreateWithoutSavedByUsersInput>
+  }
+
+  export type UserUpsertWithoutSavedFreelancersInput = {
+    update: XOR<UserUpdateWithoutSavedFreelancersInput, UserUncheckedUpdateWithoutSavedFreelancersInput>
+    create: XOR<UserCreateWithoutSavedFreelancersInput, UserUncheckedCreateWithoutSavedFreelancersInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSavedFreelancersInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSavedFreelancersInput, UserUncheckedUpdateWithoutSavedFreelancersInput>
+  }
+
+  export type UserUpdateWithoutSavedFreelancersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    userType?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    overview?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserUpdatetopSkillsInput | string[]
+    serviceOfferings?: UserUpdateserviceOfferingsInput | string[]
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    portfolio?: NullableStringFieldUpdateOperationsInput | string | null
+    experience?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserUpdatecertificationsInput | string[]
+    availability?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    companyWebsite?: NullableStringFieldUpdateOperationsInput | string | null
+    companyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    projectTypes?: UserUpdateprojectTypesInput | string[]
+    preferredSkills?: UserUpdatepreferredSkillsInput | string[]
+    budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
+    clientType?: NullableStringFieldUpdateOperationsInput | string | null
+    howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    jobsPosted?: JobUpdateManyWithoutClientNestedInput
+    proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
+    reviews?: ReviewUpdateManyWithoutAuthorNestedInput
+    receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSavedFreelancersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    userType?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    overview?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserUpdatetopSkillsInput | string[]
+    serviceOfferings?: UserUpdateserviceOfferingsInput | string[]
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    portfolio?: NullableStringFieldUpdateOperationsInput | string | null
+    experience?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserUpdatecertificationsInput | string[]
+    availability?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    companyWebsite?: NullableStringFieldUpdateOperationsInput | string | null
+    companyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    projectTypes?: UserUpdateprojectTypesInput | string[]
+    preferredSkills?: UserUpdatepreferredSkillsInput | string[]
+    budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
+    clientType?: NullableStringFieldUpdateOperationsInput | string | null
+    howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
+    proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
+    reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
+    receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+  }
+
+  export type UserUpsertWithoutSavedByUsersInput = {
+    update: XOR<UserUpdateWithoutSavedByUsersInput, UserUncheckedUpdateWithoutSavedByUsersInput>
+    create: XOR<UserCreateWithoutSavedByUsersInput, UserUncheckedCreateWithoutSavedByUsersInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSavedByUsersInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSavedByUsersInput, UserUncheckedUpdateWithoutSavedByUsersInput>
+  }
+
+  export type UserUpdateWithoutSavedByUsersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    userType?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    overview?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserUpdatetopSkillsInput | string[]
+    serviceOfferings?: UserUpdateserviceOfferingsInput | string[]
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    portfolio?: NullableStringFieldUpdateOperationsInput | string | null
+    experience?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserUpdatecertificationsInput | string[]
+    availability?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    companyWebsite?: NullableStringFieldUpdateOperationsInput | string | null
+    companyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    projectTypes?: UserUpdateprojectTypesInput | string[]
+    preferredSkills?: UserUpdatepreferredSkillsInput | string[]
+    budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
+    clientType?: NullableStringFieldUpdateOperationsInput | string | null
+    howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    jobsPosted?: JobUpdateManyWithoutClientNestedInput
+    proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
+    reviews?: ReviewUpdateManyWithoutAuthorNestedInput
+    receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSavedByUsersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    userType?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    overview?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserUpdatetopSkillsInput | string[]
+    serviceOfferings?: UserUpdateserviceOfferingsInput | string[]
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    portfolio?: NullableStringFieldUpdateOperationsInput | string | null
+    experience?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserUpdatecertificationsInput | string[]
+    availability?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    companyWebsite?: NullableStringFieldUpdateOperationsInput | string | null
+    companyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    projectTypes?: UserUpdateprojectTypesInput | string[]
+    preferredSkills?: UserUpdatepreferredSkillsInput | string[]
+    budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
+    clientType?: NullableStringFieldUpdateOperationsInput | string | null
+    howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
+    proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
+    reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
+    receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type JobCreateManyClientInput = {
@@ -19337,6 +22305,18 @@ export namespace Prisma {
     message: string
     type: $Enums.NotificationType
     isRead?: boolean
+    createdAt?: Date | string
+  }
+
+  export type SavedFreelancerCreateManyUserInput = {
+    id?: string
+    freelancerId: string
+    createdAt?: Date | string
+  }
+
+  export type SavedFreelancerCreateManyFreelancerInput = {
+    id?: string
+    userId: string
     createdAt?: Date | string
   }
 
@@ -19638,6 +22618,42 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFreelancerUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    freelancer?: UserUpdateOneRequiredWithoutSavedByUsersNestedInput
+  }
+
+  export type SavedFreelancerUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    freelancerId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFreelancerUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    freelancerId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFreelancerUpdateWithoutFreelancerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSavedFreelancersNestedInput
+  }
+
+  export type SavedFreelancerUncheckedUpdateWithoutFreelancerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFreelancerUncheckedUpdateManyWithoutFreelancerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

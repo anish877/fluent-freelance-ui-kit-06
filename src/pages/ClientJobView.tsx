@@ -574,7 +574,9 @@ const ClientJobView = () => {
                     
                     <CardContent className="pt-0">
                       <div className="mb-4">
-                        <p className="text-gray-700 line-clamp-3">{proposal.coverLetter}</p>
+                        <p className="text-gray-700 line-clamp-3 break-words whitespace-pre-wrap overflow-wrap-anywhere overflow-hidden">
+                          {proposal.coverLetter}
+                        </p>
                       </div>
 
                       {/* Skills */}
@@ -613,13 +615,13 @@ const ClientJobView = () => {
                                 View Details
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
                               <DialogHeader>
-                                <DialogTitle>
+                                <DialogTitle className="break-words overflow-wrap-anywhere">
                                   Proposal from {proposal.freelancer.firstName} {proposal.freelancer.lastName}
                                 </DialogTitle>
                               </DialogHeader>
-                              <div className="space-y-6">
+                              <div className="space-y-6 overflow-hidden">
                                 {/* Freelancer Details */}
                                 <div className="border rounded-lg p-4">
                                   <h3 className="font-semibold mb-3">Freelancer Profile</h3>
@@ -693,21 +695,25 @@ const ClientJobView = () => {
 
                                   <div>
                                     <h4 className="font-medium mb-2">Cover Letter</h4>
-                                    <div className="bg-gray-50 p-4 rounded-lg">
-                                      <p className="whitespace-pre-wrap">{proposal.coverLetter}</p>
+                                    <div className="bg-gray-50 p-4 rounded-lg overflow-hidden">
+                                      <p className="whitespace-pre-wrap break-words overflow-wrap-anywhere text-gray-700">
+                                        {proposal.coverLetter}
+                                      </p>
                                     </div>
                                   </div>
                                 </div>
 
                                 {/* Question Responses */}
                                 {proposal.questionResponses && Array.isArray(proposal.questionResponses) && proposal.questionResponses.length > 0 && (
-                                  <div className="border rounded-lg p-4">
+                                  <div className="border rounded-lg p-4 overflow-hidden">
                                     <h3 className="font-semibold mb-3">Screening Questions</h3>
                                     <div className="space-y-4">
                                       {proposal.questionResponses.map((qa: { question: string; answer: string }, index: number) => (
                                         <div key={index}>
-                                          <h4 className="font-medium text-gray-900 mb-2">Q: {qa.question}</h4>
-                                          <p className="text-gray-700 bg-gray-50 p-3 rounded">{qa.answer}</p>
+                                          <h4 className="font-medium text-gray-900 mb-2 break-words overflow-wrap-anywhere">Q: {qa.question}</h4>
+                                          <p className="text-gray-700 bg-gray-50 p-3 rounded break-words whitespace-pre-wrap overflow-wrap-anywhere overflow-hidden">
+                                            {qa.answer}
+                                          </p>
                                         </div>
                                       ))}
                                     </div>

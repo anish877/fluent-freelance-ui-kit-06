@@ -2,6 +2,7 @@ import express, { Request, Response, RequestHandler, Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, AuthRequest } from '../middleware/auth';
+import { Prisma } from '../../prisma/generated';
 
 const router: Router = express.Router();
 
@@ -13,7 +14,7 @@ router.get('/', protect, (async (req: AuthRequest, res: Response): Promise<void>
     const { page = 1, limit = 20, isRead } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const where: any = { userId: req.user!.id };
+    const where: Prisma.NotificationWhereInput = { userId: req.user!.id };
     
     if (isRead !== undefined) {
       where.isRead = isRead === 'true';

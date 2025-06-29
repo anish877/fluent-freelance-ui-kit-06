@@ -1,7 +1,7 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users, Eye, MessageCircle, Calendar, CheckCircle, AlertCircle, BarChart3, FileText, Star, Award, Target, Briefcase, Activity } from "lucide-react";
+import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users, Eye, MessageCircle, Calendar, CheckCircle, AlertCircle, BarChart3, FileText, Star, Award, Target, Briefcase, Activity, Loader2 } from "lucide-react";
+import axios from "axios";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -10,10 +10,40 @@ import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Separator } from "../components/ui/separator";
 import { Progress } from "../components/ui/progress";
+import { useAuth } from "../hooks/AuthContext";
+
+// Types for backend data
+interface Proposal {
+  id: string;
+  coverLetter: string;
+  bidAmount: number;
+  estimatedDuration: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+  createdAt: string;
+  job: {
+    id: string;
+    title: string;
+    _count: {
+      proposals: number;
+    };
+    client: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      companyName?: string;
+    };
+  };
+}
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Proposals state
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [proposalsLoading, setProposalsLoading] = useState(false);
+  const [proposalsError, setProposalsError] = useState<string | null>(null);
 
   const stats = [
     {
@@ -237,6 +267,66 @@ const Dashboard = () => {
 
   const handleMessageClick = (messageId: number) => {
     console.log(`Opening message ${messageId}`);
+  };
+
+  // Fetch proposals from backend
+  const fetchProposals = async () => {
+    if (user?.userType !== 'FREELANCER') return;
+    
+    try {
+      setProposalsLoading(true);
+      setProposalsError(null);
+      
+      const response = await axios.get('/proposals/freelancer/me?limit=5');
+      
+      if (response.data.success) {
+        setProposals(response.data.data);
+      } else {
+        setProposalsError('Failed to fetch proposals');
+      }
+    } catch (error) {
+      console.error('Error fetching proposals:', error);
+      setProposalsError('Failed to fetch proposals');
+    } finally {
+      setProposalsLoading(false);
+    }
+  };
+
+  // Load proposals on component mount
+  useEffect(() => {
+    fetchProposals();
+  }, [user]);
+
+  // Format proposal data for display
+  const formatProposalData = (proposal: Proposal) => {
+    const clientName = proposal.job.client.companyName || 
+                      `${proposal.job.client.firstName} ${proposal.job.client.lastName}`;
+    
+    const status = proposal.status.toLowerCase();
+    const bidAmount = `$${proposal.bidAmount.toLocaleString()}`;
+    const submittedDate = new Date(proposal.createdAt).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    
+    // Use real proposal count from the job
+    const totalProposals = proposal.job._count.proposals;
+    const competition = `${totalProposals} proposal${totalProposals !== 1 ? 's' : ''}`;
+    
+    // Mock data for connects (not available in current schema)
+    const connects = Math.floor(Math.random() * 8) + 2;
+    
+    return {
+      id: proposal.id,
+      title: proposal.job.title,
+      client: clientName,
+      status,
+      bidAmount,
+      submittedDate,
+      connects,
+      competition
+    };
   };
 
   return (
@@ -492,55 +582,91 @@ const Dashboard = () => {
             {/* Proposals Tab */}
             <div className={activeTab === "proposals" ? "block" : "hidden"}>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Your Proposals ({recentProposals.length})</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Your Proposals ({proposals.length})</h3>
                 <Button onClick={() => navigate('/proposals')}>
                   View All Proposals
                 </Button>
               </div>
               
-              <div className="space-y-4">
-                {recentProposals.map((proposal) => (
-                  <Card key={proposal.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900 text-lg mb-2">{proposal.title}</h4>
-                          <p className="text-gray-600 mb-2">Client: {proposal.client}</p>
-                          <div className="flex items-center space-x-4 text-sm text-gray-500">
-                            <span>Bid: <span className="font-semibold text-green-600">{proposal.bidAmount}</span></span>
-                            <span>•</span>
-                            <span>Submitted: {proposal.submittedDate}</span>
-                            <span>•</span>
-                            <span>Connects Used: {proposal.connects}</span>
+              {proposalsLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="text-center">
+                    <Loader2 className="h-12 w-12 animate-spin text-teal-600 mx-auto mb-4" />
+                    <p className="text-gray-600">Loading proposals...</p>
+                  </div>
+                </div>
+              ) : proposalsError ? (
+                <div className="text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <AlertCircle className="h-16 w-16 text-red-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading proposals</h3>
+                    <p className="text-gray-500 mb-6">{proposalsError}</p>
+                    <Button onClick={fetchProposals} variant="outline">
+                      Try Again
+                    </Button>
+                  </div>
+                </div>
+              ) : proposals.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No proposals yet</h3>
+                    <p className="text-gray-500 mb-6">
+                      Start submitting proposals to jobs to see them here.
+                    </p>
+                    <Button onClick={() => navigate('/jobs')}>
+                      Browse Jobs
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {proposals.map((proposal) => {
+                    const formattedProposal = formatProposalData(proposal);
+                    return (
+                      <Card key={proposal.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 text-lg mb-2">{formattedProposal.title}</h4>
+                              <p className="text-gray-600 mb-2">Client: {formattedProposal.client}</p>
+                              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <span>Bid: <span className="font-semibold text-green-600">{formattedProposal.bidAmount}</span></span>
+                                <span>•</span>
+                                <span>Submitted: {formattedProposal.submittedDate}</span>
+                                <span>•</span>
+                                <span>Connects Used: {formattedProposal.connects}</span>
+                              </div>
+                            </div>
+                            <Badge className={getStatusColor(formattedProposal.status)}>
+                              {formattedProposal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
+                              {formattedProposal.status === "interview" && <Calendar className="h-3 w-3 mr-1" />}
+                              {formattedProposal.status === "accepted" && <CheckCircle className="h-3 w-3 mr-1" />}
+                              <span className="capitalize">{formattedProposal.status}</span>
+                            </Badge>
                           </div>
-                        </div>
-                        <Badge className={getStatusColor(proposal.status)}>
-                          {proposal.status === "pending" && <Clock className="h-3 w-3 mr-1" />}
-                          {proposal.status === "interview" && <Calendar className="h-3 w-3 mr-1" />}
-                          {proposal.status === "accepted" && <CheckCircle className="h-3 w-3 mr-1" />}
-                          <span className="capitalize">{proposal.status}</span>
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex justify-between items-center">
-                        <div className="text-sm text-gray-600">
-                          Competition: {proposal.competition}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <MessageCircle className="h-4 w-4 mr-1" />
-                            Follow Up
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleViewProposal(proposal.id)}>
-                            <Eye className="h-4 w-4 mr-1" />
-                            View Details
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                          
+                          <div className="flex justify-between items-center">
+                            <div className="text-sm text-gray-600">
+                              Competition: {formattedProposal.competition}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm">
+                                <MessageCircle className="h-4 w-4 mr-1" />
+                                Follow Up
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => handleViewProposal(Number(proposal.id))}>
+                                <Eye className="h-4 w-4 mr-1" />
+                                View Details
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Messages Tab */}

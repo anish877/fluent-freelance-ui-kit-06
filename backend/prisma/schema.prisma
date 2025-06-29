@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output = "./generated"
@@ -58,10 +55,22 @@ model User {
   successRate   Int? // Success rate percentage
   completedJobs Int? // Number of completed jobs
   onTime        Int? // On-time delivery percentage
+  onBudget      Int? // On-budget delivery percentage
   responseTime  String? // Response time (e.g., "within 1 hour")
   lastActive    String? // Last active status (e.g., "Online now", "2 hours ago")
   topRatedPlus  Boolean @default(false) // Top rated plus status
   verified      Boolean @default(false) // Verification status
+  risingTalent  Boolean @default(false) // Rising talent status
+  
+  // Additional freelancer fields for Talent page
+  portfolioItems Json? // Array of portfolio items with title, image, description, category
+  testScores     Json? // Array of test score objects with name and score
+  specializations String[] // Array of specializations
+  memberSince    String? // Member since year
+  profileStrength Int? // Profile completion percentage
+  repeatHireRate  Int? // Repeat hire rate percentage
+  rating          Float? // Average rating
+  reviewCount     Int? // Number of reviews
 
   // Client specific fields
   companyName  String?
@@ -105,6 +114,8 @@ model User {
   messages          Message[]   @relation("MessageSender")
   receivedMessages  Message[] @relation("MessageReceiver")
   notifications     Notification[]
+  savedFreelancers  SavedFreelancer[] @relation("SavedByUser")
+  savedByUsers      SavedFreelancer[] @relation("SavedFreelancer")
 
   @@map("users")
 }
@@ -243,6 +254,19 @@ model Notification {
   @@map("notifications")
 }
 
+model SavedFreelancer {
+  id           String   @id @default(cuid())
+  userId       String   // User who saved the freelancer
+  freelancerId String   // Freelancer being saved
+  createdAt    DateTime @default(now())
+
+  // Relations
+  user         User     @relation("SavedByUser", fields: [userId], references: [id], onDelete: Cascade)
+  freelancer   User     @relation("SavedFreelancer", fields: [freelancerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, freelancerId])
+  @@map("saved_freelancers")
+}
 
 enum UserType {
   FREELANCER

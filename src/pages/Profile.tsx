@@ -1,6 +1,6 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Edit, Camera, MapPin, Star, Calendar, DollarSign, Award, Users, Clock, CheckCircle, ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -8,105 +8,254 @@ import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Separator } from "../components/ui/separator";
+import { useAuth } from "../hooks/AuthContext";
+
+interface UserProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  title: string;
+  location: string;
+  country: string;
+  city: string;
+  timezone: string;
+  joinDate: string;
+  profilePicture: string;
+  rating: number;
+  reviewCount: number;
+  completedJobs: number;
+  totalEarnings: string;
+  successRate: number;
+  responseTime: string;
+  availability: string;
+  description: string;
+  skills: string[];
+  languages: string[];
+  hourlyRate: string;
+  education: Array<{
+    degree: string;
+    school: string;
+    year: string;
+  }>;
+  certifications: Array<{
+    name: string;
+    issuer: string;
+    year: string;
+  }>;
+  portfolio: Array<{
+    title: string;
+    description: string;
+    image: string;
+    technologies: string[];
+    link: string;
+  }>;
+  workHistory: Array<{
+    title: string;
+    client: string;
+    duration: string;
+    description: string;
+    rating: number;
+    feedback: string;
+  }>;
+  reviews: Array<{
+    client: string;
+    rating: number;
+    date: string;
+    project: string;
+    comment: string;
+  }>;
+}
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const userProfile = {
-    name: "Alex Thompson",
-    title: "Senior Full-Stack Developer & Technical Consultant",
-    location: "Austin, Texas, USA",
-    joinDate: "March 2020",
-    profilePicture: "/placeholder.svg",
-    rating: 4.9,
-    reviewCount: 156,
-    completedJobs: 234,
-    totalEarnings: "$185,500",
-    successRate: 98,
-    responseTime: "Within 1 hour",
-    availability: "Available for new projects",
-    description: "Passionate full-stack developer with 10+ years of experience building scalable web applications and leading development teams. Specialized in React, Node.js, and cloud architecture. I help startups and enterprises transform their ideas into robust, user-friendly digital solutions.",
-    skills: [
-      "React", "Node.js", "TypeScript", "Python", "AWS", "Docker", "MongoDB", "PostgreSQL", 
-      "GraphQL", "REST APIs", "Microservices", "DevOps", "CI/CD", "Kubernetes"
-    ],
-    languages: ["English (Native)", "Spanish (Fluent)", "French (Conversational)"],
-    hourlyRate: "$85-120",
-    education: [
-      {
-        degree: "Master of Science in Computer Science",
-        school: "University of Texas at Austin",
-        year: "2014-2016"
-      },
-      {
-        degree: "Bachelor of Science in Software Engineering",
-        school: "Texas Tech University",
-        year: "2010-2014"
+  // Check if user is authenticated and is a freelancer
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (user.userType !== 'FREELANCER') {
+      navigate('/dashboard');
+      return;
+    }
+
+    fetchProfile();
+  }, [user, navigate]);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/users/profile/me', {
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          navigate('/dashboard');
+          return;
+        }
+        throw new Error('Failed to fetch profile');
       }
-    ],
-    certifications: [
-      { name: "AWS Solutions Architect Professional", issuer: "Amazon Web Services", year: "2023" },
-      { name: "Google Cloud Professional Developer", issuer: "Google Cloud", year: "2022" },
-      { name: "Certified Kubernetes Administrator", issuer: "CNCF", year: "2021" }
-    ],
-    portfolio: [
-      {
-        title: "E-commerce Platform Redesign",
-        description: "Complete redesign and development of a multi-vendor e-commerce platform serving 100K+ users",
-        image: "/placeholder.svg",
-        technologies: ["React", "Node.js", "MongoDB", "Stripe"],
-        link: "https://example.com"
-      },
-      {
-        title: "SaaS Analytics Dashboard",
-        description: "Real-time analytics dashboard for B2B SaaS company with advanced data visualization",
-        image: "/placeholder.svg",
-        technologies: ["React", "D3.js", "Python", "PostgreSQL"],
-        link: "https://example.com"
-      },
-      {
-        title: "Mobile Banking App",
-        description: "Secure mobile banking application with biometric authentication and real-time transactions",
-        image: "/placeholder.svg",
-        technologies: ["React Native", "Node.js", "AWS", "Docker"],
-        link: "https://example.com"
+
+      const data = await response.json();
+      
+      if (data.success) {
+        const profile = transformUserData(data.data);
+        setUserProfile(profile);
+      } else {
+        throw new Error(data.message || 'Failed to fetch profile');
       }
-    ],
-    workHistory: [
-      {
-        title: "Lead Full-Stack Developer",
-        client: "TechStart Solutions",
-        duration: "Jan 2023 - Present",
-        description: "Leading development of enterprise-level applications for Fortune 500 clients. Managed team of 5 developers and improved system performance by 40%.",
-        rating: 5.0,
-        feedback: "Alex exceeded all expectations. Delivered complex features ahead of schedule and provided excellent technical leadership."
-      },
-      {
-        title: "Senior React Developer",
-        client: "Digital Innovation Corp",
-        duration: "Jun 2022 - Dec 2022",
-        description: "Built responsive web applications using React and TypeScript. Implemented modern state management and improved code quality standards.",
-        rating: 4.9,
-        feedback: "Outstanding developer with great communication skills. Would definitely work with Alex again."
-      }
-    ],
-    reviews: [
-      {
-        client: "Sarah Johnson",
-        rating: 5.0,
-        date: "December 2024",
-        project: "E-commerce Platform Development",
-        comment: "Alex is an exceptional developer who delivered our complex e-commerce platform ahead of schedule. His attention to detail and technical expertise are outstanding. Communication was excellent throughout the project."
-      },
-      {
-        client: "Michael Chen",
-        rating: 4.9,
-        date: "November 2024",
-        project: "SaaS Dashboard Implementation",
-        comment: "Great experience working with Alex. He understood our requirements perfectly and implemented a beautiful, performant dashboard. Very professional and responsive."
-      }
-    ]
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch profile');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const transformUserData = (userData: any): UserProfile => {
+    return {
+      id: userData.id,
+      firstName: userData.firstName || '',
+      lastName: userData.lastName || '',
+      title: userData.title || 'Freelancer',
+      location: userData.location || `${userData.city || ''}, ${userData.country || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, ''),
+      country: userData.country || '',
+      city: userData.city || '',
+      timezone: userData.timezone || '',
+      joinDate: userData.memberSince || new Date(userData.createdAt).getFullYear().toString(),
+      profilePicture: userData.avatar || '/placeholder.svg',
+      rating: userData.rating || 0,
+      reviewCount: userData.reviewCount || 0,
+      completedJobs: userData.completedJobs || 0,
+      totalEarnings: userData.totalEarnings || '$0',
+      successRate: userData.successRate || 0,
+      responseTime: userData.responseTime || 'Within 24 hours',
+      availability: userData.availability || 'Available for new projects',
+      description: userData.overview || userData.bio || 'No description available',
+      skills: Array.isArray(userData.skills) ? userData.skills.map((s: any) => s.name || s) : [],
+      languages: Array.isArray(userData.languages) ? userData.languages.map((l: any) => `${l.language} (${l.proficiency})`) : [],
+      hourlyRate: userData.hourlyRate ? `$${userData.hourlyRate}` : '$0',
+      education: Array.isArray(userData.education) ? userData.education.map((e: any) => ({
+        degree: e.degree || '',
+        school: e.institution || e.school || '',
+        year: e.year || ''
+      })) : [],
+      certifications: Array.isArray(userData.certifications) ? userData.certifications.map((c: any) => ({
+        name: c.name || c,
+        issuer: c.issuer || 'Unknown',
+        year: c.year || ''
+      })) : [],
+      portfolio: Array.isArray(userData.portfolioItems) ? userData.portfolioItems.map((item: any) => ({
+        title: item.title || '',
+        description: item.description || '',
+        image: item.image || '/placeholder.svg',
+        technologies: item.technologies || [],
+        link: item.link || '#'
+      })) : [],
+      workHistory: [], // This will be populated from reviews/jobs
+      reviews: [] // This will be populated from the reviews API
+    };
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch('/api/users/profile/reviews', {
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const reviews = data.data.map((review: any) => ({
+            client: `${review.author.firstName} ${review.author.lastName}`,
+            rating: review.rating,
+            date: new Date(review.createdAt).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long' 
+            }),
+            project: review.job?.title || 'Project',
+            comment: review.comment
+          }));
+
+          setUserProfile(prev => prev ? {
+            ...prev,
+            reviews
+          } : null);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+    }
+  };
+
+  // Fetch reviews when profile is loaded
+  useEffect(() => {
+    if (userProfile) {
+      fetchReviews();
+    }
+  }, [userProfile]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse">
+            <div className="bg-white rounded-lg p-6 mb-8">
+              <div className="flex items-center space-x-4">
+                <div className="w-32 h-32 bg-gray-300 rounded-full"></div>
+                <div className="flex-1">
+                  <div className="h-8 bg-gray-300 rounded w-1/3 mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Profile</h1>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={fetchProfile}>Try Again</Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Profile Not Found</h1>
+            <p className="text-gray-600">Unable to load profile information.</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -120,7 +269,7 @@ const Profile = () => {
               <div className="relative">
                 <img
                   src={userProfile.profilePicture}
-                  alt={userProfile.name}
+                  alt={`${userProfile.firstName} ${userProfile.lastName}`}
                   className="w-32 h-32 rounded-full object-cover"
                 />
                 <Button size="sm" className="absolute bottom-0 right-0 rounded-full">
@@ -131,7 +280,7 @@ const Profile = () => {
               <div className="flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{userProfile.name}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{userProfile.firstName} {userProfile.lastName}</h1>
                     <p className="text-xl text-gray-600 mb-2">{userProfile.title}</p>
                     <div className="flex items-center text-gray-600 mb-2">
                       <MapPin className="h-4 w-4 mr-2" />

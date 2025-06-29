@@ -101,3 +101,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom utility classes for job cards */
+.break-words {
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.hyphens-auto {
+  hyphens: auto;
+}
+
+.ml-13 {
+  margin-left: 3.25rem; /* 52px - to align with avatar */
+}

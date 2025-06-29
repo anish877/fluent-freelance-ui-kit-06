@@ -1,21 +1,61 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   Plus, Eye, Edit, Trash2, Clock, Users, DollarSign, 
   TrendingUp, Star, MessageCircle, CheckCircle, AlertCircle,
-  Filter, Search, Calendar, BarChart3, PieChart
+  Filter, Search, Calendar, BarChart3, PieChart, Loader2
 } from "lucide-react";
+import axios from "axios";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { useAuth } from "../hooks/AuthContext";
+
+// Types for backend data
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  requirements: string[];
+  budget: 'FIXED' | 'HOURLY';
+  minBudget?: number;
+  maxBudget?: number;
+  hourlyRate?: number;
+  duration?: string;
+  skills: string[];
+  category: string;
+  subcategory?: string;
+  projectType?: string;
+  experienceLevel?: string;
+  workingHours?: string;
+  timezone?: string;
+  communicationPreferences: string[];
+  location?: string;
+  isRemote: boolean;
+  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  isUrgent: boolean;
+  visibility: string;
+  applicationDeadline?: string;
+  clientId: string;
+  createdAt: string;
+  updatedAt: string;
+  _count: {
+    proposals: number;
+  };
+}
 
 const ClientDashboard = () => {
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Jobs state
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobsLoading, setJobsLoading] = useState(true);
+  const [jobsError, setJobsError] = useState<string | null>(null);
 
   // Mock data for client dashboard
   const stats = {
@@ -27,6 +67,114 @@ const ClientDashboard = () => {
     avgJobValue: 1900,
     hiredFreelancers: 18,
     repeatHires: 7
+  };
+
+  // Fetch jobs from backend
+  const fetchJobs = async () => {
+    try {
+      setJobsLoading(true);
+      setJobsError(null);
+      
+      const response = await axios.get('/jobs/client/me');
+      
+      if (response.data.success) {
+        setJobs(response.data.data);
+      } else {
+        setJobsError('Failed to fetch jobs');
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      setJobsError(error.response?.data?.message || 'Failed to fetch jobs');
+    } finally {
+      setJobsLoading(false);
+    }
+  };
+
+  // Delete job
+  const deleteJob = async (jobId: string) => {
+    try {
+      const response = await axios.delete(`/jobs/${jobId}`);
+      
+      if (response.data.success) {
+        // Remove the job from state
+        setJobs(jobs.filter(job => job.id !== jobId));
+      } else {
+        console.error('Failed to delete job');
+      }
+    } catch (error) {
+      console.error('Error deleting job:', error);
+    }
+  };
+
+  // Filter jobs based on search term and status
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.category.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = activeFilter === "all" || 
+                         (activeFilter === "active" && job.status === "OPEN") ||
+                         (activeFilter === "in_progress" && job.status === "IN_PROGRESS") ||
+                         (activeFilter === "completed" && job.status === "COMPLETED") ||
+                         (activeFilter === "cancelled" && job.status === "CANCELLED");
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  // Load jobs on component mount
+  useEffect(() => {
+    if (user?.userType === 'CLIENT') {
+      fetchJobs();
+    }
+  }, [user]);
+
+  // Format budget display
+  const formatBudget = (job: Job) => {
+    if (job.budget === 'FIXED') {
+      if (job.minBudget && job.maxBudget) {
+        return `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`;
+      } else if (job.minBudget) {
+        return `$${job.minBudget.toLocaleString()}`;
+      }
+    } else if (job.budget === 'HOURLY' && job.hourlyRate) {
+      return `$${job.hourlyRate}/hour`;
+    }
+    return 'Budget not specified';
+  };
+
+  // Convert backend status to frontend status
+  const getFrontendStatus = (status: string) => {
+    switch (status) {
+      case 'OPEN': return 'active';
+      case 'IN_PROGRESS': return 'in_progress';
+      case 'COMPLETED': return 'completed';
+      case 'CANCELLED': return 'cancelled';
+      default: return status.toLowerCase();
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active": return "bg-green-100 text-green-800";
+      case "in_progress": return "bg-blue-100 text-blue-800";
+      case "completed": return "bg-gray-100 text-gray-800";
+      case "paused": return "bg-yellow-100 text-yellow-800";
+      case "shortlisted": return "bg-purple-100 text-purple-800";
+      case "cancelled": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "active": return "Active";
+      case "in_progress": return "In Progress";
+      case "completed": return "Completed";
+      case "paused": return "Paused";
+      case "shortlisted": return "Shortlisted";
+      case "cancelled": return "Cancelled";
+      default: return status;
+    }
   };
 
   const recentJobs = [
@@ -151,28 +299,6 @@ const ClientDashboard = () => {
     }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active": return "bg-green-100 text-green-800";
-      case "in_progress": return "bg-blue-100 text-blue-800";
-      case "completed": return "bg-gray-100 text-gray-800";
-      case "paused": return "bg-yellow-100 text-yellow-800";
-      case "shortlisted": return "bg-purple-100 text-purple-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active": return "Active";
-      case "in_progress": return "In Progress";
-      case "completed": return "Completed";
-      case "paused": return "Paused";
-      case "shortlisted": return "Shortlisted";
-      default: return status;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -287,75 +413,99 @@ const ClientDashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentJobs.map((job) => (
-                    <div key={job.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
-                            <Badge className={getStatusColor(job.status)}>
-                              {getStatusText(job.status)}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center space-x-6 text-sm text-gray-600">
-                            <span className="flex items-center">
-                              <DollarSign className="h-4 w-4 mr-1" />
-                              {job.budget}
-                            </span>
-                            <span className="flex items-center">
-                              <Users className="h-4 w-4 mr-1" />
-                              {job.proposals} proposals
-                            </span>
-                            <span className="flex items-center">
-                              <Eye className="h-4 w-4 mr-1" />
-                              {job.views} views
-                            </span>
-                            <span className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-1" />
-                              Due: {new Date(job.deadline).toLocaleDateString()}
-                            </span>
-                          </div>
-                          {job.assignedTo && (
-                            <p className="text-sm text-blue-600 mt-2">
-                              Assigned to: {job.assignedTo}
-                            </p>
-                          )}
-                          {job.status === "completed" && job.rating && (
-                            <div className="flex items-center mt-2">
-                              <div className="flex items-center">
-                                {[...Array(job.rating)].map((_, i) => (
-                                  <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                                ))}
-                              </div>
-                              <span className="text-sm text-gray-600 ml-2">
-                                Completed on {new Date(job.completedDate!).toLocaleDateString()}
-                              </span>
+                {jobsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+                    <span className="ml-2 text-gray-600">Loading jobs...</span>
+                  </div>
+                ) : jobsError ? (
+                  <div className="text-center py-8">
+                    <p className="text-red-600 mb-4">{jobsError}</p>
+                    <Button onClick={fetchJobs} variant="outline">
+                      Try Again
+                    </Button>
+                  </div>
+                ) : filteredJobs.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 mb-4">No jobs found</p>
+                    {searchTerm && (
+                      <Button onClick={() => setSearchTerm("")} variant="outline">
+                        Clear Search
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {filteredJobs.map((job) => (
+                      <div key={job.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+                              <Badge className={getStatusColor(getFrontendStatus(job.status))}>
+                                {getStatusText(getFrontendStatus(job.status))}
+                              </Badge>
                             </div>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Link to={`/jobs/${job.id}`}>
+                            <div className="flex items-center space-x-6 text-sm text-gray-600">
+                              <span className="flex items-center">
+                                <DollarSign className="h-4 w-4 mr-1" />
+                                {formatBudget(job)}
+                              </span>
+                              <span className="flex items-center">
+                                <Users className="h-4 w-4 mr-1" />
+                                {job._count.proposals} proposals
+                              </span>
+                              <span className="flex items-center">
+                                <Calendar className="h-4 w-4 mr-1" />
+                                Posted: {new Date(job.createdAt).toLocaleDateString()}
+                              </span>
+                              {job.applicationDeadline && (
+                                <span className="flex items-center">
+                                  <Clock className="h-4 w-4 mr-1" />
+                                  Due: {new Date(job.applicationDeadline).toLocaleDateString()}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center space-x-2 mt-2">
+                              <span className="text-sm text-gray-600">Category:</span>
+                              <Badge variant="secondary" className="text-xs">
+                                {job.category}
+                              </Badge>
+                              {job.subcategory && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {job.subcategory}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Link to={`/client-jobs/${job.id}`}>
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4 mr-1" />
+                                View
+                              </Button>
+                            </Link>
                             <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-1" />
-                              View
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
                             </Button>
-                          </Link>
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
-                          {job.status === "active" && (
-                            <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Delete
-                            </Button>
-                          )}
+                            {job.status === "OPEN" && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => deleteJob(job.id)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-1" />
+                                Delete
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

@@ -2,6 +2,7 @@ import express, { Request, Response, RequestHandler } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, authorize, AuthRequest } from '../middleware/auth';
+import { Prisma } from '../../prisma/generated';
 
 const router = express.Router();
 
@@ -77,10 +78,10 @@ router.get('/freelancer/me', protect, authorize('FREELANCER'), (async (req: Auth
     const { page = 1, limit = 10, status } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const where: any = { freelancerId: req.user!.id };
+    const where: Prisma.ProposalWhereInput = { freelancerId: req.user!.id };
     
     if (status) {
-      where.status = status;
+      where.status = status as 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
     }
 
     const proposals = await prisma.proposal.findMany({
@@ -99,6 +100,11 @@ router.get('/freelancer/me', protect, authorize('FREELANCER'), (async (req: Auth
             location: true,
             isRemote: true,
             status: true,
+            _count: {
+              select: {
+                proposals: true
+              }
+            },
             client: {
               select: {
                 id: true,
@@ -335,7 +341,7 @@ router.put('/:id', protect, authorize('CLIENT'), (async (req: AuthRequest, res: 
     }
 
     // Update proposal with allowed fields
-    const updateData: any = {};
+    const updateData: Prisma.ProposalUpdateInput = {};
     
     if (req.body.clientNotes !== undefined) {
       updateData.clientNotes = req.body.clientNotes;

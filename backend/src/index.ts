@@ -14,6 +14,7 @@ import messageRoutes from './routes/messages';
 import notificationRoutes from './routes/notifications';
 import onboardingRoutes from './routes/onboarding';
 import uploadRoutes from './routes/upload';
+import talentRoutes from './routes/talent';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -35,7 +36,7 @@ const limiter = rateLimit({
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.CORS_ORIGIN || ['http://localhost:3000', 'http://localhost:3002'],
   credentials: true
 }));
 app.use(morgan('combined'));
@@ -61,6 +62,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/talent', talentRoutes);
 
 // Error handling middleware
 app.use(notFound);
