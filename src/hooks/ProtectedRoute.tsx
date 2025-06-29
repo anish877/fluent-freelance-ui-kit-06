@@ -36,7 +36,13 @@ const ProtectedRoute = ({
     return <Navigate to={dashboardPath} replace />;
   }
 
-  // Check if onboarding is required and user is not onboarded
+  // FIXED: Allow access to onboarding page when user is not onboarded
+  // For onboarding page, we want to allow access when user is NOT onboarded
+  if (location.pathname === '/onboarding') {
+    return <>{children}</>;
+  }
+
+  // For other pages, check if onboarding is required and user is not onboarded
   if (requireOnboarding && !user.isOnboarded) {
     return <Navigate to="/onboarding" replace />;
   }
@@ -44,4 +50,4 @@ const ProtectedRoute = ({
   return <>{children}</>;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

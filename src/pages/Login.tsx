@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import axios from "axios";
 import { useAuth } from "@/hooks/AuthContext";
 import { toast } from "sonner";
 
@@ -12,7 +11,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { login, isAuthenticated } = useAuth()
+  const { login } = useAuth()
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -27,9 +26,11 @@ const Login = () => {
       const { success, message } = await login(formData.email, formData.password)
       if(success){
         toast.success(message)
+
       }
       else{
         setError(message)
+        navigate('/onboarding', { replace: true });
       }
 
     } catch (err) {

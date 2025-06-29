@@ -37,6 +37,7 @@ interface WSMessage {
 interface ClientConnection {
   ws: WebSocket;
   userEmail: string;
+  userName: string;
   conversationId?: string;
   authenticated: boolean;
 }
@@ -149,7 +150,8 @@ wss.on("connection", (ws: WebSocket, req) => {
       switch (message.type) {
         case "authenticate":
           (async () => {
-            const { userEmail } = message.payload;
+            const { userEmail, userName } = message.payload;
+
 
           try {
             // Verify user exists in database
@@ -166,6 +168,7 @@ wss.on("connection", (ws: WebSocket, req) => {
             currentConnection = {
               ws,
               userEmail,
+              userName,
               authenticated: true,
             };
             
@@ -199,7 +202,6 @@ wss.on("connection", (ws: WebSocket, req) => {
 
         case "join_conversation":
           (async () => {
-          console.log("Reached here")
           if (!currentConnection) {
             sendError(ws, "Not authenticated", 4001);
             return;
@@ -219,7 +221,6 @@ wss.on("connection", (ws: WebSocket, req) => {
               return;
             }
             
-            console.log("Conv: ", conversation)
             // Check if user is participant
             if (!conversation.participants.includes(currentConnection.userEmail)) {
               sendError(ws, "Access denied to this conversation", 4003);
@@ -237,9 +238,6 @@ wss.on("connection", (ws: WebSocket, req) => {
 
             // Send recent messages
             const conversationMessages = await getConversationMessages(conversationId)
-
-            console.log("Found messages: ", conversationMessages)
-            console.log("Found conversation: ", conversationId)
 
             ws.send(JSON.stringify({
               type: "messages_loaded",
@@ -380,7 +378,7 @@ wss.on("connection", (ws: WebSocket, req) => {
               {
                 type: "user_typing",
                 payload: {
-                  userEmail: currentConnection.userEmail,
+                  userName: currentConnection.userName
                 },
               },
               currentConnection.userEmail
@@ -396,7 +394,7 @@ wss.on("connection", (ws: WebSocket, req) => {
               {
                 type: "user_stop_typing",
                 payload: {
-                  userEmail: currentConnection.userEmail,
+                  userName: currentConnection.userName
                 },
               }
             );

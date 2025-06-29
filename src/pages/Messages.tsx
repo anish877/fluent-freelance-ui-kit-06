@@ -7,6 +7,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Badge } from "../components/ui/badge";
+import { useParams, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
 import { useWebSocket } from "@/hooks/socketContext";
@@ -15,7 +16,9 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/AuthContext";
 
 const Messages = () => {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>("1");
+  const { conversationId } = useParams();
+  const navigate = useNavigate();
+  const selectedConversation = conversationId || null;
   const [localConversations, setLocalConversations] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,42 +59,44 @@ const conversations = useMemo(() => {
     fetchConversations()
   }, [])
 
-  useEffect(() => {
-  if (currentConversationId) {
-    setSelectedConversation(currentConversationId);
+useEffect(() => {
+  if (conversationId && conversationId !== currentConversationId) {
+    joinConversation(conversationId);
   }
-}, [currentConversationId]);
+}, [conversationId, currentConversationId, joinConversation]);
 
-const handleConversationSelect = (conversationId: string) => {
-  setSelectedConversation(conversationId);
-  joinConversation(conversationId); // This will trigger WebSocket to load messages
+const handleConversationSelect = (selectedConversationId) => {
+  if (selectedConversationId !== conversationId) {
+    navigate(`/messages/${selectedConversationId}`);
+  }
 };
 
   const handleCreateConversation = async () => {
-    try {
-      const payload = {
-        otherUserEmail: newConversationData.otherUserEmail,
-        jobId: newConversationData.jobId || null,
-        projectName: newConversationData.projectName || null
-      };
-      const response = await axios.post('/messages/conversations', payload);
-      const { success, data, message } = response.data;
-      
-      if (!success) {
-        toast.error("Conversation creation Failed: " + message);
-        return;
-      }
-      
-      // Join the new conversation via WebSocket
-      joinConversation(data.id);
-      setShowNewConversation(false);
-      
-      // Refresh local conversations
-      fetchConversations();
-    } catch (error) {
-      console.error('Error creating conversation:', error.response?.data || error.message);
+  try {
+    const payload = {
+      otherUserEmail: newConversationData.otherUserEmail,
+      jobId: newConversationData.jobId || null,
+      projectName: newConversationData.projectName || null
+    };
+    const response = await axios.post('/messages/conversations', payload);
+    const { success, data, message } = response.data;
+    
+    if (!success) {
+      toast.error("Conversation creation Failed: " + message);
+      return;
     }
-  };
+    
+    // Navigate to the new conversation instead of setting state
+    navigate(`/messages/${data.id}`);
+    joinConversation(data.id);
+    setShowNewConversation(false);
+    
+    // Refresh local conversations
+    fetchConversations();
+  } catch (error) {
+    console.error('Error creating conversation:', error.response?.data || error.message);
+  }
+};
 
   const handleInputChange = (e) => {
   setMessageText(e.target.value);
@@ -118,7 +123,9 @@ useEffect(() => {
   }
 }, [wsMessages]);
 
-  const messages = wsMessages || [];
+  const messages = (conversationId === currentConversationId) ? (wsMessages || []) : [];
+
+
 
   const selectedConv = conversations.find(conv => conv.id === selectedConversation);
   const filteredConversations = conversations.filter(conv => 
@@ -126,9 +133,9 @@ useEffect(() => {
     conv.project.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSendMessage = () => {
-  if (messageText.trim() && selectedConversation) {
-    sendMessage(messageText.trim()); // Use WebSocket sendMessage
+const handleSendMessage = () => {
+  if (messageText.trim() && conversationId && conversationId === currentConversationId) {
+    sendMessage(messageText.trim());
     setMessageText("");
   }
 };
@@ -149,19 +156,14 @@ useEffect(() => {
 // }
 
   return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="h-screen bg-gray-50 flex flex-col">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
-          <p className="text-gray-600">Communicate with clients and freelancers</p>
-        </div>
-
-        <div className="grid grid-cols-12 gap-6 h-[800px]">
+      <div className="max-w-6xl mx-auto w-full flex-1 flex min-h-0 p-4">
+        <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">
           {/* Conversations Sidebar */}
-          <div className="col-span-4 bg-white rounded-lg border overflow-hidden">
-            <div className="p-4 border-b">
+          <div className="col-span-4 bg-white rounded-lg border flex flex-col min-h-0">
+            <div className="p-4 border-b flex-shrink-0">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Conversations</h2>
                 <Button size="sm" className="bg-teal-600 hover:bg-teal-700" onClick={() => setShowNewConversation(true)}>
@@ -181,12 +183,12 @@ useEffect(() => {
               </div>
             </div>
 
-            <div className="overflow-y-auto max-h-[700px]">
+            <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
               {filteredConversations.map((conversation) => (
                 <div
                   key={conversation.id}
-                  className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors ${
-                    selectedConversation === conversation.id ? "bg-teal-50 border-r-4 border-r-teal-600" : ""
+                  className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors flex-shrink-0 ${
+                    conversationId === conversation.id ? "bg-teal-50 border-r-4 border-r-teal-600" : ""
                   }`}
                   onClick={() => handleConversationSelect(conversation.id)}
                 >
@@ -210,7 +212,7 @@ useEffect(() => {
                       <p className="text-sm text-gray-600 mb-1">{conversation.project}</p>
                       
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-500 truncate">{conversation.lastMessage.content}</p>
+                        <p className="text-sm text-gray-500 truncate">{conversation.lastMessage && conversation.lastMessage.content}</p>
                         {conversation.unread > 0 && (
                           <Badge variant="default" className="bg-teal-600 text-xs px-2 py-1">
                             {conversation.unread}
@@ -258,11 +260,11 @@ useEffect(() => {
           )}
 
           {/* Messages Area */}
-          <div className="col-span-8 bg-white rounded-lg border flex flex-col">
-            {selectedConv ? (
+          <div className="col-span-8 bg-white rounded-lg border flex flex-col min-h-0">
+            {selectedConv && (
               <>
                 {/* Header */}
-                <div className="p-4 border-b flex items-center justify-between">
+                <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center space-x-3">
                     <div className="relative">
                       <Avatar className="h-10 w-10">
@@ -308,7 +310,7 @@ useEffect(() => {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
 
                 {messages.map((message) => (
                   <div key={message.id} className={`flex ${message.senderEmail === user.email ? "justify-end" : "justify-start"}`}>
@@ -339,7 +341,7 @@ useEffect(() => {
                 </div>
 
                 {/* Message Input */}
-                <div className="p-4 border-t">
+                <div className="p-4 border-t flex-shrink-0">
                   <div className="flex items-end space-x-2">
                     <Button variant="outline" size="sm">
                       <Paperclip className="h-4 w-4" />
@@ -376,22 +378,10 @@ useEffect(() => {
                   </div>
                 </div>
               </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Circle className="h-8 w-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select a conversation</h3>
-                  <p className="text-gray-500">Choose a conversation from the sidebar to start messaging</p>
-                </div>
-              </div>
-            )}
+            ) }
           </div>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 };

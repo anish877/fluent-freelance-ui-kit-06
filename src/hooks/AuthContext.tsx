@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 // Types based on your backend user model
@@ -31,11 +30,11 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
-  register: (userData: RegisterData) => Promise<{ success: boolean; message?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; user?: User }>;
+  register: (userData: RegisterData) => Promise<{ success: boolean; message?: string; user?: User }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
-  completeOnboarding: (userData: any) => Promise<{ success: boolean; message?: string }>;
+  completeOnboarding: (userData: any) => Promise<{ success: boolean; message?: string; user?: User }>;
 }
 
 interface RegisterData {
@@ -59,20 +58,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Routes that don't require authentication
-  const publicRoutes = ['/login', '/signup', '/forgot-password', '/', '/onboarding'];
-
-  
-  // Check if current route is public
-  const isPublicRoute = publicRoutes.includes(location.pathname);
-  
 
   // Function to verify authentication with backend
   const checkAuth = async (): Promise<boolean> => {
-
     try {
       const response = await axios.get('/auth/me');
       
@@ -96,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Login function
-  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; user?: User }> => {
     try {
       const response = await axios.post('/auth/login', { email, password });
       
@@ -106,17 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(user);
         setIsAuthenticated(true);
 
-        if(user.isOnboarded){
-            // Redirect based on user type
-            const dashboardPath = user.userType === 'FREELANCER' ? '/dashboard' : '/client-dashboard';
-            const from = location.state?.from?.pathname || dashboardPath;
-            navigate(from, { replace: true });
-            return { success: true, message: "Signed In" };
-        } else {
-            navigate("/onboarding")
-            return { success: true, message: "Signed In" };
-        }
-
+        return { success: true, message: "Signed In", user };
       } else {
         return { success: false, message: response.data.message || 'Login failed' };
       }
@@ -130,22 +108,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Register function
-  const register = async (userData: RegisterData): Promise<{ success: boolean; message?: string }> => {
+  const register = async (userData: RegisterData): Promise<{ success: boolean; message?: string; user?: User }> => {
     try {
       const response = await axios.post('/auth/register', userData);
       
       if (response.data.success) {
         const { user } = response.data;
-
         
         setUser(user);
         setIsAuthenticated(true);
         
-        // Redirect based on user type
-        const dashboardPath = user.userType === 'FREELANCER' ? '/dashboard' : '/client-dashboard';
-        navigate(dashboardPath, { replace: true });
-        
-        return { success: true };
+        return { success: true, user };
       } else {
         return { success: false, message: response.data.message || 'Registration failed' };
       }
@@ -159,80 +132,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Logout function
-    const logout = async () => {
+  const logout = async () => {
     try {
-        await axios.post('/auth/logout');
-        setUser(null);
-        setIsAuthenticated(false);
-
-        navigate('/login', { replace: true });
+      await axios.post('/auth/logout');
+      setUser(null);
+      setIsAuthenticated(false);
     } catch (err) {
-        console.error('Logout failed:', err);
+      console.error('Logout failed:', err);
+      // Still clear local state even if API call fails
+      setUser(null);
+      setIsAuthenticated(false);
     }
-    };
-
-    useEffect(() => {
-    axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    axios.defaults.withCredentials = true;
-    }, []);
-
-  // Setup interceptor with access to logout
-    useEffect(() => {
-      const interceptor = axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          logout(); // This works because we're inside the component
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    // Cleanup
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
-  }, []);
-
-  // Initialize auth on component mount
-  useEffect(() => {
-    const initializeAuth = async () => {
-      setLoading(true);
-      
-      if(!isPublicRoute){
-        const isAuthenticated = await checkAuth();
-      
-        // If user is not authenticated and trying to access protected route
-        if (!isAuthenticated) {
-            navigate('/login', { 
-            replace: true, 
-            state: { from: location } 
-            });
-        }
-      }
-      
-      setLoading(false);
-    };
-
-    initializeAuth();
-  }, [location.pathname]);
-
-  // Show loading spinner while checking authentication
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  // For protected routes, only render children if authenticated
-  if (!isPublicRoute && !isAuthenticated) {
-    return null; // Will redirect to login
-  }
+  };
 
   // Complete onboarding function
-  const completeOnboarding = async (userData: any): Promise<{ success: boolean; message?: string }> => {
+  const completeOnboarding = async (userData: any): Promise<{ success: boolean; message?: string; user?: User }> => {
     try {
       const response = await axios.post('/onboarding/complete-with-data', userData);
       
@@ -241,12 +155,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         setUser(user);
         setIsAuthenticated(true);
-
-        // Redirect based on user type
-        const dashboardPath = user.userType === 'FREELANCER' ? '/dashboard' : '/client-dashboard';
-        navigate(dashboardPath, { replace: true });
         
-        return { success: true, message: "Onboarding completed successfully" };
+        return { success: true, message: "Onboarding completed successfully", user };
       } else {
         return { success: false, message: response.data.message || 'Onboarding completion failed' };
       }
@@ -258,6 +168,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       };
     }
   };
+
+  // Setup axios defaults
+  useEffect(() => {
+    axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    axios.defaults.withCredentials = true;
+  }, []);
+
+  // Setup axios interceptor for 401 responses
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          setUser(null);
+          setIsAuthenticated(false);
+          localStorage.removeItem('token');
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
+
+  // Initialize auth on component mount
+  useEffect(() => {
+    const initializeAuth = async () => {
+      setLoading(true);
+      await checkAuth();
+      setLoading(false);
+    };
+
+    initializeAuth();
+  }, []);
 
   const value: AuthContextType = {
     user,
@@ -284,34 +230,4 @@ export const useAuth = (): AuthContextType => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
-
-// Protected Route Component (optional, for extra protection)
-export const ProtectedRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate('/login', { 
-        replace: true, 
-        state: { from: location } 
-      });
-    }
-  }, [isAuthenticated, loading, navigate, location]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  return <>{children}</>;
 };

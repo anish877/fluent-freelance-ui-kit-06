@@ -93,8 +93,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const shouldReconnectRef = useRef<boolean>(true);
   const isManualDisconnectRef = useRef<boolean>(false);
   const connectionStateRef = useRef<'disconnected' | 'connecting' | 'connected'>('disconnected');
+  const [providerId] = useState(() => Math.random().toString(36).substr(2, 9));
+  console.log('🔌 Provider ID:', providerId);
 
   // Clear all timeouts
+  console.log('🔌 WebSocketProvider render - User:', user?.email);
   const clearTimeouts = useCallback(() => {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
@@ -106,6 +109,15 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
   }, []);
 
+  useEffect(() => {
+    console.log('👤 User effect triggered:', {
+      providerId,
+      userEmail: user?.email,
+      userName: user?.firstName,
+      userType: user?.userType
+    });
+  }, [user?.email, user?.firstName, user?.userType, providerId]);
+
   // Message handlers
   const handleMessage = useCallback((event: MessageEvent) => {
     try {
@@ -113,40 +125,61 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       
       switch (wsMessage.type) {
           
-        case 'messages_loaded':
-        // Ensure each message has the expected structure
-        console.log(wsMessage)
-        const loadedMessages = wsMessage.payload.messages.map(msg => ({
+    case 'messages_loaded':
+      // Sort messages by timestamp on initial load
+      const loadedMessages = wsMessage.payload.messages
+        .map(msg => ({
           id: msg.id,
           conversationId: msg.conversationId,
           senderEmail: msg.senderEmail,
-          // senderName: msg.sender.firstName || "",
           content: String(msg.content || ''),
           timestamp: msg.timestamp || msg.createdAt,
           type: msg.type || 'text'
-        }));
-        setMessages(loadedMessages);
-        setCurrentConversationId(wsMessage.payload.conversationId);
-        break;
-        
-      case 'new_message':
-        // Ensure the new message has the expected structure
-        const newMessage = {
-          id: wsMessage.payload.id,
-          conversationId: wsMessage.payload.conversationId,
-          senderEmail: wsMessage.payload.senderEmail,
-          // senderName: wsMessage.payload.sender.firstName || "",
-          content: String(wsMessage.payload.content || ''),
-          timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
-          type: wsMessage.payload.type || 'text'
-        };
-        setMessages(prev => [...prev, newMessage]);
+        }))
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      
+      setMessages(loadedMessages);
+      setCurrentConversationId(wsMessage.payload.conversationId);
+      break;
 
-        break
+    case 'new_message':
+      const newMessage = {
+        id: wsMessage.payload.id,
+        conversationId: wsMessage.payload.conversationId,
+        senderEmail: wsMessage.payload.senderEmail,
+        content: String(wsMessage.payload.content || ''),
+        timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
+        type: wsMessage.payload.type || 'text'
+      };
+
+      // Use functional update with optimized insertion
+      setMessages(prevMessages => {
+        // Check if message already exists
+        const messageExists = prevMessages.some(msg => msg.id === newMessage.id);
+        if (messageExists) {
+          return prevMessages;
+        }
+
+        // Find the correct position to insert the message (binary search could be used for very large arrays)
+        const newTimestamp = new Date(newMessage.timestamp);
+        let insertIndex = prevMessages.length;
+        
+        // If the new message is older than the last message, find correct position
+        if (prevMessages.length > 0 && newTimestamp.getTime() < new Date(prevMessages[prevMessages.length - 1].timestamp).getTime()) {
+          insertIndex = prevMessages.findIndex(msg => new Date(msg.timestamp).getTime() > newTimestamp.getTime());
+          if (insertIndex === -1) insertIndex = prevMessages.length;
+        }
+
+        // Insert at the correct position
+        const updatedMessages = [...prevMessages];
+        updatedMessages.splice(insertIndex, 0, newMessage);
+        return updatedMessages;
+      });
+      break;
           
         case 'user_typing':
           setTypingUsers(prev => {
-            const exists = prev.find(u => u.userEmail === wsMessage.payload.userEmail);
+            const exists = prev.find(u => u.userName === wsMessage.payload.userName);
             if (!exists) {
               return [...prev, wsMessage.payload];
             }
@@ -156,7 +189,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           
         case 'user_stop_typing':
           setTypingUsers(prev => 
-            prev.filter(u => u.userEmail !== wsMessage.payload.userEmail)
+            prev.filter(u => u.userName !== wsMessage.payload.userName)
           );
           break;
           
@@ -222,7 +255,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         type: 'authenticate',
         payload: {
           userEmail: user.email,
-          name: user.firstName,
+          userName: user.firstName,
           type: user.userType,
           avatar: user.avatar
         }
@@ -381,7 +414,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   }, []);
 
   const sendMessage = useCallback((content: string, type: 'text' | 'file' | 'image' = 'text') => {
-    console.log("In sendmessage")
     console.log(socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim())
     if (socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim()) {
       console.log("Sending message")
@@ -433,11 +465,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Auto-connect when provider mounts
   useEffect(() => {
+    console.log('🔌 WebSocketProvider MOUNTED - ID:', providerId);
     shouldReconnectRef.current = true;
     connect();
     
     // Cleanup on unmount
     return () => {
+      console.log('🔌 WebSocketProvider UNMOUNTING - ID:', providerId);
       shouldReconnectRef.current = false;
       disconnect();
     };

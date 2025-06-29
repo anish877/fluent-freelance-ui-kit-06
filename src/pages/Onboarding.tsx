@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardContent } from "../components/ui/card";
 import { Progress } from "../components/ui/progress";
 import { Badge } from "../components/ui/badge";
-import { User, Briefcase, CheckCircle, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { User, Briefcase, CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { useOnboarding } from "../hooks/useOnboarding";
 
 // Import onboarding steps
@@ -23,8 +21,6 @@ import ClientVerification from "../components/onboarding/ClientVerification";
 import OnboardingComplete from "../components/onboarding/OnboardingComplete";
 
 const Onboarding = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   // Use the onboarding hook
   const {
