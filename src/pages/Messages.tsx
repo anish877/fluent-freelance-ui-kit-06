@@ -263,6 +263,7 @@ useEffect(() => {
                           {/* {conversation.isOnline && (
                             <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0" />
                           )} */}
+                          
                         </div>
                         <span className="text-xs text-gray-500">{conversation.timestamp}</span>
                       </div>
