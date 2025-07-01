@@ -76,6 +76,7 @@ router.get('/conversations', protect, (async (req: AuthRequest, res: Response): 
             id: true,
             firstName: true,
             lastName: true,
+            email: true,
             avatar: true,
             userType: true,
             companyName: true
@@ -546,6 +547,7 @@ router.get('/search', protect, (async (req: AuthRequest, res: Response): Promise
             id: true,
             firstName: true,
             lastName: true,
+            email: true,
             avatar: true,
             userType: true
           }
@@ -557,6 +559,9 @@ router.get('/search', protect, (async (req: AuthRequest, res: Response): Promise
         };
       })
     );
+
+
+    console.log("email: ", conversationsWithUsers)
 
     res.json({
       success: true,

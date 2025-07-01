@@ -17,7 +17,7 @@ interface OnlineUser {
 
 
 interface WSMessage {
-  type: 'authenticate' | "error" | "user_left" | "user_joined" | "user_stop_typing" | "user_typing" | "messages_loaded" | "new_message" | 'authentication_success' | 'connection_established' | 'join_conversation' | 'send_message' | 'typing' | 'stop_typing' | 'user_online' | 'user_offline';
+  type: 'authenticate' | "online_users_list" | "error" | "user_left" | "user_joined" | "user_stop_typing" | "user_typing" | "messages_loaded" | "new_message" | 'authentication_success' | 'connection_established' | 'join_conversation' | 'send_message' | 'typing' | 'stop_typing' | 'user_online' | 'user_offline';
   payload: any;
 }
 
@@ -106,10 +106,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const isManualDisconnectRef = useRef<boolean>(false);
   const connectionStateRef = useRef<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [providerId] = useState(() => Math.random().toString(36).substr(2, 9));
-  console.log('🔌 Provider ID:', providerId);
-
-  // Clear all timeouts
-  console.log('🔌 WebSocketProvider render - User:', user?.email);
   const clearTimeouts = useCallback(() => {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
@@ -189,7 +185,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
             break;
 
           case 'user_online':
-            console.log("Received online status")
             setOnlineUsers(prev => {
               const newMap = new Map(prev);
               newMap.set(wsMessage.payload.userEmail, {
@@ -197,6 +192,16 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
                 userName: wsMessage.payload.userName,
                 lastSeen: wsMessage.payload.lastSeen || new Date().toISOString()
               });
+              return newMap;
+            });
+          break;
+          case 'online_users_list':
+            console.log("online users received: ", wsMessage.payload.users)
+            setOnlineUsers(prev => {
+              const newMap = new Map(prev);
+              wsMessage.payload.users.forEach((user) => {
+                newMap.set(user.userEmail, user)
+              })
               return newMap;
             });
           break;
@@ -226,9 +231,9 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           );
           break;
           
-        case 'user_joined':
-          console.log(`${wsMessage.payload.userEmail} joined the conversation`);
-          break;
+        // case 'user_joined':
+        //   console.log(`${wsMessage.payload.userEmail} joined the conversation`);
+        //   break;
           
         case 'user_left':
           console.log(`${wsMessage.payload.userEmail} left the conversation`);

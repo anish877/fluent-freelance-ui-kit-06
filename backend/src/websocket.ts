@@ -42,6 +42,10 @@ interface ClientConnection {
   conversationId?: string;
   authenticated: boolean;
 }
+interface OnlineUsers {
+  userEmail: string;
+  userName: string;
+}
 
 const connections = new Map<string, ClientConnection>();
 const conversationRooms = new Map<string, Set<string>>();
@@ -338,6 +342,16 @@ wss.on("connection", (ws: WebSocket, req) => {
 
             console.log(`✅ Authentication successful for ${userEmail}`);
             console.log(`📊 Total authenticated connections: ${connections.size}`);
+
+            const currentOnlineUsers= Array.from(connections.values()); // Your server's online users storage
+            const usersToSend = currentOnlineUsers.map((u) => ({ userEmail: u.userEmail, userName: u.userName }))
+            ws.send(JSON.stringify({
+              type: 'online_users_list',
+              payload: {
+                users: usersToSend
+              }
+            }));
+            
 
             if(conversationId){
               try {
