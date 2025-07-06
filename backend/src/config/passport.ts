@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import prisma from "../lib/prisma"
+import prisma from "../lib/prisma.js"
 // import type { User } from '@prisma/client';
 // Serialize user for session
 passport.serializeUser((user: any, done) => {

@@ -2,10 +2,10 @@ import express, { Request, Response, Router, RequestHandler } from 'express';
 import crypto from 'crypto';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
-import prisma from '../lib/prisma';
-import { protect, AuthRequest } from '../middleware/auth';
-import { generateToken } from '../utils/jwt';
-import passport from "../config/passport"
+import prisma from '../lib/prisma.js';
+import { protect, AuthRequest } from '../middleware/auth.js';
+import { generateToken } from '../utils/jwt.js';
+import passport from "../config/passport.js"
 
 const router: Router = express.Router();
 

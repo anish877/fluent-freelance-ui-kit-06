@@ -2,8 +2,8 @@ import express, { Request, Response, RequestHandler, Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import crypto from 'crypto';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
-import prisma from '../lib/prisma';
-import { protect, authorize, AuthRequest } from '../middleware/auth';
+import prisma from '../lib/prisma.js';
+import { protect, authorize, AuthRequest } from '../middleware/auth.js';
 
 
 const router: Router = express.Router();

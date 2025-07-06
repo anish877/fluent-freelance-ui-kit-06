@@ -7,19 +7,19 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 // Import routes
-import authRoutes from './routes/auth';
-import userRoutes from './routes/users';
-import jobRoutes from './routes/jobs';
-import proposalRoutes from './routes/proposals';
-import messageRoutes from './routes/messages';
-import notificationRoutes from './routes/notifications';
-import onboardingRoutes from './routes/onboarding';
-import uploadRoutes from './routes/upload';
-import talentRoutes from './routes/talent';
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/users.js';
+import jobRoutes from './routes/jobs.js';
+import proposalRoutes from './routes/proposals.js';
+import messageRoutes from './routes/messages.js';
+import notificationRoutes from './routes/notifications.js';
+import onboardingRoutes from './routes/onboarding.js';
+import uploadRoutes from './routes/upload.js';
+import talentRoutes from './routes/talent.js';
 
 // Import middleware
-import { errorHandler } from './middleware/errorHandler';
-import { notFound } from './middleware/notFound';
+import { errorHandler } from './middleware/errorHandler.js';
+import { notFound } from './middleware/notFound.js';
 import session from 'express-session';
 import passport from 'passport';
 
