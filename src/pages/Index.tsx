@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, Users, Shield, CheckCircle, TrendingUp, Award, Globe, Zap, Target, MessageSquare } from "lucide-react";
-import Navbar from "../components/layout/Navbar";
+
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
@@ -100,7 +100,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+
       
       {/* Enhanced Hero Section */}
       <section className="bg-gradient-to-br from-teal-50 via-sky-50 to-indigo-50 pt-20 pb-24">
@@ -317,7 +317,7 @@ const Index = () => {
             Join millions of professionals and businesses building the future of work
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link to="/signup">
+            <Link to="/onboarding">
               <Button size="lg" className="bg-white text-teal-600 hover:bg-gray-100 px-10 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                 Get Started Free
                 <ArrowRight className="ml-2 h-6 w-6" />

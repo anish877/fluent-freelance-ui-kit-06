@@ -115,6 +115,12 @@ model User {
   minimumProjectBudget String? // Minimum project budget they accept
   specialRequirements  String? // Special requirements or notes
 
+  // Verification documents
+  idDocument     String? // Government-issued ID document URL
+  addressProof   String? // Address proof document URL
+  taxInformation String? // Tax information (ID, EIN, VAT number)
+  phoneVerified  Boolean @default(false) // Phone verification status
+
   // Relations
   jobsPosted       Job[]             @relation("JobPoster")
   proposals        Proposal[]        @relation("ProposalAuthor")
@@ -199,32 +205,36 @@ model Review {
   id         String   @id @default(cuid())
   rating     Int
   comment    String
-  jobId      String
   authorId   String
   receiverId String
+  jobId      String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   // Relations
-  job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
   author   User @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
   receiver User @relation("ReviewReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  job      Job? @relation(fields: [jobId], references: [id], onDelete: SetNull)
 
   @@map("reviews")
 }
 
 model Conversation {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   participants  String[] // Array of user IDs
   jobId         String? // Optional: link to specific job
-  projectName   String?
-  isActive      Boolean   @default(true)
-  lastMessageId String?   @unique
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  messages      Message[]
-  lastMessage   Message?  @relation("ConversationLastMessage", fields: [lastMessageId], references: [id])
-  job           Job?      @relation(fields: [jobId], references: [id])
+  projectName   String? // Name of the project for this conversation
+  isActive      Boolean  @default(true) // Whether the conversation is active
+  lastMessageId String? // ID of the last message in the conversation
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  job         Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  messages    Message[]
+  lastMessage Message?  @relation("ConversationLastMessage", fields: [lastMessageId], references: [id])
+
+  @@map("conversations")
 }
 
 model Message {
@@ -233,17 +243,15 @@ model Message {
   senderEmail    String
   receiverEmail  String
   conversationId String
-  jobId          String?
   isRead         Boolean  @default(false)
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relations
-  sender       User         @relation("MessageSender", fields: [senderEmail], references: [email], onDelete: Cascade)
-  receiver     User         @relation("MessageReceiver", fields: [receiverEmail], references: [email], onDelete: Cascade)
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-
-  // Reverse relation for last message
-  conversationAsLast Conversation? @relation("ConversationLastMessage")
+  sender                    User           @relation("MessageSender", fields: [senderEmail], references: [email], onDelete: Cascade)
+  receiver                  User           @relation("MessageReceiver", fields: [receiverEmail], references: [email], onDelete: Cascade)
+  conversation              Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationAsLastMessage Conversation[] @relation("ConversationLastMessage")
 
   @@map("messages")
 }
@@ -256,6 +264,7 @@ model Notification {
   isRead    Boolean          @default(false)
   userId    String
   createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -306,6 +315,7 @@ enum NotificationType {
   PROPOSAL_ACCEPTED
   PROPOSAL_REJECTED
   MESSAGE_RECEIVED
-  JOB_COMPLETED
+  JOB_POSTED
   PAYMENT_RECEIVED
+  SYSTEM_UPDATE
 }

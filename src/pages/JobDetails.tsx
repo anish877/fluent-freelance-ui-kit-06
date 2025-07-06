@@ -5,7 +5,7 @@ import {
   Bookmark, Share2, Flag, CheckCircle, Award, 
   MessageCircle, ThumbsUp, Eye, Send, Paperclip 
 } from "lucide-react";
-import Navbar from "../components/layout/Navbar";
+
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -198,7 +198,6 @@ const JobDetails = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-500"></div>
@@ -212,7 +211,6 @@ const JobDetails = () => {
   if (error || !job) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Job Not Found</h1>
@@ -270,7 +268,6 @@ const JobDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}

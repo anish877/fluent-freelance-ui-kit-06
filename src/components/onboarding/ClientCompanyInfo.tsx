@@ -4,7 +4,8 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { ArrowRight, Building, Upload, Globe } from "lucide-react";
+import { ArrowRight, Building, Upload, Globe, Loader2 } from "lucide-react";
+import { uploadService } from "../../lib/uploadService";
 
 interface ClientCompanyInfoData {
   companyName?: string;
@@ -39,6 +40,7 @@ const ClientCompanyInfo = ({ onNext, data }: ClientCompanyInfoProps) => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
 
   const industries = [
     "Technology", "Healthcare", "Finance", "E-commerce", "Education", "Marketing & Advertising",
@@ -85,14 +87,34 @@ const ClientCompanyInfo = ({ onNext, data }: ClientCompanyInfoProps) => {
     }
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData({ ...formData, companyLogo: e.target?.result as string });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Validate file
+    const validation = uploadService.validateFile(file);
+    if (!validation.isValid) {
+      setErrors({ companyLogo: validation.error });
+      return;
+    }
+
+    setUploading(true);
+    setErrors({});
+
+    try {
+      // Upload to Cloudinary
+      const result = await uploadService.uploadSingle(file);
+      
+      if (result.success) {
+        setFormData({ ...formData, companyLogo: result.data.url });
+      } else {
+        setErrors({ companyLogo: 'Upload failed. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setErrors({ companyLogo: 'Upload failed. Please try again.' });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -124,16 +146,24 @@ const ClientCompanyInfo = ({ onNext, data }: ClientCompanyInfoProps) => {
               </div>
             )}
             <label className="absolute bottom-0 right-0 bg-blue-600 text-white p-1 rounded-full cursor-pointer hover:bg-blue-700 transition-colors">
-              <Upload className="h-3 w-3" />
+              {uploading ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Upload className="h-3 w-3" />
+              )}
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleLogoUpload}
                 className="hidden"
+                disabled={uploading}
               />
             </label>
           </div>
           <p className="text-sm text-gray-500 mt-2">Company logo (optional)</p>
+          {errors.companyLogo && (
+            <p className="text-red-500 text-sm mt-1">{errors.companyLogo}</p>
+          )}
         </div>
 
         {/* Basic Company Info */}
@@ -260,7 +290,7 @@ const ClientCompanyInfo = ({ onNext, data }: ClientCompanyInfoProps) => {
           </p>
         </div>
 
-        <Button type="submit" className="w-full" size="lg">
+        <Button type="submit" className="w-full" size="lg" disabled={uploading}>
           Continue
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>

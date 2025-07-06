@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Filter, MapPin, Clock, DollarSign, Bookmark, Eye, Users, Star, Award, AlertCircle, Calendar, Building, Globe, ChevronDown, Loader2 } from "lucide-react";
 import axios from "axios";
-import Navbar from "../components/layout/Navbar";
+
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -309,7 +309,7 @@ const Jobs = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-      <Navbar />
+
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-hidden">
         {/* Header with Enhanced Stats */}

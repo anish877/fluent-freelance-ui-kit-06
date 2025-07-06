@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
-import { ArrowRight, Shield, Upload, FileText, CreditCard, Phone } from "lucide-react";
+import { ArrowRight, Shield, Upload, FileText, CreditCard, Phone, Loader2 } from "lucide-react";
+import { uploadService } from "../../lib/uploadService";
 
 interface FreelancerVerificationData {
   phoneNumber?: string;
@@ -39,6 +39,7 @@ const FreelancerVerification = ({ onNext, data }: FreelancerVerificationProps) =
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadingStates, setUploadingStates] = useState<Record<string, boolean>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,14 +69,34 @@ const FreelancerVerification = ({ onNext, data }: FreelancerVerificationProps) =
     }
   };
 
-  const handleFileUpload = (field: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (field: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData({ ...formData, [field]: e.target?.result as string });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Validate file
+    const validation = uploadService.validateFile(file);
+    if (!validation.isValid) {
+      setErrors({ [field]: validation.error });
+      return;
+    }
+
+    setUploadingStates(prev => ({ ...prev, [field]: true }));
+    setErrors({});
+
+    try {
+      // Upload to Cloudinary
+      const result = await uploadService.uploadSingle(file);
+      
+      if (result.success) {
+        setFormData({ ...formData, [field]: result.data.url });
+      } else {
+        setErrors({ [field]: 'Upload failed. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setErrors({ [field]: 'Upload failed. Please try again.' });
+    } finally {
+      setUploadingStates(prev => ({ ...prev, [field]: false }));
     }
   };
 
@@ -151,14 +172,25 @@ const FreelancerVerification = ({ onNext, data }: FreelancerVerificationProps) =
                   onChange={(e) => handleFileUpload("idDocument", e)}
                   className="hidden"
                   id="id-document"
+                  disabled={uploadingStates.idDocument}
                 />
                 <label htmlFor="id-document" className="flex flex-col items-center cursor-pointer">
-                  <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-600">
-                    {formData.idDocument ? "Document uploaded ✓" : "Upload passport, driver's license, or national ID"}
-                  </span>
+                  {uploadingStates.idDocument ? (
+                    <div className="flex items-center">
+                      <Loader2 className="h-8 w-8 text-gray-400 mb-2 animate-spin" />
+                      <span className="text-sm text-gray-600">Uploading...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-600">
+                        {formData.idDocument ? "Document uploaded ✓" : "Upload passport, driver's license, or national ID"}
+                      </span>
+                    </>
+                  )}
                 </label>
               </div>
+              {errors.idDocument && <p className="text-red-500 text-sm mt-1">{errors.idDocument}</p>}
             </div>
             
             <div>
@@ -170,14 +202,25 @@ const FreelancerVerification = ({ onNext, data }: FreelancerVerificationProps) =
                   onChange={(e) => handleFileUpload("addressProof", e)}
                   className="hidden"
                   id="address-proof"
+                  disabled={uploadingStates.addressProof}
                 />
                 <label htmlFor="address-proof" className="flex flex-col items-center cursor-pointer">
-                  <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-600">
-                    {formData.addressProof ? "Document uploaded ✓" : "Upload utility bill or bank statement"}
-                  </span>
+                  {uploadingStates.addressProof ? (
+                    <div className="flex items-center">
+                      <Loader2 className="h-8 w-8 text-gray-400 mb-2 animate-spin" />
+                      <span className="text-sm text-gray-600">Uploading...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-600">
+                        {formData.addressProof ? "Document uploaded ✓" : "Upload utility bill or bank statement"}
+                      </span>
+                    </>
+                  )}
                 </label>
               </div>
+              {errors.addressProof && <p className="text-red-500 text-sm mt-1">{errors.addressProof}</p>}
             </div>
           </div>
         </div>
@@ -286,7 +329,7 @@ const FreelancerVerification = ({ onNext, data }: FreelancerVerificationProps) =
           </p>
         </div>
 
-        <Button type="submit" className="w-full" size="lg">
+        <Button type="submit" className="w-full" size="lg" disabled={Object.values(uploadingStates).some(Boolean)}>
           Complete Verification
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>

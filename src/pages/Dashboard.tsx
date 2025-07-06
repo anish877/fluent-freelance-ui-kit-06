@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users, Eye, MessageCircle, Calendar, CheckCircle, AlertCircle, BarChart3, FileText, Star, Award, Target, Briefcase, Activity, Loader2 } from "lucide-react";
 import axios from "axios";
-import Navbar from "../components/layout/Navbar";
+
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -331,7 +331,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Enhanced Header */}
