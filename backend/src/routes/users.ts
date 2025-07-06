@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import prisma from '../lib/prisma';
 import { protect, authorize, AuthRequest } from '../middleware/auth';
-import { Prisma } from '@prisma/client';
+
 
 const router: Router = express.Router();
 

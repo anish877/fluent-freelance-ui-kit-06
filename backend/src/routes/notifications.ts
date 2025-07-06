@@ -2,7 +2,7 @@ import express, { Request, Response, RequestHandler, Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, AuthRequest } from '../middleware/auth';
-import { Prisma } from '@prisma/client';
+
 
 const router: Router = express.Router();
 

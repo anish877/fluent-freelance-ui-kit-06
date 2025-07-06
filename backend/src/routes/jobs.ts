@@ -2,9 +2,6 @@ import express, { Request, Response, RequestHandler } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, authorize, AuthRequest } from '../middleware/auth';
-import { PrismaClient } from '@prisma/client';
-type Prisma = typeof PrismaClient;
-
 const router = express.Router();
 
 // @desc    Get all jobs
@@ -24,7 +21,7 @@ router.get('/', (async (req: Request, res: Response): Promise<void> => {
     } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const where: Prisma.JobWhereInput = {};
+    const where: any = {};
     
     if (category) {
       where.category = category as string;
