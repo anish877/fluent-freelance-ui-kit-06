@@ -19,11 +19,26 @@ import talentRoutes from './routes/talent';
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
+import session from 'express-session';
+import passport from 'passport';
 
 // Load environment variables
 dotenv.config();
 
 const app: Application = express();
+app.use(session({
+  secret: process.env.SESSION_SECRET!,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 const PORT = process.env.PORT || 5000;
 app.use(cookieParser())
 // Rate limiting
@@ -39,6 +54,7 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || ['http://localhost:3000', 'http://localhost:3002'],
   credentials: true
 }));
+
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));

@@ -4,9 +4,8 @@ import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, AuthRequest } from '../middleware/auth';
-import passport from 'passport';
 import { generateToken } from '../utils/jwt';
-
+import passport from "../config/passport"
 
 const router: Router = express.Router();
 
@@ -161,6 +160,8 @@ router.post('/login', [
       return;
     }
 
+
+
     // Fetch user data without password for response
     const user = await prisma.user.findUnique({
       where: { id: userWithPassword.id },
@@ -212,8 +213,93 @@ router.post('/login', [
   }
 });
 
+
+router.post('/logout', (req: Request, res: Response) => {
+  
+  // Handle session-based logout (OAuth users)
+  if (req.session && req.isAuthenticated && req.isAuthenticated()) {
+    
+    req.logout((err) => {
+      if (err) {
+        console.error('❌ [Backend] Passport logout error:', err);
+        res.status(500).json({ 
+          success: false, 
+          message: 'Logout failed' 
+        });
+        return
+      }
+      
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('❌ [Backend] Session destruction error:', err);
+          res.status(500).json({ 
+            success: false, 
+            message: 'Session cleanup failed' 
+          });
+          return
+        }
+
+        
+        // Clear both session cookie and token cookie (just in case)
+        res.clearCookie('connect.sid');
+        res.clearCookie('token');
+        
+        res.json({ 
+          success: true, 
+          message: 'Logged out successfully' 
+        });
+      });
+    });
+  } 
+  // Handle token-based logout (traditional email/password users)
+  else {
+    
+    // Your existing token-based logout logic
+    res.clearCookie('token').json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+    
+  }
+});
+
+router.get('/google', (req, res, next) => {
+  
+  passport.authenticate('google', {
+    scope: ['profile', 'email']
+  })(req, res, next);
+});
+
+router.get('/google/callback', 
+  passport.authenticate('google', { 
+    failureRedirect: `${process.env.CLIENT_URL}/login?error=oauth_failed` 
+  }),
+  (req, res) => {
+    
+    // Redirect to frontend with success
+    const signOptions: SignOptions = { expiresIn: '7d' };
+    const user = req.user as any;
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET as Secret,
+      signOptions
+    );
+    
+    if (user.isOnboarded) {
+      res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    })
+    res.redirect(`${process.env.CLIENT_URL}/dashboard?from=oauth`);
+    } else {
+      res.redirect(`${process.env.CLIENT_URL}/onboarding`);
+    }
+  }
+);
+
 router.get('/me', protect, (async (req: AuthRequest, res: Response): Promise<void> => {
-  console.log("hitted")
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id },
@@ -242,6 +328,7 @@ router.get('/me', protect, (async (req: AuthRequest, res: Response): Promise<voi
       }
     });
 
+
     res.json({
       success: true,
       user
@@ -252,32 +339,5 @@ router.get('/me', protect, (async (req: AuthRequest, res: Response): Promise<voi
   }
 }) as RequestHandler);
 
-router.post('/logout', (req: Request, res: Response) => {
-  res.clearCookie('token').json({
-    success: true,
-    message: 'Logged out successfully'
-  });
-});
-
-router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  (req, res) => {
-    const user = req.user as any;
-    
-    // Generate JWT token
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      userType: user.userType,
-      isOnboarded: user.isOnboarded,
-    });
-
-    // Redirect to frontend with token
-    const redirectPath = user.isOnboarded ? '/dashboard' : '/onboarding';
-    res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}&redirect=${redirectPath}`);
-  }
-);
 
 export default router; 
