@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": ">=18 <23"
+    "node": "18.x"
   },
   "packageManager": "pnpm@10.12.4",
   "scripts": {
@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "start": "node backend/dist/index.js",
     "lint": "eslint .",
-    "heroku-postbuild": "pnpm install --filter ./backend... && pnpm run build && cd backend && pnpm run build"
+    "heroku-postbuild": "pnpm run build && cd backend && pnpm install && pnpm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
