@@ -7,9 +7,6 @@
     "node": ">=18 <23"
   },
   "packageManager": "pnpm@10.12.4",
-  "workspaces": [
-    "backend"
-  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
