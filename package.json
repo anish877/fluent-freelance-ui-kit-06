@@ -8,9 +8,9 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
-    "start": "vite preview --port $PORT --host 0.0.0.0",
+    "start": "node backend/dist/index.js",
     "lint": "eslint .",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "npm run build && cd backend && npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

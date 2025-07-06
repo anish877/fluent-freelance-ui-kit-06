@@ -1,73 +1,277 @@
-# Welcome to your Lovable project
+# Fluent Freelance Platform
 
-## Project info
+A full-stack freelance platform built with React, Node.js, TypeScript, and PostgreSQL.
 
-**URL**: https://lovable.dev/projects/b2552196-b594-4490-ad53-e091b8347178
+## 🚀 Quick Deployment to Heroku
 
-## How can I edit this code?
+### Prerequisites
+1. Install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+2. Have a [Heroku account](https://signup.heroku.com/)
+3. Git repository set up
 
-There are several ways of editing your application.
+### Option 1: Automated Deployment (Recommended)
 
-**Use Lovable**
+Use the provided deployment script:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b2552196-b594-4490-ad53-e091b8347178) and start prompting.
+```bash
+# Make the script executable
+chmod +x deploy.sh
 
-Changes made via Lovable will be committed automatically to this repo.
+# Deploy both frontend and backend
+./deploy.sh both
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# Or deploy individually
+./deploy.sh backend
+./deploy.sh frontend
 ```
 
-**Edit a file directly in GitHub**
+### Option 2: Manual Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+#### Step 1: Deploy Backend
 
-**Use GitHub Codespaces**
+```bash
+# Navigate to backend directory
+cd backend
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Create Heroku app
+heroku create your-backend-app-name
 
-## What technologies are used for this project?
+# Add PostgreSQL database
+heroku addons:create heroku-postgresql:mini
 
-This project is built with:
+# Set environment variables
+heroku config:set NODE_ENV=production
+heroku config:set SESSION_SECRET=$(openssl rand -base64 32)
+heroku config:set JWT_SECRET=$(openssl rand -base64 32)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+# Deploy
+git add .
+git commit -m "Deploy backend"
+git push heroku main
 
-## How can I deploy this project?
+# Run database migrations
+heroku run npm run db:migrate
+```
 
-Simply open [Lovable](https://lovable.dev/projects/b2552196-b594-4490-ad53-e091b8347178) and click on Share -> Publish.
+#### Step 2: Deploy Frontend
 
-## Can I connect a custom domain to my Lovable project?
+```bash
+# Navigate back to root
+cd ..
 
-Yes, you can!
+# Create Heroku app
+heroku create your-frontend-app-name
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+# Set backend URL
+heroku config:set VITE_API_URL=https://your-backend-app-name.herokuapp.com
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+# Deploy
+git add .
+git commit -m "Deploy frontend"
+git push heroku main
+```
+
+#### Step 3: Update CORS
+
+```bash
+# Update backend CORS with frontend URL
+cd backend
+heroku config:set CORS_ORIGIN=https://your-frontend-app-name.herokuapp.com
+heroku restart
+```
+
+### Environment Variables
+
+#### Backend (Required)
+- `NODE_ENV=production`
+- `SESSION_SECRET` (auto-generated)
+- `JWT_SECRET` (auto-generated)
+- `DATABASE_URL` (auto-set by Heroku)
+- `CORS_ORIGIN` (your frontend URL)
+
+#### Backend (Optional)
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+
+#### Frontend (Required)
+- `VITE_API_URL` (your backend URL)
+
+## 🛠️ Local Development
+
+### Prerequisites
+- Node.js 18+
+- PostgreSQL
+- pnpm (recommended) or npm
+
+### Setup
+
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd fluent-freelance-ui-kit-06
+```
+
+2. **Install dependencies**
+```bash
+# Frontend
+pnpm install
+
+# Backend
+cd backend
+pnpm install
+```
+
+3. **Set up environment variables**
+```bash
+# Backend (.env file)
+cp backend/.env.example backend/.env
+# Edit backend/.env with your values
+
+# Frontend (.env file)
+cp .env.example .env
+# Edit .env with your values
+```
+
+4. **Set up database**
+```bash
+cd backend
+npx prisma generate
+npx prisma db push
+```
+
+5. **Start development servers**
+```bash
+# Backend (in backend directory)
+pnpm dev
+
+# Frontend (in root directory)
+pnpm dev
+```
+
+## 📁 Project Structure
+
+```
+fluent-freelance-ui-kit-06/
+├── src/                    # Frontend React app
+│   ├── components/         # React components
+│   │   ├── components/     # React components
+│   │   ├── pages/          # Page components
+│   │   ├── hooks/          # Custom React hooks
+│   │   └── lib/            # Utility functions
+│   ├── backend/            # Backend Node.js app
+│   │   ├── src/           # Source code
+│   │   │   ├── routes/    # API routes
+│   │   │   ├── middleware/# Express middleware
+│   │   │   ├── lib/       # Database and utilities
+│   │   │   └── types/     # TypeScript types
+│   │   └── prisma/         # Database schema and migrations
+│   ├── public/             # Static assets
+│   └── dist/               # Built frontend (generated)
+```
+
+## 🚀 Features
+
+### Frontend
+- React 18 with TypeScript
+- Vite for fast development
+- Tailwind CSS for styling
+- Shadcn/ui components
+- React Router for navigation
+- React Query for data fetching
+- Form handling with React Hook Form
+- Real-time messaging with WebSocket
+
+### Backend
+- Node.js with Express
+- TypeScript for type safety
+- Prisma ORM with PostgreSQL
+- JWT authentication
+- Google OAuth integration
+- File upload with Cloudinary
+- WebSocket for real-time features
+- Rate limiting and security middleware
+
+### Key Features
+- User authentication (email/password + Google OAuth)
+- Job posting and management
+- Proposal submission and management
+- Real-time messaging
+- User profiles and portfolios
+- Search and filtering
+- Notifications system
+- File uploads
+- Responsive design
+
+## 🔧 Configuration
+
+### Database
+The app uses PostgreSQL with Prisma ORM. The database schema is defined in `backend/prisma/schema.prisma`.
+
+### Authentication
+- JWT tokens for API authentication
+- Session-based authentication for web
+- Google OAuth integration
+
+### File Uploads
+File uploads are handled by Cloudinary. Set up your Cloudinary account and add credentials to environment variables.
+
+## 📚 API Documentation
+
+The API endpoints are organized as follows:
+
+- `/api/auth` - Authentication routes
+- `/api/users` - User management
+- `/api/jobs` - Job posting and management
+- `/api/proposals` - Proposal management
+- `/api/messages` - Messaging system
+- `/api/notifications` - Notification system
+- `/api/upload` - File uploads
+- `/api/talent` - Talent search and profiles
+
+## 🧪 Testing
+
+```bash
+# Frontend tests
+pnpm test
+
+# Backend tests
+cd backend
+pnpm test
+```
+
+## 📦 Build
+
+```bash
+# Frontend build
+pnpm build
+
+# Backend build
+cd backend
+pnpm build
+```
+
+## 🚀 Deployment
+
+See the deployment section above for Heroku deployment instructions.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support and questions:
+- Check the [deployment guide](DEPLOYMENT.md)
+- Review the [Heroku quick reference](HEROKU_QUICK_REFERENCE.md)
+- Open an issue on GitHub
