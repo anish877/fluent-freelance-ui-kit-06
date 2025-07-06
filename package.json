@@ -13,9 +13,10 @@
     "preview": "vite preview",
     "start": "node backend/dist/index.js",
     "lint": "eslint .",
-    "heroku-postbuild": "npm run build && npm run backend:build",
+    "heroku-postbuild": "npm run build && npm run backend:build && npm run prisma:generate",
     "backend:build": "cd backend && npx tsc",
-    "backend:dev": "cd backend && npx nodemon --exec npx ts-node src/index.ts"
+    "backend:dev": "cd backend && npx nodemon --exec npx ts-node src/index.ts",
+    "prisma:generate": "cd backend && npx prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
