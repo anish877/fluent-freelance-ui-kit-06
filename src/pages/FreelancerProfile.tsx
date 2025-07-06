@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   MapPin, Clock, Star, Users, Award, Eye, MessageCircle, 
   ThumbsUp, Calendar, DollarSign, CheckCircle, Badge as BadgeIcon,
   Download, ExternalLink, Heart, Share2, Flag, Camera,
-  Briefcase, GraduationCap, Globe, Phone, Mail, Loader2
+  Briefcase, GraduationCap, Globe, Phone, Mail, Loader2, Edit
 } from "lucide-react";
 
 import Footer from "../components/layout/Footer";
@@ -79,12 +79,31 @@ interface FreelancerData {
 
 const FreelancerProfile = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [isFollowing, setIsFollowing] = useState(false);
   const [freelancer, setFreelancer] = useState<FreelancerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setCurrentUser(result.user);
+            // Check if the current user is viewing their own profile
+            setIsOwnProfile(result.user.id === id);
+          }
+        }
+      } catch (err) {
+        console.log('User not authenticated or error fetching user data');
+      }
+    };
+
     const fetchFreelancerProfile = async () => {
       try {
         setLoading(true);
@@ -99,6 +118,16 @@ const FreelancerProfile = () => {
         if (result.success) {
           console.log('Freelancer data received:', result.data);
           console.log('Response time:', result.data.responseTime);
+          console.log('Portfolio data:', result.data.portfolio);
+          console.log('Work history data:', result.data.workHistory);
+          console.log('Languages data:', result.data.languages);
+          console.log('Skills data:', result.data.skills);
+          console.log('Portfolio type:', typeof result.data.portfolio);
+          console.log('Portfolio is array:', Array.isArray(result.data.portfolio));
+          console.log('Portfolio length:', result.data.portfolio?.length);
+          console.log('Work history type:', typeof result.data.workHistory);
+          console.log('Work history is array:', Array.isArray(result.data.workHistory));
+          console.log('Work history length:', result.data.workHistory?.length);
           setFreelancer(result.data);
         } else {
           throw new Error(result.message || 'Failed to fetch freelancer profile');
@@ -111,6 +140,7 @@ const FreelancerProfile = () => {
     };
 
     if (id) {
+      fetchCurrentUser();
       fetchFreelancerProfile();
     }
   }, [id]);
@@ -121,6 +151,10 @@ const FreelancerProfile = () => {
 
   const handleHire = () => {
     console.log("Hire freelancer");
+  };
+
+  const handleEditProfile = () => {
+    navigate('/profile');
   };
 
   if (loading) {
@@ -237,22 +271,31 @@ const FreelancerProfile = () => {
               </div>
 
               <div className="flex flex-col space-y-3 mt-16">
-                <Button onClick={handleHire} className="bg-teal-600 hover:bg-teal-700">
-                  <Briefcase className="h-4 w-4 mr-2" />
-                  Hire Now
-                </Button>
-                <Button variant="outline" onClick={handleContact}>
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Contact
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsFollowing(!isFollowing)}
-                  className={isFollowing ? "text-red-600 border-red-600" : ""}
-                >
-                  <Heart className={`h-4 w-4 mr-2 ${isFollowing ? "fill-current" : ""}`} />
-                  {isFollowing ? "Following" : "Follow"}
-                </Button>
+                {isOwnProfile ? (
+                  <Button onClick={handleEditProfile} className="bg-teal-600 hover:bg-teal-700">
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                ) : (
+                  <>
+                    <Button onClick={handleHire} className="bg-teal-600 hover:bg-teal-700">
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      Hire Now
+                    </Button>
+                    <Button variant="outline" onClick={handleContact}>
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Contact
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsFollowing(!isFollowing)}
+                      className={isFollowing ? "text-red-600 border-red-600" : ""}
+                    >
+                      <Heart className={`h-4 w-4 mr-2 ${isFollowing ? "fill-current" : ""}`} />
+                      {isFollowing ? "Following" : "Follow"}
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -370,72 +413,88 @@ const FreelancerProfile = () => {
               <TabsContent value="portfolio" className="space-y-6">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-6">Portfolio</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {freelancer.portfolio.map((project) => (
-                      <div key={project.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                        <img 
-                          src={project.image} 
-                          alt={project.title}
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="p-4">
-                          <h4 className="font-semibold text-gray-900 mb-2">{project.title}</h4>
-                          <p className="text-gray-600 text-sm mb-3">{project.description}</p>
-                          <div className="flex flex-wrap gap-1 mb-3">
-                            {project.technologies.map((tech, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {tech}
-                              </Badge>
-                            ))}
+                  {freelancer.portfolio && freelancer.portfolio.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {freelancer.portfolio.map((project) => (
+                        <div key={project.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                          <img 
+                            src={project.image} 
+                            alt={project.title}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="p-4">
+                            <h4 className="font-semibold text-gray-900 mb-2">{project.title}</h4>
+                            <p className="text-gray-600 text-sm mb-3">{project.description}</p>
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {project.technologies.map((tech, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {tech}
+                                </Badge>
+                              ))}
+                            </div>
+                            <div className="flex justify-between items-center text-sm text-gray-600">
+                              <span>Client: {project.client}</span>
+                              <span>{project.completion}</span>
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="w-full mt-3"
+                              asChild
+                              disabled={!project.url}
+                            >
+                              <a href={project.url || '#'} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                View Project
+                              </a>
+                            </Button>
                           </div>
-                          <div className="flex justify-between items-center text-sm text-gray-600">
-                            <span>Client: {project.client}</span>
-                            <span>{project.completion}</span>
-                          </div>
-                          <Button variant="outline" size="sm" className="w-full mt-3">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            View Project
-                          </Button>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 text-center py-8">No portfolio projects available</p>
+                  )}
                 </div>
               </TabsContent>
 
               <TabsContent value="work-history" className="space-y-6">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-6">Work History</h3>
-                  <div className="space-y-6">
-                    {freelancer.workHistory.map((work) => (
-                      <div key={work.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">{work.title}</h4>
-                            <p className="text-gray-600">Client: {work.client}</p>
-                            <p className="text-sm text-gray-600">{work.duration} • Completed {work.completedDate}</p>
-                          </div>
-                          <div className="text-right">
-                            <div className="flex items-center mb-1">
-                              {[...Array(Math.floor(work.clientRating))].map((_, i) => (
-                                <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                              ))}
-                              <span className="ml-1 text-sm font-medium">{work.clientRating}</span>
+                  {freelancer.workHistory && freelancer.workHistory.length > 0 ? (
+                    <div className="space-y-6">
+                      {freelancer.workHistory.map((work) => (
+                        <div key={work.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <h4 className="font-semibold text-gray-900">{work.title}</h4>
+                              <p className="text-gray-600">Client: {work.client}</p>
+                              <p className="text-sm text-gray-600">{work.duration} • Completed {work.completedDate}</p>
                             </div>
-                            <p className="text-lg font-bold text-gray-900">{work.budget}</p>
+                            <div className="text-right">
+                              <div className="flex items-center mb-1">
+                                {[...Array(Math.floor(work.clientRating))].map((_, i) => (
+                                  <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                                ))}
+                                <span className="ml-1 text-sm font-medium">{work.clientRating}</span>
+                              </div>
+                              <p className="text-lg font-bold text-gray-900">{work.budget}</p>
+                            </div>
+                          </div>
+                          <p className="text-gray-700 mb-3">{work.feedback}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {work.skills.map((skill, index) => (
+                              <Badge key={index} variant="secondary">
+                                {skill}
+                              </Badge>
+                            ))}
                           </div>
                         </div>
-                        <p className="text-gray-700 mb-3">{work.feedback}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {work.skills.map((skill, index) => (
-                            <Badge key={index} variant="secondary">
-                              {skill}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-600 text-center py-8">No work history available</p>
+                  )}
                 </div>
               </TabsContent>
 
@@ -497,29 +556,37 @@ const FreelancerProfile = () => {
             {/* Languages */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Languages</h3>
-              <div className="space-y-2">
-                {freelancer.languages.map((lang, index) => (
-                  <div key={index} className="flex justify-between">
-                    <span className="text-gray-700">{lang.name}</span>
-                    <span className="text-gray-600 text-sm">{lang.level}</span>
-                  </div>
-                ))}
-              </div>
+              {freelancer.languages && freelancer.languages.length > 0 ? (
+                <div className="space-y-2">
+                  {freelancer.languages.map((lang, index) => (
+                    <div key={index} className="flex justify-between">
+                      <span className="text-gray-700">{lang.name}</span>
+                      <span className="text-gray-600 text-sm">{lang.level}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600 text-sm">No languages specified</p>
+              )}
             </div>
 
             {/* Employment History */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Employment</h3>
-              <div className="space-y-4">
-                {freelancer.employment.map((job, index) => (
-                  <div key={index}>
-                    <h4 className="font-medium text-gray-900">{job.position}</h4>
-                    <p className="text-gray-600">{job.company}</p>
-                    <p className="text-sm text-gray-600">{job.period}</p>
-                    <p className="text-sm text-gray-700 mt-1">{job.description}</p>
-                  </div>
-                ))}
-              </div>
+              {freelancer.employment && freelancer.employment.length > 0 ? (
+                <div className="space-y-4">
+                  {freelancer.employment.map((job, index) => (
+                    <div key={index}>
+                      <h4 className="font-medium text-gray-900">{job.position}</h4>
+                      <p className="text-gray-600">{job.company}</p>
+                      <p className="text-sm text-gray-600">{job.period}</p>
+                      <p className="text-sm text-gray-700 mt-1">{job.description}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600 text-sm">No employment history available</p>
+              )}
             </div>
 
             {/* Verification */}

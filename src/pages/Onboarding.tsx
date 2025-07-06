@@ -129,6 +129,8 @@ interface OnboardingCompleteProps {
   error?: string | null;
 }
 
+type StepComponentProps = ComponentProps | UserTypeSelectionProps | OnboardingCompleteProps;
+
 const Onboarding = () => {
 
   // Use the onboarding hook
@@ -362,7 +364,7 @@ const Onboarding = () => {
         <Card className="mb-8">
           <CardContent className="p-8">
             {CurrentStepComponent && (
-              <CurrentStepComponent {...(getComponentProps() as any)} />
+              <CurrentStepComponent {...(getComponentProps() as StepComponentProps)} />
             )}
           </CardContent>
         </Card>

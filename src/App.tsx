@@ -20,6 +20,7 @@ import Login from "./pages/Login";
 
 import Onboarding from "./pages/Onboarding";
 import PostJob from "./pages/PostJob";
+import EditJob from "./pages/EditJob";
 import Proposals from "./pages/Proposals";
 import Talent from "./pages/Talent";
 import Profile from "./pages/Profile";
@@ -66,6 +67,14 @@ const App = () => {
                       element={
                         <ProtectedRoute allowedUserTypes={['CLIENT']}>
                           <PostJob />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/edit-job/:id" 
+                      element={
+                        <ProtectedRoute allowedUserTypes={['CLIENT']}>
+                          <EditJob />
                         </ProtectedRoute>
                       } 
                     />

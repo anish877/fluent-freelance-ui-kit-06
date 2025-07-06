@@ -384,10 +384,12 @@ const ClientJobView = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Edit className="h-4 w-4 mr-1" />
-                Edit Job
-              </Button>
+              <Link to={`/edit-job/${job.id}`}>
+                <Button variant="outline" size="sm">
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit Job
+                </Button>
+              </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
@@ -523,20 +525,26 @@ const ClientJobView = () => {
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-lg font-semibold text-gray-900">
-                                {proposal.freelancer.firstName} {proposal.freelancer.lastName}
-                              </h3>
-                              {proposal.freelancer.topRatedPlus && (
-                                <Badge variant="secondary" className="text-xs">
-                                  <Award className="h-3 w-3 mr-1" />
-                                  Top Rated Plus
-                                </Badge>
-                              )}
-                              {proposal.freelancer.verified && (
-                                <CheckCircle className="h-4 w-4 text-green-600" />
-                              )}
-                            </div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {proposal.freelancer.firstName} {proposal.freelancer.lastName}
+                          </h3>
+                          {proposal.freelancer.topRatedPlus && (
+                            <Badge variant="secondary" className="text-xs">
+                              <Award className="h-3 w-3 mr-1" />
+                              Top Rated Plus
+                            </Badge>
+                          )}
+                          {proposal.freelancer.verified && (
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                          )}
+                          <Link to={`/freelancer/${proposal.freelancer.id}`}>
+                            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                              <Eye className="h-3 w-3 mr-1" />
+                              Profile
+                            </Button>
+                          </Link>
+                        </div>
                             <p className="text-gray-600 mb-2">{proposal.freelancer.title || 'Freelancer'}</p>
                             <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                               <div className="flex items-center">
@@ -605,10 +613,16 @@ const ClientJobView = () => {
                           )}
                         </div>
                         <div className="flex gap-2">
+                          <Link to={`/freelancer/${proposal.freelancer.id}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Profile
+                            </Button>
+                          </Link>
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button variant="outline" size="sm">
-                                <Eye className="h-4 w-4 mr-1" />
+                                <FileText className="h-4 w-4 mr-1" />
                                 View Details
                               </Button>
                             </DialogTrigger>
@@ -719,6 +733,12 @@ const ClientJobView = () => {
 
                                 {/* Action Buttons */}
                                 <div className="flex justify-end gap-2 pt-4 border-t">
+                                  <Link to={`/freelancer/${proposal.freelancer.id}`}>
+                                    <Button variant="outline">
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      View Profile
+                                    </Button>
+                                  </Link>
                                   <Button variant="outline">
                                     <MessageCircle className="h-4 w-4 mr-2" />
                                     Message

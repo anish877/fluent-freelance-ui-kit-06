@@ -70,6 +70,37 @@ router.get('/job/:jobId', protect, (async (req: AuthRequest, res: Response): Pro
   }
 }) as RequestHandler);
 
+// @desc    Check if freelancer has submitted proposal for a job
+// @route   GET /api/proposals/check/:jobId
+// @access  Private (Freelancers only)
+router.get('/check/:jobId', protect, authorize('FREELANCER'), (async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const existingProposal = await prisma.proposal.findFirst({
+      where: {
+        jobId: req.params.jobId,
+        freelancerId: req.user!.id
+      },
+      select: {
+        id: true,
+        coverLetter: true,
+        bidAmount: true,
+        estimatedDuration: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+
+    res.json({
+      success: true,
+      data: existingProposal
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
 // @desc    Get proposals by freelancer
 // @route   GET /api/proposals/freelancer/me
 // @access  Private (Freelancers only)
@@ -366,6 +397,91 @@ router.put('/:id', protect, authorize('CLIENT'), (async (req: AuthRequest, res: 
     const updatedProposal = await prisma.proposal.update({
       where: { id: req.params.id },
       data: updateData,
+      include: {
+        job: {
+          select: {
+            id: true,
+            title: true,
+            client: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                companyName: true
+              }
+            }
+          }
+        },
+        freelancer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true
+          }
+        }
+      }
+    });
+
+    res.json({
+      success: true,
+      data: updatedProposal
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
+// @desc    Update proposal by freelancer
+// @route   PUT /api/proposals/:id/update
+// @access  Private (Proposal owner only)
+router.put('/:id/update', protect, authorize('FREELANCER'), [
+  body('coverLetter').optional().notEmpty().withMessage('Cover letter cannot be empty'),
+  body('bidAmount').optional().isFloat({ min: 0 }).withMessage('Bid amount must be a positive number'),
+  body('estimatedDuration').optional().notEmpty().withMessage('Estimated duration cannot be empty'),
+  body('attachments').optional().isArray().withMessage('Attachments must be an array'),
+  body('questionResponses').optional().isArray().withMessage('Question responses must be an array'),
+  body('milestones').optional().isArray().withMessage('Milestones must be an array')
+], (async (req: AuthRequest, res: Response): Promise<void> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  try {
+    // Check if proposal exists and belongs to user
+    const existingProposal = await prisma.proposal.findUnique({
+      where: { id: req.params.id }
+    });
+
+    if (!existingProposal) {
+      res.status(404).json({ message: 'Proposal not found' });
+      return;
+    }
+
+    if (existingProposal.freelancerId !== req.user!.id) {
+      res.status(403).json({ message: 'Not authorized to update this proposal' });
+      return;
+    }
+
+    if (existingProposal.status !== 'PENDING') {
+      res.status(400).json({ message: 'Can only update pending proposals' });
+      return;
+    }
+
+    // Update proposal
+    const updatedProposal = await prisma.proposal.update({
+      where: { id: req.params.id },
+      data: {
+        coverLetter: req.body.coverLetter,
+        bidAmount: req.body.bidAmount,
+        estimatedDuration: req.body.estimatedDuration,
+        attachments: req.body.attachments,
+        questionResponses: req.body.questionResponses,
+        milestones: req.body.milestones
+      },
       include: {
         job: {
           select: {

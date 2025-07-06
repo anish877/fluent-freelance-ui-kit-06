@@ -20,6 +20,7 @@ interface OnboardingData {
   subcategory?: string;
   experienceLevel?: string;
   workExperience?: any[];
+  employment?: any[];
   education?: any[];
   certifications?: string[];
   languages?: any[];
@@ -39,6 +40,7 @@ interface OnboardingData {
   responseTime?: string;
   minimumProjectBudget?: string;
   specialRequirements?: string;
+  coverImage?: string;
   
   // Client specific fields
   clientType?: string;
@@ -194,7 +196,7 @@ export const useOnboarding = (): UseOnboardingReturn => {
     setError(null);
 
     try {
-      // Prepare data for API call
+      // Prepare data for API call with correct field mappings
       const apiData = {
         userType: userType?.toUpperCase(),
         firstName: data.firstName,
@@ -209,18 +211,19 @@ export const useOnboarding = (): UseOnboardingReturn => {
         title: data.title,
         overview: data.overview,
         
-        // Freelancer specific fields
+        // Freelancer specific fields - map to correct database fields
         category: data.category,
         subcategory: data.subcategory,
         experienceLevel: data.experienceLevel,
-        workExperience: data.workExperience,
+        workExperience: data.workExperience, // Keep workExperience as workExperience
+        employmentHistory: data.employment, // Map employment to employmentHistory
         education: data.education,
         certifications: data.certifications,
         languages: data.languages,
         skills: data.skills,
         topSkills: data.topSkills,
         serviceOfferings: data.serviceOfferings,
-        portfolio: data.portfolio,
+        portfolioProjects: data.portfolio, // Map portfolio to portfolioProjects
         socialLinks: data.socialLinks,
         hourlyRate: data.hourlyRate,
         availability: data.availability,
@@ -233,6 +236,7 @@ export const useOnboarding = (): UseOnboardingReturn => {
         responseTime: data.responseTime,
         minimumProjectBudget: data.minimumProjectBudget,
         specialRequirements: data.specialRequirements,
+        coverImage: data.coverImage,
         
         // Client specific fields
         clientType: data.clientType,

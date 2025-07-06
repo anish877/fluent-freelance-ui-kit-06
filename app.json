@@ -1,0 +1,18 @@
+{
+  "name": "fluent-freelance-frontend",
+  "description": "Frontend for Fluent Freelance platform",
+  "repository": "https://github.com/yourusername/fluent-freelance-ui-kit-06",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["react", "vite", "typescript", "tailwindcss"],
+  "env": {
+    "VITE_API_URL": {
+      "description": "Backend API URL",
+      "value": "https://your-backend-app.herokuapp.com"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+} 

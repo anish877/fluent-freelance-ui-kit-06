@@ -292,12 +292,28 @@ router.put('/:id', protect, authorize('CLIENT'), [
   body('budget').optional().isIn(['FIXED', 'HOURLY']).withMessage('Budget must be FIXED or HOURLY'),
   body('skills').optional().isArray().withMessage('Skills must be an array'),
   body('category').optional().notEmpty().withMessage('Category cannot be empty'),
+  body('subcategory').optional().notEmpty().withMessage('Subcategory cannot be empty'),
+  body('projectType').optional().notEmpty().withMessage('Project type cannot be empty'),
+  body('experienceLevel').optional().notEmpty().withMessage('Experience level cannot be empty'),
+  body('workingHours').optional().notEmpty().withMessage('Working hours cannot be empty'),
+  body('timezone').optional().notEmpty().withMessage('Timezone cannot be empty'),
+  body('communicationPreferences').optional().isArray().withMessage('Communication preferences must be an array'),
   body('minBudget').optional().isFloat({ min: 0 }).withMessage('Min budget must be a positive number'),
   body('maxBudget').optional().isFloat({ min: 0 }).withMessage('Max budget must be a positive number'),
   body('hourlyRate').optional().isFloat({ min: 0 }).withMessage('Hourly rate must be a positive number'),
   body('duration').optional().notEmpty().withMessage('Duration cannot be empty'),
-  body('location').optional().notEmpty().withMessage('Location cannot be empty'),
   body('isRemote').optional().isBoolean().withMessage('Is remote must be a boolean'),
+  body('isUrgent').optional().isBoolean().withMessage('Is urgent must be a boolean'),
+  body('visibility').optional().isIn(['public', 'private', 'invite-only']).withMessage('Visibility must be public, private, or invite-only'),
+  body('applicationDeadline').optional().custom((value) => {
+    if (!value) return true;
+    // Accept both ISO and YYYY-MM-DD
+    const date = new Date(value);
+    if (isNaN(date.getTime())) {
+      throw new Error('Application deadline must be a valid date');
+    }
+    return true;
+  }),
   body('status').optional().isIn(['OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']).withMessage('Invalid status')
 ], (async (req: AuthRequest, res: Response): Promise<void> => {
   const errors = validationResult(req);
@@ -322,9 +338,15 @@ router.put('/:id', protect, authorize('CLIENT'), [
       return;
     }
 
+    // Convert applicationDeadline to Date if present
+    const updateData = { ...req.body };
+    if (updateData.applicationDeadline) {
+      updateData.applicationDeadline = new Date(updateData.applicationDeadline);
+    }
+
     const updatedJob = await prisma.job.update({
       where: { id: req.params.id },
-      data: req.body,
+      data: updateData,
       include: {
         client: {
           select: {

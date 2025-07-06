@@ -1,13 +1,12 @@
 // utils/jwt.ts
 import jwt from 'jsonwebtoken';
-import { UserType } from '@prisma/client';
 
 export interface JWTPayload {
   userId: string;
   email: string;
   firstName: string;
   lastName: string;
-  userType: UserType;
+  userType: 'FREELANCER' | 'CLIENT';
   isOnboarded: boolean;
 }
 
@@ -16,7 +15,7 @@ export const generateToken = (user: {
   email: string;
   firstName: string;
   lastName: string;
-  userType: UserType;
+  userType: 'FREELANCER' | 'CLIENT';
   isOnboarded: boolean;
 }): string => {
   const payload: JWTPayload = {

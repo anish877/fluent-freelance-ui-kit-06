@@ -51,28 +51,28 @@ const JobReviewStep = ({ formData }: JobReviewStepProps) => {
       {/* Job Preview Card */}
       <Card className="border-2 border-teal-200">
         <CardHeader className="pb-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-xl text-gray-900 mb-2">
+          <div className="flex justify-between items-start gap-4">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-xl text-gray-900 mb-2 break-words">
                 {formData.title || "Untitled Job"}
               </CardTitle>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                 <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-1" />
-                  {formData.duration}
+                  <Clock className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <span className="truncate">{formData.duration}</span>
                 </div>
                 <div className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1" />
-                  {getBudgetDisplay()}
+                  <DollarSign className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <span className="truncate">{getBudgetDisplay()}</span>
                 </div>
                 <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-1" />
-                  {getExperienceLevelDisplay()}
+                  <Users className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <span className="truncate">{getExperienceLevelDisplay()}</span>
                 </div>
               </div>
             </div>
             {formData.isUrgent && (
-              <Badge variant="destructive" className="ml-2">
+              <Badge variant="destructive" className="ml-2 flex-shrink-0">
                 <AlertCircle className="h-3 w-3 mr-1" />
                 Urgent
               </Badge>
@@ -81,17 +81,19 @@ const JobReviewStep = ({ formData }: JobReviewStepProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div>
+            <div className="flex flex-wrap gap-2">
               <Badge variant="outline">{formData.category}</Badge>
               {formData.subcategory && (
-                <Badge variant="outline" className="ml-2">{formData.subcategory}</Badge>
+                <Badge variant="outline">{formData.subcategory}</Badge>
               )}
-              <Badge variant="outline" className="ml-2">{getProjectTypeDisplay()}</Badge>
+              <Badge variant="outline">{getProjectTypeDisplay()}</Badge>
             </div>
             
-            <p className="text-gray-700 leading-relaxed">
-              {formData.description || "No description provided"}
-            </p>
+            <div className="max-h-32 overflow-y-auto">
+              <p className="text-gray-700 leading-relaxed break-words">
+                {formData.description || "No description provided"}
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

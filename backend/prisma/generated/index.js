@@ -367,7 +367,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/abhishekverma/Desktop/Cluster/Projects/fluent-freelance-ui-kit-06/backend/prisma/generated",
+      "value": "/Users/anishsuman/Documents/freelance/alex 2/fluent-freelance-ui-kit-06/backend/prisma/generated",
       "fromEnvVar": null
     },
     "config": {
@@ -381,7 +381,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/abhishekverma/Desktop/Cluster/Projects/fluent-freelance-ui-kit-06/backend/prisma/schema.prisma",
+    "sourceFilePath": "/Users/anishsuman/Documents/freelance/alex 2/fluent-freelance-ui-kit-06/backend/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -395,6 +395,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

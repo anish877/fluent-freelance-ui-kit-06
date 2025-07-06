@@ -84,8 +84,11 @@ router.post('/register', [
         skills: true,
         hourlyRate: true,
         portfolio: true,
+        portfolioProjects: true,
         experience: true,
         education: true,
+        workExperience: true,
+        employmentHistory: true,
         certifications: true,
         companyName: true,
         companySize: true,
@@ -179,8 +182,11 @@ router.post('/login', [
         skills: true,
         hourlyRate: true,
         portfolio: true,
+        portfolioProjects: true,
         experience: true,
         education: true,
+        workExperience: true,
+        employmentHistory: true,
         certifications: true,
         companyName: true,
         companySize: true,
@@ -278,7 +284,7 @@ router.get('/google/callback',
     
     // Redirect to frontend with success
     const signOptions: SignOptions = { expiresIn: '7d' };
-    const user = req.user as any;
+    const user = req.user as { id: string; email: string; firstName: string; lastName: string; userType: string; isOnboarded: boolean };
     const token = jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET as Secret,
@@ -317,8 +323,11 @@ router.get('/me', protect, (async (req: AuthRequest, res: Response): Promise<voi
         skills: true,
         hourlyRate: true,
         portfolio: true,
+        portfolioProjects: true,
         experience: true,
         education: true,
+        workExperience: true,
+        employmentHistory: true,
         certifications: true,
         companyName: true,
         companySize: true,

@@ -254,35 +254,46 @@ const PostJob = () => {
         {/* Progress Indicator */}
         <Card className="mb-8">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-6">
+              <span className="text-sm font-medium text-gray-700">
+                Step {currentStep} of {steps.length}
+              </span>
+              <span className="text-sm text-gray-500">
+                {Math.round(progressPercentage)}% Complete
+              </span>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 rounded-full h-3 mb-6">
+              <div
+                className="bg-teal-600 h-3 rounded-full transition-all duration-300 ease-in-out"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
+            </div>
+            
+            {/* Step Indicators */}
+            <div className="flex justify-between items-center">
               {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+                <div key={step.id} className="flex flex-col items-center">
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-medium transition-all duration-200 ${
                     currentStep > step.id 
-                      ? 'bg-green-500 text-white' 
+                      ? 'bg-green-500 text-white shadow-md' 
                       : currentStep === step.id 
-                      ? 'bg-teal-500 text-white' 
+                      ? 'bg-teal-500 text-white shadow-lg scale-110' 
                       : 'bg-gray-200 text-gray-600'
                   }`}>
-                    {currentStep > step.id ? <Check className="h-4 w-4" /> : step.id}
+                    {currentStep > step.id ? <Check className="h-5 w-5" /> : step.id}
                   </div>
-                  <div className="ml-3 hidden sm:block">
-                    <p className={`text-sm font-medium ${
+                  <div className="mt-2 text-center max-w-24">
+                    <p className={`text-xs font-medium ${
                       currentStep >= step.id ? 'text-gray-900' : 'text-gray-500'
                     }`}>
                       {step.title}
                     </p>
-                    <p className="text-xs text-gray-500">{step.description}</p>
                   </div>
-                  {index < steps.length - 1 && (
-                    <div className={`hidden sm:block w-20 h-0.5 ml-4 ${
-                      currentStep > step.id ? 'bg-green-500' : 'bg-gray-200'
-                    }`} />
-                  )}
                 </div>
               ))}
             </div>
-            <Progress value={progressPercentage} className="h-2" />
           </CardContent>
         </Card>
 

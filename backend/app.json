@@ -1,0 +1,38 @@
+{
+  "name": "fluent-freelance-backend",
+  "description": "Backend API for Fluent Freelance platform",
+  "repository": "https://github.com/yourusername/fluent-freelance-ui-kit-06",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["node", "express", "typescript", "prisma", "postgresql"],
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment setting for the application",
+      "value": "production"
+    },
+    "SESSION_SECRET": {
+      "description": "Secret key for session management",
+      "generator": "secret"
+    },
+    "JWT_SECRET": {
+      "description": "Secret key for JWT tokens",
+      "generator": "secret"
+    },
+    "CORS_ORIGIN": {
+      "description": "CORS origin for frontend",
+      "value": "https://your-frontend-app.herokuapp.com"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql:mini"
+    }
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "npm run db:migrate"
+  }
+} 

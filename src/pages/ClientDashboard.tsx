@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Plus, Eye, Edit, Trash2, Clock, Users, DollarSign, 
   TrendingUp, Star, MessageCircle, CheckCircle, AlertCircle,
@@ -51,7 +51,7 @@ const ClientDashboard = () => {
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  
+  const navigate = useNavigate();
   // Jobs state
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsLoading, setJobsLoading] = useState(true);
@@ -310,7 +310,7 @@ const ClientDashboard = () => {
             <h1 className="text-3xl font-bold text-gray-900">Client Dashboard</h1>
             <p className="text-gray-600 mt-1">Manage your jobs, proposals, and freelancer relationships</p>
           </div>
-          <Button className="bg-teal-600 hover:bg-teal-700">
+          <Button className="bg-teal-600 hover:bg-teal-700" onClick={()=>navigate('/post-job')}>
             <Plus className="h-4 w-4 mr-2" />
             Post New Job
           </Button>
@@ -485,10 +485,12 @@ const ClientDashboard = () => {
                                 View
                               </Button>
                             </Link>
-                            <Button variant="outline" size="sm">
-                              <Edit className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
+                            <Link to={`/edit-job/${job.id}`}>
+                              <Button variant="outline" size="sm">
+                                <Edit className="h-4 w-4 mr-1" />
+                                Edit
+                              </Button>
+                            </Link>
                             {job.status === "OPEN" && (
                               <Button 
                                 variant="outline" 

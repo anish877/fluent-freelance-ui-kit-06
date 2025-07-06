@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Plus, Upload, Camera, Loader2, Save, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -74,9 +74,14 @@ const EditProfileModal = ({ isOpen, onClose, userProfile, onSave, defaultTab = "
   const [newSkill, setNewSkill] = useState("");
   const [newLanguage, setNewLanguage] = useState({ language: "", proficiency: "" });
   const [newCertification, setNewCertification] = useState({ name: "", issuer: "", year: "" });
+  const [uploadingPortfolioIndex, setUploadingPortfolioIndex] = useState<number | null>(null);
+  const initializedProfileId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (userProfile && isOpen) {
+    if (userProfile && isOpen && initializedProfileId.current !== userProfile.id) {
+      console.log('Initializing formData for userProfile:', userProfile.id);
+      console.log('UserProfile coverImage:', userProfile.coverImage);
+      
       setFormData({
         firstName: userProfile.firstName || "",
         lastName: userProfile.lastName || "",
@@ -106,13 +111,22 @@ const EditProfileModal = ({ isOpen, onClose, userProfile, onSave, defaultTab = "
         }
       });
       setNewCertification({ name: "", issuer: "", year: "" });
+      initializedProfileId.current = userProfile.id;
     }
-  }, [isOpen]);
+  }, [userProfile, isOpen]);
 
   // Debug useEffect to monitor formData changes
   useEffect(() => {
     console.log('formData changed:', formData);
+    console.log('Current coverImage in formData:', formData.coverImage);
   }, [formData]);
+
+  // Reset initialization when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      initializedProfileId.current = null;
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,6 +175,7 @@ const EditProfileModal = ({ isOpen, onClose, userProfile, onSave, defaultTab = "
 
       console.log('Modal sending profile data:', updatedProfile);
       console.log('Profile picture URL:', updatedProfile.profilePicture);
+      console.log('Cover image URL:', updatedProfile.coverImage);
       console.log('Portfolio data being sent:', updatedProfile.portfolio);
       console.log('Portfolio items count:', updatedProfile.portfolio?.length || 0);
 
@@ -191,12 +206,15 @@ const EditProfileModal = ({ isOpen, onClose, userProfile, onSave, defaultTab = "
     try {
       const result = await uploadService.uploadSingle(file);
       if (result.success) {
-        setFormData(prevData => ({
-          ...prevData,
-          [field]: result.data.url
-        }));
-        console.log(`${field} uploaded successfully:`, result.data.url);
-        console.log('Updated formData:', { ...formData, [field]: result.data.url });
+        setFormData(prevData => {
+          const updatedData = {
+            ...prevData,
+            [field]: result.data.url
+          };
+          console.log(`${field} uploaded successfully:`, result.data.url);
+          console.log('Updated formData:', updatedData);
+          return updatedData;
+        });
       } else {
         setErrors({ [field]: 'Upload failed. Please try again.' });
       }
@@ -772,7 +790,7 @@ const EditProfileModal = ({ isOpen, onClose, userProfile, onSave, defaultTab = "
                               className="w-20 h-20 object-cover rounded border"
                             />
                             <label className="bg-teal-600 text-white px-3 py-2 rounded cursor-pointer hover:bg-teal-700">
-                              {uploading ? (
+                              {uploadingPortfolioIndex === index ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
                               ) : (
                                 <Upload className="h-4 w-4" />
@@ -780,14 +798,21 @@ const EditProfileModal = ({ isOpen, onClose, userProfile, onSave, defaultTab = "
                               <input
                                 type="file"
                                 accept="image/*"
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
-                                    uploadService.uploadSingle(file).then(result => {
+                                    setUploadingPortfolioIndex(index);
+                                    try {
+                                      const result = await uploadService.uploadSingle(file);
                                       if (result.success) {
                                         updatePortfolioItem(index, 'image', result.data.url);
                                       }
-                                    });
+                                    } catch (error) {
+                                      console.error('Upload failed:', error);
+                                      // You could add a toast notification here
+                                    } finally {
+                                      setUploadingPortfolioIndex(null);
+                                    }
                                   }
                                 }}
                                 className="hidden"

@@ -35,9 +35,11 @@ router.get('/progress', protect, (async (req: AuthRequest, res: Response): Promi
         serviceOfferings: true,
         hourlyRate: true,
         portfolio: true,
+        portfolioProjects: true,
         experience: true,
         education: true,
         workExperience: true,
+        employmentHistory: true,
         certifications: true,
         availability: true,
         languages: true,
@@ -206,10 +208,10 @@ router.put('/freelancer/professional', protect, [
         subcategory,
         experienceLevel,
         workExperience: workExperience || [],
+        employmentHistory: employment || workExperience || [],
         education: education || [],
         certifications: certifications || [],
         languages: languages || [],
-        employmentHistory: employment || [],
         onboardingStep: 3
       },
       select: {
@@ -218,10 +220,10 @@ router.put('/freelancer/professional', protect, [
         subcategory: true,
         experienceLevel: true,
         workExperience: true,
+        employmentHistory: true,
         education: true,
         certifications: true,
         languages: true,
-        employmentHistory: true,
         onboardingStep: true
       }
     });
@@ -290,12 +292,14 @@ router.put('/freelancer/portfolio', protect, (async (req: AuthRequest, res: Resp
     const updatedUser = await prisma.user.update({
       where: { id: req.user!.id },
       data: {
+        portfolio: portfolio || null,
         portfolioProjects: portfolio || [],
         socialLinks,
         onboardingStep: 5
       },
       select: {
         id: true,
+        portfolio: true,
         portfolioProjects: true,
         socialLinks: true,
         onboardingStep: true
@@ -721,6 +725,8 @@ router.post('/complete-with-data', [
       subcategory,
       experienceLevel,
       workExperience,
+      employment,
+      employmentHistory,
       education,
       certifications,
       languages,
@@ -728,6 +734,7 @@ router.post('/complete-with-data', [
       topSkills,
       serviceOfferings,
       portfolio,
+      portfolioProjects,
       socialLinks,
       hourlyRate,
       availability,
@@ -792,7 +799,7 @@ router.post('/complete-with-data', [
     const hashedPassword = await hashPassword(password);
     console.log('Password hashed successfully');
 
-    // Create user with all onboarding data
+    // Create user with all onboarding data - use correct field mappings
     const user = await prisma.user.create({
       data: {
         email,
@@ -810,18 +817,21 @@ router.post('/complete-with-data', [
         isOnboarded: true,
         onboardingStep: userType === 'FREELANCER' ? 8 : 7,
         
-        // Freelancer fields
+        // Freelancer fields - use correct field names
         category,
         subcategory,
         experienceLevel,
-        workExperience: workExperience || [],
+        workHistory: workExperience || [], // Map workExperience to workHistory for profile display
+        workExperience: workExperience || [], // Keep original field for backward compatibility
+        employmentHistory: employment || employmentHistory || [],
         education: education || [],
         certifications: certifications || [],
         languages: languages || [],
         skills,
         topSkills: topSkills || [],
         serviceOfferings: serviceOfferings || [],
-        portfolioProjects: portfolio || [],
+        portfolio: portfolio || null,
+        portfolioProjects: portfolioProjects || portfolio || [],
         socialLinks,
         hourlyRate: hourlyRate ? parseFloat(hourlyRate.toString()) : null,
         availability,
@@ -872,7 +882,12 @@ router.post('/complete-with-data', [
         overview: true,
         skills: true,
         hourlyRate: true,
+        portfolio: true,
         portfolioProjects: true,
+        workExperience: true,
+        employmentHistory: true,
+        education: true,
+        certifications: true,
         companyName: true,
         companySize: true,
         industry: true

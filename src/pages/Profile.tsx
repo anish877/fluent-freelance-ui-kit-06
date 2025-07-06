@@ -55,8 +55,19 @@ interface UserProfile {
     title: string;
     description: string;
     image: string;
+    images?: string[];
     technologies: string[];
     link: string;
+    category?: string;
+    completionDate?: string;
+    clientFeedback?: string;
+    role?: string;
+    duration?: string;
+    client?: string;
+    budget?: string;
+    projectType?: string;
+    challenges?: string;
+    outcomes?: string;
   }>;
   workHistory: Array<{
     title: string;
@@ -101,6 +112,8 @@ interface Education {
   institution?: string;
   school?: string;
   year: string;
+  endDate?: string;
+  startDate?: string;
 }
 
 interface Certification {
@@ -113,19 +126,41 @@ interface PortfolioItem {
   title: string;
   description: string;
   image: string;
+  images?: string[];
   technologies: string[];
   link: string;
   category?: string;
+  completionDate?: string;
+  clientFeedback?: string;
+  role?: string;
+  duration?: string;
+  client?: string;
+  budget?: string;
+  projectType?: string;
+  challenges?: string;
+  outcomes?: string;
 }
 
 interface BackendPortfolioItem {
   title: string;
   description: string;
   image: string;
+  images?: string[];
   technologies: string[];
   link?: string;
   url?: string;
+  liveUrl?: string;
+  sourceUrl?: string;
   category?: string;
+  completionDate?: string;
+  clientFeedback?: string;
+  role?: string;
+  duration?: string;
+  client?: string;
+  budget?: string;
+  projectType?: string;
+  challenges?: string;
+  outcomes?: string;
 }
 
 interface WorkExperience {
@@ -333,65 +368,76 @@ const EmptyState = ({
 );
 
 // 4. Improved Profile Header with Better Visual Hierarchy
-const ProfileHeader = ({ userProfile, onEditClick }: { userProfile: UserProfile; onEditClick: () => void }) => (
-  <Card className="mb-8">
-    <CardContent className="pt-6">
-      <div className="flex flex-col md:flex-row items-start gap-6">
-        <div className="relative w-32 h-32 flex-shrink-0">
-          <img
-            src={userProfile.profilePicture}
-            alt={`${userProfile.firstName} ${userProfile.lastName}`}
-            className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg bg-gray-100"
-            style={{ 
-              objectPosition: 'center',
-              minWidth: '128px',
-              minHeight: '128px'
-            }}
-            onError={(e) => {
-              e.currentTarget.src = '/placeholder.svg';
-            }}
-          />
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
-          <Button size="sm" className="absolute top-0 right-0 rounded-full bg-white shadow-lg p-2 border border-gray-200 hover:bg-gray-50 z-10">
-            <Camera className="h-4 w-4 text-gray-700" />
-          </Button>
-        </div>
-        
-        <div className="flex-1">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {userProfile.firstName} {userProfile.lastName}
-                </h1>
-                {userProfile.rating > 4.5 && (
-                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
-                    <Star className="h-3 w-3 mr-1 fill-current" />
-                    Top Rated
-                  </Badge>
-                )}
-              </div>
-              <p className="text-xl text-gray-600 mb-2">{userProfile.title}</p>
-              <div className="flex items-center text-gray-600 mb-2">
-                <MapPin className="h-4 w-4 mr-2" />
-                {userProfile.location}
-              </div>
-              <div className="flex items-center text-gray-600">
-                <Calendar className="h-4 w-4 mr-2" />
-                Member since {userProfile.joinDate}
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4 sm:mt-0">
-              <Button variant="outline" size="sm">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Share Profile
-              </Button>
-              <Button onClick={onEditClick}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Button>
-            </div>
+const ProfileHeader = ({ userProfile, onEditClick }: { userProfile: UserProfile; onEditClick: () => void }) => {
+  const navigate = useNavigate();
+  
+  const handleViewPublicProfile = () => {
+    navigate(`/freelancer/${userProfile.id}`);
+  };
+  
+  return (
+    <Card className="mb-8">
+      <CardContent className="pt-6">
+        <div className="flex flex-col md:flex-row items-start gap-6">
+          <div className="relative w-32 h-32 flex-shrink-0">
+            <img
+              src={userProfile.profilePicture}
+              alt={`${userProfile.firstName} ${userProfile.lastName}`}
+              className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg bg-gray-100"
+              style={{ 
+                objectPosition: 'center',
+                minWidth: '128px',
+                minHeight: '128px'
+              }}
+              onError={(e) => {
+                e.currentTarget.src = '/placeholder.svg';
+              }}
+            />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
+            <Button size="sm" className="absolute top-0 right-0 rounded-full bg-white shadow-lg p-2 border border-gray-200 hover:bg-gray-50 z-10">
+              <Camera className="h-4 w-4 text-gray-700" />
+            </Button>
           </div>
+          
+          <div className="flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    {userProfile.firstName} {userProfile.lastName}
+                  </h1>
+                  {userProfile.rating > 4.5 && (
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                      <Star className="h-3 w-3 mr-1 fill-current" />
+                      Top Rated
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xl text-gray-600 mb-2">{userProfile.title}</p>
+                <div className="flex items-center text-gray-600 mb-2">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  {userProfile.location}
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Member since {userProfile.joinDate}
+                </div>
+              </div>
+              <div className="flex gap-2 mt-4 sm:mt-0">
+                <Button variant="outline" size="sm" onClick={handleViewPublicProfile}>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View Public Profile
+                </Button>
+                <Button variant="outline" size="sm">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Share Profile
+                </Button>
+                <Button onClick={onEditClick}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+              </div>
+            </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center p-3 bg-gray-50 rounded-lg border">
@@ -441,7 +487,8 @@ const ProfileHeader = ({ userProfile, onEditClick }: { userProfile: UserProfile;
       </div>
     </CardContent>
   </Card>
-);
+  );
+};
 
 // 5. Enhanced Tabs with Better Spacing and Animation
 const ProfileTabs = ({ userProfile, onEditClick }: { userProfile: UserProfile; onEditClick: (tab?: string) => void }) => {
@@ -841,6 +888,7 @@ const Profile = () => {
     certifications?: Certification[] | string[];
     portfolioProjects?: BackendPortfolioItem[];
     workExperience?: WorkExperience[];
+    workHistory?: any[];
     phone?: string;
     coverImage?: string;
     socialLinks?: {
@@ -850,7 +898,11 @@ const Profile = () => {
       twitter?: string;
     };
   }) : UserProfile => {
-    return {
+    console.log('transformUserData - Input userData:', userData);
+    console.log('transformUserData - portfolioProjects:', userData.portfolioProjects);
+    console.log('transformUserData - certifications:', userData.certifications);
+    
+    const transformed = {
       id: userData.id,
       firstName: userData.firstName || '',
       lastName: userData.lastName || '',
@@ -870,10 +922,14 @@ const Profile = () => {
       availability: userData.availability || 'Available for new projects',
       description: userData.overview || userData.bio || 'No description available',
       skills: Array.isArray(userData.skills)
-        ? (userData.skills as Skill[]).map((s) => typeof s === 'string' ? s : s.name)
+        ? (userData.skills as Skill[]).map((s) => 
+            typeof s === 'string' ? s : s.name || 'Unknown Skill'
+          )
         : [],
       languages: Array.isArray(userData.languages)
-        ? (userData.languages as Language[]).map((l) => `${l.language} (${l.proficiency})`)
+        ? (userData.languages as Language[]).map((l) => 
+            typeof l === 'string' ? l : `${l.language} (${l.proficiency})`
+          )
         : [],
       hourlyRate: userData.hourlyRate ? `$${userData.hourlyRate}` : '$0',
       phone: userData.phone,
@@ -883,7 +939,7 @@ const Profile = () => {
         ? (userData.education as Education[]).map((e) => ({
             degree: e.degree || '',
             school: e.institution || e.school || '',
-            year: e.year || ''
+            year: e.endDate || e.year || ''
           }))
         : [],
       certifications: Array.isArray(userData.certifications)
@@ -894,13 +950,25 @@ const Profile = () => {
           )
         : [],
       portfolio: Array.isArray(userData.portfolioProjects)
-        ? (userData.portfolioProjects as BackendPortfolioItem[]).map((item) => ({
+        ? userData.portfolioProjects.map((item) => ({
             title: item.title || '',
             description: item.description || '',
-            image: item.image || '/placeholder.svg',
-            technologies: item.technologies || [],
-            link: item.link || item.url || '#',
-            category: item.category || 'Web Development'
+            image: Array.isArray(item.images) && item.images.length > 0 
+              ? item.images[0] 
+              : (item.image || '/placeholder.svg'),
+            images: Array.isArray(item.images) ? item.images : [],
+            technologies: Array.isArray(item.technologies) ? item.technologies : [],
+            link: item.liveUrl || item.sourceUrl || item.link || item.url || '#',
+            category: item.category || 'Web Development',
+            completionDate: item.completionDate || '',
+            clientFeedback: item.clientFeedback || '',
+            role: item.role || '',
+            duration: item.duration || '',
+            client: item.client || '',
+            budget: item.budget || '',
+            projectType: item.projectType || '',
+            challenges: item.challenges || '',
+            outcomes: item.outcomes || ''
           }))
         : [],
       workExperience: Array.isArray(userData.workExperience)
@@ -913,9 +981,23 @@ const Profile = () => {
             description: exp.description || '',
           }))
         : [],
-      workHistory: [], // This will be populated from reviews/jobs
+      workHistory: Array.isArray(userData.workHistory)
+        ? userData.workHistory.map((work) => ({
+            title: work.title || work.position || '',
+            client: work.client || work.company || '',
+            duration: work.duration || `${work.startDate || ''} - ${work.endDate || ''}`,
+            description: work.description || '',
+            rating: work.clientRating || work.rating || 5.0,
+            feedback: work.feedback || work.clientFeedback || ''
+          }))
+        : [],
       reviews: [] // This will be populated from the reviews API
     };
+    
+    console.log('transformUserData - Transformed portfolio:', transformed.portfolio);
+    console.log('transformUserData - Transformed certifications:', transformed.certifications);
+    
+    return transformed;
   };
 
   const fetchReviews = async () => {
@@ -974,7 +1056,7 @@ const Profile = () => {
         phone: updatedProfile.phone,
         hourlyRate: updatedProfile.hourlyRate 
           ? (typeof updatedProfile.hourlyRate === 'string' 
-              ? parseFloat(updatedProfile.hourlyRate.replace('$', '')) 
+              ? parseFloat(updatedProfile.hourlyRate.replace(/[^0-9.]/g, '')) 
               : updatedProfile.hourlyRate)
           : null,
         availability: updatedProfile.availability || "Available - 30+ hrs/week", // Ensure default value
@@ -989,23 +1071,33 @@ const Profile = () => {
         ),
         education: updatedProfile.education,
         certifications: updatedProfile.certifications,
-        // Transform portfolio data to match backend expectations
-        portfolio: updatedProfile.portfolio?.map(item => ({
+        // Transform portfolio data to match backend expectations (send as portfolioProjects)
+        portfolioProjects: updatedProfile.portfolio?.map(item => ({
           title: item.title || '',
           description: item.description || '',
-          image: item.image || '/placeholder.svg',
+          images: Array.isArray(item.images) ? item.images : [item.image || '/placeholder.svg'],
           technologies: Array.isArray(item.technologies) ? item.technologies : [],
-          link: item.link || '',
-          category: (item as PortfolioItem).category || 'Web Development'
+          liveUrl: item.link || '',
+          sourceUrl: '',
+          category: (item as PortfolioItem).category || 'Web Development',
+          completionDate: item.completionDate || new Date().toISOString().split('T')[0],
+          clientFeedback: item.clientFeedback || '',
+          role: item.role || 'Solo Developer',
+          duration: item.duration || '3 months',
+          client: item.client || '',
+          budget: item.budget || '0',
+          projectType: item.projectType || 'Web Development',
+          challenges: item.challenges || '',
+          outcomes: item.outcomes || ''
         })) || [],
         workExperience: updatedProfile.workExperience,
         socialLinks: updatedProfile.socialLinks
       };
 
-      console.log('Profile page sending portfolio data:', transformedData.portfolio);
-      console.log('Portfolio items count:', transformedData.portfolio?.length || 0);
+      console.log('Profile page sending portfolio data:', transformedData.portfolioProjects);
+      console.log('Portfolio items count:', transformedData.portfolioProjects?.length || 0);
 
-      // Remove undefined values
+      // Remove undefined values (but keep empty strings for coverImage)
       Object.keys(transformedData).forEach(key => {
         if (transformedData[key as keyof typeof transformedData] === undefined) {
           delete transformedData[key as keyof typeof transformedData];
@@ -1013,6 +1105,11 @@ const Profile = () => {
       });
 
       console.log('Sending profile update data:', transformedData);
+      console.log('Overview length:', transformedData.overview?.length || 0);
+      console.log('Overview content:', transformedData.overview);
+      console.log('Cover image being sent:', transformedData.coverImage);
+      console.log('Cover image type:', typeof transformedData.coverImage);
+      console.log('Cover image length:', transformedData.coverImage?.length || 0);
 
       const response = await fetch("/api/users/profile/me", {
         method: "PUT",

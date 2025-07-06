@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { 
   MapPin, Clock, DollarSign, Star, Users, Calendar, 
   Bookmark, Share2, Flag, CheckCircle, Award, 
-  MessageCircle, ThumbsUp, Eye, Send, Paperclip 
+  MessageCircle, ThumbsUp, Eye, Send, Paperclip, Edit 
 } from "lucide-react";
 
 import Footer from "../components/layout/Footer";
@@ -56,6 +56,16 @@ interface Job {
   };
 }
 
+interface ExistingProposal {
+  id: string;
+  coverLetter: string;
+  bidAmount: number;
+  estimatedDuration: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+  createdAt: string;
+  updatedAt: string;
+}
+
 const JobDetails = () => {
   const { id } = useParams();
   const { toast } = useToast();
@@ -68,6 +78,8 @@ const JobDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submittingProposal, setSubmittingProposal] = useState(false);
+  const [existingProposal, setExistingProposal] = useState<ExistingProposal | null>(null);
+  const [checkingProposal, setCheckingProposal] = useState(false);
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -93,10 +105,32 @@ const JobDetails = () => {
       }
     };
 
+    const checkExistingProposal = async () => {
+      if (!user || user.userType !== 'FREELANCER' || !id) return;
+      
+      try {
+        setCheckingProposal(true);
+        const response = await axios.get(`/proposals/check/${id}`);
+        if (response.data.success && response.data.data) {
+          setExistingProposal(response.data.data);
+          // Pre-fill the form with existing proposal data
+          setProposal(response.data.data.coverLetter);
+          setProposalBudget(response.data.data.bidAmount.toString());
+          setProposalDelivery(response.data.data.estimatedDuration);
+        }
+      } catch (err: unknown) {
+        console.error('Error checking existing proposal:', err);
+        // Don't show error toast for this as it's not critical
+      } finally {
+        setCheckingProposal(false);
+      }
+    };
+
     if (id) {
       fetchJobDetails();
+      checkExistingProposal();
     }
-  }, [id, toast]);
+  }, [id, toast, user]);
 
   const formatBudget = (job: Job) => {
     if (job.budget === 'FIXED') {
@@ -181,10 +215,64 @@ const JobDetails = () => {
         setProposal("");
         setProposalBudget("");
         setProposalDelivery("");
+        // Refresh the existing proposal data
+        const checkResponse = await axios.get(`/proposals/check/${id}`);
+        if (checkResponse.data.success && checkResponse.data.data) {
+          setExistingProposal(checkResponse.data.data);
+        }
       }
     } catch (err: unknown) {
       console.error('Error submitting proposal:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to submit proposal';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setSubmittingProposal(false);
+    }
+  };
+
+  const handleProposalUpdate = async () => {
+    if (!existingProposal) return;
+
+    if (!proposal.trim() || !proposalBudget.trim() || !proposalDelivery.trim()) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setSubmittingProposal(true);
+      
+      const proposalData = {
+        coverLetter: proposal,
+        bidAmount: parseFloat(proposalBudget.replace(/[^0-9.]/g, '')),
+        estimatedDuration: proposalDelivery,
+        attachments: []
+      };
+
+      const response = await axios.put(`/proposals/${existingProposal.id}/update`, proposalData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data.success) {
+        toast({
+          title: "Success",
+          description: "Proposal updated successfully!",
+        });
+        // Update the existing proposal data
+        setExistingProposal(response.data.data);
+      }
+    } catch (err: unknown) {
+      console.error('Error updating proposal:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update proposal';
       toast({
         title: "Error",
         description: errorMessage,
@@ -515,84 +603,180 @@ const JobDetails = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Submit Proposal */}
+            {/* Submit/Edit Proposal */}
             {user && user.userType === 'FREELANCER' && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Submit a Proposal</h3>
-                
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full bg-teal-600 hover:bg-teal-700">
-                      <Send className="h-4 w-4 mr-2" />
-                      Send Proposal
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                      <DialogTitle>Submit Your Proposal</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Your Proposal
-                        </label>
-                        <textarea
-                          value={proposal}
-                          onChange={(e) => setProposal(e.target.value)}
-                          className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                          placeholder="Describe your approach to this project..."
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Your Budget
-                          </label>
-                          <input
-                            type="text"
-                            value={proposalBudget}
-                            onChange={(e) => setProposalBudget(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                            placeholder="$3,500"
-                          />
+                {checkingProposal ? (
+                  <div className="flex items-center justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500"></div>
+                    <span className="ml-2 text-gray-600">Checking proposal status...</span>
+                  </div>
+                ) : existingProposal ? (
+                  <>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Edit Your Proposal</h3>
+                    
+                    {existingProposal.status === 'PENDING' && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Proposal
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Edit Your Proposal</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Your Proposal
+                              </label>
+                              <textarea
+                                value={proposal}
+                                onChange={(e) => setProposal(e.target.value)}
+                                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                placeholder="Describe your approach to this project..."
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Your Budget
+                                </label>
+                                <input
+                                  type="text"
+                                  value={proposalBudget}
+                                  onChange={(e) => setProposalBudget(e.target.value)}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                  placeholder="$3,500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Delivery Time
+                                </label>
+                                <select 
+                                  value={proposalDelivery}
+                                  onChange={(e) => setProposalDelivery(e.target.value)}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                >
+                                  <option value="">Select duration</option>
+                                  <option value="1 week">1 week</option>
+                                  <option value="2 weeks">2 weeks</option>
+                                  <option value="1 month">1 month</option>
+                                  <option value="2-3 months">2-3 months</option>
+                                </select>
+                              </div>
+                            </div>
+                            <Button 
+                              onClick={handleProposalUpdate} 
+                              className="w-full"
+                              disabled={submittingProposal}
+                            >
+                              {submittingProposal ? "Updating..." : "Update Proposal"}
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                    
+                    {existingProposal.status !== 'PENDING' && (
+                      <div className="text-center py-4">
+                        <div className="mb-4">
+                          <Badge variant={existingProposal.status === 'ACCEPTED' ? 'default' : 'secondary'}>
+                            {existingProposal.status === 'ACCEPTED' ? 'Accepted' : 
+                             existingProposal.status === 'REJECTED' ? 'Rejected' : 'Withdrawn'}
+                          </Badge>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Delivery Time
-                          </label>
-                          <select 
-                            value={proposalDelivery}
-                            onChange={(e) => setProposalDelivery(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        <p className="text-gray-600 mb-2">
+                          Your proposal has been {existingProposal.status.toLowerCase()}.
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Submitted on {new Date(existingProposal.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Submit a Proposal</h3>
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                          <Send className="h-4 w-4 mr-2" />
+                          Send Proposal
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Submit Your Proposal</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Your Proposal
+                            </label>
+                            <textarea
+                              value={proposal}
+                              onChange={(e) => setProposal(e.target.value)}
+                              className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                              placeholder="Describe your approach to this project..."
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Your Budget
+                              </label>
+                              <input
+                                type="text"
+                                value={proposalBudget}
+                                onChange={(e) => setProposalBudget(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                placeholder="$3,500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Delivery Time
+                              </label>
+                              <select 
+                                value={proposalDelivery}
+                                onChange={(e) => setProposalDelivery(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                              >
+                                <option value="">Select duration</option>
+                                <option value="1 week">1 week</option>
+                                <option value="2 weeks">2 weeks</option>
+                                <option value="1 month">1 month</option>
+                                <option value="2-3 months">2-3 months</option>
+                              </select>
+                            </div>
+                          </div>
+                          <Button 
+                            onClick={handleProposalSubmit} 
+                            className="w-full"
+                            disabled={submittingProposal}
                           >
-                            <option value="">Select duration</option>
-                            <option value="1 week">1 week</option>
-                            <option value="2 weeks">2 weeks</option>
-                            <option value="1 month">1 month</option>
-                            <option value="2-3 months">2-3 months</option>
-                          </select>
+                            {submittingProposal ? "Submitting..." : "Submit Proposal"}
+                          </Button>
                         </div>
-                      </div>
-                      <Button 
-                        onClick={handleProposalSubmit} 
-                        className="w-full"
-                        disabled={submittingProposal}
-                      >
-                        {submittingProposal ? "Submitting..." : "Submit Proposal"}
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                      </DialogContent>
+                    </Dialog>
 
-                <div className="mt-4 text-sm text-gray-600">
-                  <p className="mb-2">Tips for a great proposal:</p>
-                  <ul className="space-y-1 list-disc list-inside">
-                    <li>Address the client's specific needs</li>
-                    <li>Showcase relevant experience</li>
-                    <li>Be clear about your timeline</li>
-                    <li>Ask clarifying questions</li>
-                  </ul>
-                </div>
+                    <div className="mt-4 text-sm text-gray-600">
+                      <p className="mb-2">Tips for a great proposal:</p>
+                      <ul className="space-y-1 list-disc list-inside">
+                        <li>Address the client's specific needs</li>
+                        <li>Showcase relevant experience</li>
+                        <li>Be clear about your timeline</li>
+                        <li>Ask clarifying questions</li>
+                      </ul>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
