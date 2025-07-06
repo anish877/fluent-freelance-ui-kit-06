@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 // Import routes
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
@@ -79,6 +80,14 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/talent', talentRoutes);
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../../dist')));
+
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../dist/index.html'));
+});
 
 // Error handling middleware
 app.use(notFound);

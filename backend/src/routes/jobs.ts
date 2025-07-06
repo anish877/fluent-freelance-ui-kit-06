@@ -2,7 +2,8 @@ import express, { Request, Response, RequestHandler } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, authorize, AuthRequest } from '../middleware/auth';
-import { Prisma } from '../../prisma/generated';
+import { PrismaClient } from '@prisma/client';
+type Prisma = typeof PrismaClient;
 
 const router = express.Router();
 
