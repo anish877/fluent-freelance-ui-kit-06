@@ -28,9 +28,10 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
+  isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; user?: User }>;
+  login_google: () => void;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; user?: User, status: number }>;
   register: (userData: RegisterData) => Promise<{ success: boolean; message?: string; user?: User }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
@@ -84,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Login function
-  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; user?: User }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; user?: User; status: number }> => {
     try {
       const response = await axios.post('/auth/login', { email, password });
       
@@ -94,14 +95,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(user);
         setIsAuthenticated(true);
 
-        return { success: true, message: "Signed In", user };
-      } else {
-        return { success: false, message: response.data.message || 'Login failed' };
+        return { success: true, message: "Signed In", user, status: 200 };
+      } 
+      else if(response.status === 401){
+        return { success: false, message: response.data.message, status: 401 }
+      }
+      else {
+        return { success: false, message: response.data.message || 'Login failed', status: 400 };
       }
     } catch (error: any) {
       console.error('Login error:', error);
       return { 
         success: false, 
+        status: 400,
         message: error.response?.data?.message || 'Login failed. Please try again.' 
       };
     }
@@ -144,6 +150,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(false);
     }
   };
+
+  const login_google = () => {
+    window.location.href = "http://localhost:5001/api/auth/google"
+  }
 
   // Complete onboarding function
   const completeOnboarding = async (userData: any): Promise<{ success: boolean; message?: string; user?: User }> => {
@@ -207,13 +217,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value: AuthContextType = {
     user,
-    loading,
+    isLoading: loading,
     isAuthenticated,
     login,
     register,
     logout,
     checkAuth,
     completeOnboarding,
+    login_google
+
   };
 
   return (

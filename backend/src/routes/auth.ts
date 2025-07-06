@@ -4,6 +4,8 @@ import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma';
 import { protect, AuthRequest } from '../middleware/auth';
+import passport from 'passport';
+import { generateToken } from '../utils/jwt';
 
 
 const router: Router = express.Router();
@@ -256,5 +258,26 @@ router.post('/logout', (req: Request, res: Response) => {
     message: 'Logged out successfully'
   });
 });
+
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  (req, res) => {
+    const user = req.user as any;
+    
+    // Generate JWT token
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      userType: user.userType,
+      isOnboarded: user.isOnboarded,
+    });
+
+    // Redirect to frontend with token
+    const redirectPath = user.isOnboarded ? '/dashboard' : '/onboarding';
+    res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}&redirect=${redirectPath}`);
+  }
+);
 
 export default router; 
