@@ -217,7 +217,7 @@ router.post('/', protect, authorize('CLIENT'), [
     const budgetEnum = budgetType === 'fixed' ? 'FIXED' : 'HOURLY';
     
     // Prepare job data
-    const jobData: Prisma.JobCreateInput = {
+    const jobData: any = {
       title,
       description,
       requirements: [...(objectives || []), ...(deliverables || [])],
@@ -410,7 +410,7 @@ router.get('/client/me', protect, authorize('CLIENT'), (async (req: AuthRequest,
     const { page = 1, limit = 10, status } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const where: Prisma.JobWhereInput = { clientId: req.user!.id };
+    const where: any = { clientId: req.user!.id };
     
     if (status) {
       where.status = status as 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';

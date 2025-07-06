@@ -13,9 +13,9 @@
     "preview": "vite preview",
     "start": "node backend/dist/index.js",
     "lint": "eslint .",
-    "heroku-postbuild": "npm run build && cd backend && npm run build",
-    "backend:build": "cd backend && npm run build",
-    "backend:dev": "cd backend && npm run dev"
+    "heroku-postbuild": "npm run build && npm run backend:build",
+    "backend:build": "cd backend && npx tsc",
+    "backend:dev": "cd backend && npx nodemon --exec npx ts-node src/index.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

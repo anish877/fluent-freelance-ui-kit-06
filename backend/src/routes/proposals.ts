@@ -109,7 +109,7 @@ router.get('/freelancer/me', protect, authorize('FREELANCER'), (async (req: Auth
     const { page = 1, limit = 10, status } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const where: Prisma.ProposalWhereInput = { freelancerId: req.user!.id };
+    const where: any = { freelancerId: req.user!.id };
     
     if (status) {
       where.status = status as 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
@@ -372,7 +372,7 @@ router.put('/:id', protect, authorize('CLIENT'), (async (req: AuthRequest, res: 
     }
 
     // Update proposal with allowed fields
-    const updateData: Prisma.ProposalUpdateInput = {};
+    const updateData: any = {};
     
     if (req.body.clientNotes !== undefined) {
       updateData.clientNotes = req.body.clientNotes;

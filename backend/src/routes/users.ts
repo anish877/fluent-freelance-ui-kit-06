@@ -16,7 +16,7 @@ router.get('/', protect, (async (req: Request, res: Response): Promise<void> => 
     const { page = 1, limit = 10, userType, location } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const where: Prisma.UserWhereInput = {};
+    const where: any = {};
     
     if (userType) {
       where.userType = userType as 'FREELANCER' | 'CLIENT';

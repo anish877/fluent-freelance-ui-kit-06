@@ -25,7 +25,7 @@ router.get('/', (async (req: Request, res: Response): Promise<void> => {
     
     const skip = (Number(page) - 1) * Number(limit);
 
-    const where: Prisma.UserWhereInput = {
+    const where: any = {
       userType: 'FREELANCER',
       isOnboarded: true
     };
@@ -118,7 +118,7 @@ router.get('/', (async (req: Request, res: Response): Promise<void> => {
     }
 
     // Sort options
-    let orderBy: Prisma.UserOrderByWithRelationInput = {};
+    let orderBy: any = {};
     switch (sortBy) {
       case 'highestRated':
         orderBy = { rating: 'desc' };
