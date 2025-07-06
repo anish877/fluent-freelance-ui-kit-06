@@ -2,10 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { AuthProvider } from "./hooks/AuthContext";
 import { WebSocketProvider } from "./hooks/socketContext";
+import Navbar from "./components/layout/Navbar";
 
 // Import all pages
 import Index from "./pages/Index";
@@ -16,7 +17,7 @@ import FreelancerProfile from "./pages/FreelancerProfile";
 import Dashboard from "./pages/Dashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+
 import Onboarding from "./pages/Onboarding";
 import PostJob from "./pages/PostJob";
 import Proposals from "./pages/Proposals";
@@ -41,134 +42,131 @@ const App = () => {
             <BrowserRouter>
         <AuthProvider>
               <WebSocketProvider>
-
-                <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                
-                {/* Semi-public routes - accessible but may show different content based on auth */}
-                <Route path="/jobs" element={<Jobs />} />
-                <Route path="/jobs/:id" element={<JobDetails />} />
-                <Route path="/freelancer/:id" element={<FreelancerProfile />} />
-                <Route path="/talent" element={<Talent />} />
-                
-                {/* Protected onboarding route */}
-                <Route 
-                  path="/onboarding" 
-                  element={
-                    <ProtectedRoute>
-                      <Onboarding />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Client-only routes */}
-                <Route 
-                  path="/post-job" 
-                  element={
-                    <ProtectedRoute allowedUserTypes={['CLIENT']}>
-                      <PostJob />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/client-jobs/:id" 
-                  element={
-                    <ProtectedRoute allowedUserTypes={['CLIENT']}>
-                      <ClientJobView />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/client-dashboard" 
-                  element={
-                    <ProtectedRoute allowedUserTypes={['CLIENT']}>
-                      <ClientDashboard />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Freelancer-only routes */}
-                <Route 
-                  path="/dashboard" 
-                  element={
-                    <ProtectedRoute allowedUserTypes={['FREELANCER']}>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/proposals" 
-                  element={
-                    <ProtectedRoute allowedUserTypes={['FREELANCER']}>
-                      <Proposals />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Protected routes for all authenticated users */}
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/messages" 
-                  element={
-                    <ProtectedRoute>
-                      <Messages />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/messages/:conversationId" 
-                  element={
-                    <ProtectedRoute>
-                      <Messages />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/contracts" 
-                  element={
-                    <ProtectedRoute>
-                      <Contracts />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/reports" 
-                  element={
-                    <ProtectedRoute>
-                      <Reports />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/settings" 
-                  element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/help" 
-                  element={
-                    <ProtectedRoute>
-                      <Help />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Catch-all route - must be last */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+                <div className="min-h-screen bg-gray-50">
+                  <Navbar />
+                  <main>
+                    <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<Index />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Navigate to="/onboarding" replace />} />
+                    
+                    {/* Semi-public routes - accessible but may show different content based on auth */}
+                    <Route path="/jobs" element={<Jobs />} />
+                    <Route path="/jobs/:id" element={<JobDetails />} />
+                    <Route path="/freelancer/:id" element={<FreelancerProfile />} />
+                    <Route path="/talent" element={<Talent />} />
+                    
+                    {/* Public onboarding route - accessible to everyone */}
+                    <Route path="/onboarding" element={<Onboarding />} />
+                    
+                    {/* Client-only routes */}
+                    <Route 
+                      path="/post-job" 
+                      element={
+                        <ProtectedRoute allowedUserTypes={['CLIENT']}>
+                          <PostJob />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/client-jobs/:id" 
+                      element={
+                        <ProtectedRoute allowedUserTypes={['CLIENT']}>
+                          <ClientJobView />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/client-dashboard" 
+                      element={
+                        <ProtectedRoute allowedUserTypes={['CLIENT']}>
+                          <ClientDashboard />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    
+                    {/* Freelancer-only routes */}
+                    <Route 
+                      path="/dashboard" 
+                      element={
+                        <ProtectedRoute allowedUserTypes={['FREELANCER']}>
+                          <Dashboard />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/proposals" 
+                      element={
+                        <ProtectedRoute allowedUserTypes={['FREELANCER']}>
+                          <Proposals />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    
+                    {/* Protected routes for all authenticated users */}
+                    <Route 
+                      path="/profile" 
+                      element={
+                        <ProtectedRoute>
+                          <Profile />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/messages" 
+                      element={
+                        <ProtectedRoute>
+                          <Messages />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/messages/:conversationId" 
+                      element={
+                        <ProtectedRoute>
+                          <Messages />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/contracts" 
+                      element={
+                        <ProtectedRoute>
+                          <Contracts />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/reports" 
+                      element={
+                        <ProtectedRoute>
+                          <Reports />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/settings" 
+                      element={
+                        <ProtectedRoute>
+                          <Settings />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/help" 
+                      element={
+                        <ProtectedRoute>
+                          <Help />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    
+                    {/* Catch-all route - must be last */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                  </main>
+                </div>
 
               </WebSocketProvider>
         </AuthProvider>

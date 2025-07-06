@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, Plus, Send, Paperclip, Smile, MoreVertical, Phone, Video, Archive, Star, Circle } from "lucide-react";
-import Navbar from "../components/layout/Navbar";
+
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -202,7 +202,7 @@ useEffect(() => {
 
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
-      <Navbar />
+
       
       <div className="max-w-6xl mx-auto w-full flex-1 flex min-h-0 p-4">
         <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">

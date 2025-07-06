@@ -99,8 +99,9 @@ export const NotificationType: {
   PROPOSAL_ACCEPTED: 'PROPOSAL_ACCEPTED',
   PROPOSAL_REJECTED: 'PROPOSAL_REJECTED',
   MESSAGE_RECEIVED: 'MESSAGE_RECEIVED',
-  JOB_COMPLETED: 'JOB_COMPLETED',
-  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED'
+  JOB_POSTED: 'JOB_POSTED',
+  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
+  SYSTEM_UPDATE: 'SYSTEM_UPDATE'
 };
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
@@ -1758,6 +1759,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type MessageCountOutputType
+   */
+
+  export type MessageCountOutputType = {
+    conversationAsLastMessage: number
+  }
+
+  export type MessageCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    conversationAsLastMessage?: boolean | MessageCountOutputTypeCountConversationAsLastMessageArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * MessageCountOutputType without action
+   */
+  export type MessageCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageCountOutputType
+     */
+    select?: MessageCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * MessageCountOutputType without action
+   */
+  export type MessageCountOutputTypeCountConversationAsLastMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ConversationWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -1865,6 +1897,10 @@ export namespace Prisma {
     hoursPerWeek: string | null
     minimumProjectBudget: string | null
     specialRequirements: string | null
+    idDocument: string | null
+    addressProof: string | null
+    taxInformation: string | null
+    phoneVerified: boolean | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1933,6 +1969,10 @@ export namespace Prisma {
     hoursPerWeek: string | null
     minimumProjectBudget: string | null
     specialRequirements: string | null
+    idDocument: string | null
+    addressProof: string | null
+    taxInformation: string | null
+    phoneVerified: boolean | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -2022,6 +2062,10 @@ export namespace Prisma {
     workingDays: number
     minimumProjectBudget: number
     specialRequirements: number
+    idDocument: number
+    addressProof: number
+    taxInformation: number
+    phoneVerified: number
     _all: number
   }
 
@@ -2118,6 +2162,10 @@ export namespace Prisma {
     hoursPerWeek?: true
     minimumProjectBudget?: true
     specialRequirements?: true
+    idDocument?: true
+    addressProof?: true
+    taxInformation?: true
+    phoneVerified?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -2186,6 +2234,10 @@ export namespace Prisma {
     hoursPerWeek?: true
     minimumProjectBudget?: true
     specialRequirements?: true
+    idDocument?: true
+    addressProof?: true
+    taxInformation?: true
+    phoneVerified?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -2275,6 +2327,10 @@ export namespace Prisma {
     workingDays?: true
     minimumProjectBudget?: true
     specialRequirements?: true
+    idDocument?: true
+    addressProof?: true
+    taxInformation?: true
+    phoneVerified?: true
     _all?: true
   }
 
@@ -2451,6 +2507,10 @@ export namespace Prisma {
     workingDays: string[]
     minimumProjectBudget: string | null
     specialRequirements: string | null
+    idDocument: string | null
+    addressProof: string | null
+    taxInformation: string | null
+    phoneVerified: boolean
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -2559,6 +2619,10 @@ export namespace Prisma {
     workingDays?: boolean
     minimumProjectBudget?: boolean
     specialRequirements?: boolean
+    idDocument?: boolean
+    addressProof?: boolean
+    taxInformation?: boolean
+    phoneVerified?: boolean
     jobsPosted?: boolean | User$jobsPostedArgs<ExtArgs>
     proposals?: boolean | User$proposalsArgs<ExtArgs>
     reviews?: boolean | User$reviewsArgs<ExtArgs>
@@ -2658,6 +2722,10 @@ export namespace Prisma {
     workingDays?: boolean
     minimumProjectBudget?: boolean
     specialRequirements?: boolean
+    idDocument?: boolean
+    addressProof?: boolean
+    taxInformation?: boolean
+    phoneVerified?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2747,6 +2815,10 @@ export namespace Prisma {
     workingDays?: boolean
     minimumProjectBudget?: boolean
     specialRequirements?: boolean
+    idDocument?: boolean
+    addressProof?: boolean
+    taxInformation?: boolean
+    phoneVerified?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -2836,9 +2908,13 @@ export namespace Prisma {
     workingDays?: boolean
     minimumProjectBudget?: boolean
     specialRequirements?: boolean
+    idDocument?: boolean
+    addressProof?: boolean
+    taxInformation?: boolean
+    phoneVerified?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "googleId" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "totalEarnings" | "successRate" | "completedJobs" | "onTime" | "onBudget" | "responseTime" | "lastActive" | "topRatedPlus" | "verified" | "risingTalent" | "portfolioItems" | "testScores" | "specializations" | "memberSince" | "profileStrength" | "repeatHireRate" | "rating" | "reviewCount" | "portfolioProjects" | "workHistory" | "employmentHistory" | "coverImage" | "isOnline" | "hourlyRateRange" | "availabilityStatus" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "minimumProjectBudget" | "specialRequirements", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "avatar" | "bio" | "location" | "phone" | "userType" | "isOnboarded" | "onboardingStep" | "createdAt" | "updatedAt" | "country" | "city" | "timezone" | "title" | "overview" | "skills" | "topSkills" | "serviceOfferings" | "hourlyRate" | "portfolio" | "experience" | "education" | "workExperience" | "certifications" | "availability" | "languages" | "socialLinks" | "category" | "subcategory" | "experienceLevel" | "totalEarnings" | "successRate" | "completedJobs" | "onTime" | "onBudget" | "responseTime" | "lastActive" | "topRatedPlus" | "verified" | "risingTalent" | "portfolioItems" | "testScores" | "specializations" | "memberSince" | "profileStrength" | "repeatHireRate" | "rating" | "reviewCount" | "portfolioProjects" | "workHistory" | "employmentHistory" | "coverImage" | "isOnline" | "hourlyRateRange" | "availabilityStatus" | "companyName" | "companySize" | "industry" | "companyWebsite" | "companyDescription" | "projectTypes" | "preferredSkills" | "budgetRange" | "clientType" | "howDidYouHear" | "interestedCategories" | "urgencyLevel" | "preferredWorkingStyle" | "communicationPreference" | "projectDescription" | "paymentPreference" | "projectFrequency" | "averageProjectDuration" | "maxHourlyRate" | "totalMonthlyBudget" | "projectBasedRates" | "hoursPerWeek" | "workingHours" | "workingDays" | "minimumProjectBudget" | "specialRequirements" | "idDocument" | "addressProof" | "taxInformation" | "phoneVerified", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     jobsPosted?: boolean | User$jobsPostedArgs<ExtArgs>
     proposals?: boolean | User$proposalsArgs<ExtArgs>
@@ -2954,6 +3030,10 @@ export namespace Prisma {
       workingDays: string[]
       minimumProjectBudget: string | null
       specialRequirements: string | null
+      idDocument: string | null
+      addressProof: string | null
+      taxInformation: string | null
+      phoneVerified: boolean
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -3472,6 +3552,10 @@ export namespace Prisma {
     readonly workingDays: FieldRef<"User", 'String[]'>
     readonly minimumProjectBudget: FieldRef<"User", 'String'>
     readonly specialRequirements: FieldRef<"User", 'String'>
+    readonly idDocument: FieldRef<"User", 'String'>
+    readonly addressProof: FieldRef<"User", 'String'>
+    readonly taxInformation: FieldRef<"User", 'String'>
+    readonly phoneVerified: FieldRef<"User", 'Boolean'>
   }
     
 
@@ -6826,9 +6910,9 @@ export namespace Prisma {
     id: string | null
     rating: number | null
     comment: string | null
-    jobId: string | null
     authorId: string | null
     receiverId: string | null
+    jobId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6837,9 +6921,9 @@ export namespace Prisma {
     id: string | null
     rating: number | null
     comment: string | null
-    jobId: string | null
     authorId: string | null
     receiverId: string | null
+    jobId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6848,9 +6932,9 @@ export namespace Prisma {
     id: number
     rating: number
     comment: number
-    jobId: number
     authorId: number
     receiverId: number
+    jobId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -6869,9 +6953,9 @@ export namespace Prisma {
     id?: true
     rating?: true
     comment?: true
-    jobId?: true
     authorId?: true
     receiverId?: true
+    jobId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6880,9 +6964,9 @@ export namespace Prisma {
     id?: true
     rating?: true
     comment?: true
-    jobId?: true
     authorId?: true
     receiverId?: true
+    jobId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6891,9 +6975,9 @@ export namespace Prisma {
     id?: true
     rating?: true
     comment?: true
-    jobId?: true
     authorId?: true
     receiverId?: true
+    jobId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6989,9 +7073,9 @@ export namespace Prisma {
     id: string
     rating: number
     comment: string
-    jobId: string
     authorId: string
     receiverId: string
+    jobId: string | null
     createdAt: Date
     updatedAt: Date
     _count: ReviewCountAggregateOutputType | null
@@ -7019,86 +7103,86 @@ export namespace Prisma {
     id?: boolean
     rating?: boolean
     comment?: boolean
-    jobId?: boolean
     authorId?: boolean
     receiverId?: boolean
+    jobId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    job?: boolean | JobDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
+    job?: boolean | Review$jobArgs<ExtArgs>
   }, ExtArgs["result"]["review"]>
 
   export type ReviewSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     rating?: boolean
     comment?: boolean
-    jobId?: boolean
     authorId?: boolean
     receiverId?: boolean
+    jobId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    job?: boolean | JobDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
+    job?: boolean | Review$jobArgs<ExtArgs>
   }, ExtArgs["result"]["review"]>
 
   export type ReviewSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     rating?: boolean
     comment?: boolean
-    jobId?: boolean
     authorId?: boolean
     receiverId?: boolean
+    jobId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    job?: boolean | JobDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
+    job?: boolean | Review$jobArgs<ExtArgs>
   }, ExtArgs["result"]["review"]>
 
   export type ReviewSelectScalar = {
     id?: boolean
     rating?: boolean
     comment?: boolean
-    jobId?: boolean
     authorId?: boolean
     receiverId?: boolean
+    jobId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ReviewOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "rating" | "comment" | "jobId" | "authorId" | "receiverId" | "createdAt" | "updatedAt", ExtArgs["result"]["review"]>
+  export type ReviewOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "rating" | "comment" | "authorId" | "receiverId" | "jobId" | "createdAt" | "updatedAt", ExtArgs["result"]["review"]>
   export type ReviewInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    job?: boolean | JobDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
+    job?: boolean | Review$jobArgs<ExtArgs>
   }
   export type ReviewIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    job?: boolean | JobDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
+    job?: boolean | Review$jobArgs<ExtArgs>
   }
   export type ReviewIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    job?: boolean | JobDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
+    job?: boolean | Review$jobArgs<ExtArgs>
   }
 
   export type $ReviewPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Review"
     objects: {
-      job: Prisma.$JobPayload<ExtArgs>
       author: Prisma.$UserPayload<ExtArgs>
       receiver: Prisma.$UserPayload<ExtArgs>
+      job: Prisma.$JobPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       rating: number
       comment: string
-      jobId: string
       authorId: string
       receiverId: string
+      jobId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["review"]>
@@ -7495,9 +7579,9 @@ export namespace Prisma {
    */
   export interface Prisma__ReviewClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    job<T extends JobDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobDefaultArgs<ExtArgs>>): Prisma__JobClient<$Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     author<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     receiver<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    job<T extends Review$jobArgs<ExtArgs> = {}>(args?: Subset<T, Review$jobArgs<ExtArgs>>): Prisma__JobClient<$Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7530,9 +7614,9 @@ export namespace Prisma {
     readonly id: FieldRef<"Review", 'String'>
     readonly rating: FieldRef<"Review", 'Int'>
     readonly comment: FieldRef<"Review", 'String'>
-    readonly jobId: FieldRef<"Review", 'String'>
     readonly authorId: FieldRef<"Review", 'String'>
     readonly receiverId: FieldRef<"Review", 'String'>
+    readonly jobId: FieldRef<"Review", 'String'>
     readonly createdAt: FieldRef<"Review", 'DateTime'>
     readonly updatedAt: FieldRef<"Review", 'DateTime'>
   }
@@ -7931,6 +8015,25 @@ export namespace Prisma {
   }
 
   /**
+   * Review.job
+   */
+  export type Review$jobArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Job
+     */
+    select?: JobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Job
+     */
+    omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    where?: JobWhereInput
+  }
+
+  /**
    * Review without action
    */
   export type ReviewDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8133,9 +8236,9 @@ export namespace Prisma {
     lastMessageId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    job?: boolean | Conversation$jobArgs<ExtArgs>
     messages?: boolean | Conversation$messagesArgs<ExtArgs>
     lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
-    job?: boolean | Conversation$jobArgs<ExtArgs>
     _count?: boolean | ConversationCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["conversation"]>
 
@@ -8148,8 +8251,8 @@ export namespace Prisma {
     lastMessageId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
     job?: boolean | Conversation$jobArgs<ExtArgs>
+    lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
   }, ExtArgs["result"]["conversation"]>
 
   export type ConversationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8161,8 +8264,8 @@ export namespace Prisma {
     lastMessageId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
     job?: boolean | Conversation$jobArgs<ExtArgs>
+    lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
   }, ExtArgs["result"]["conversation"]>
 
   export type ConversationSelectScalar = {
@@ -8178,26 +8281,26 @@ export namespace Prisma {
 
   export type ConversationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "participants" | "jobId" | "projectName" | "isActive" | "lastMessageId" | "createdAt" | "updatedAt", ExtArgs["result"]["conversation"]>
   export type ConversationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job?: boolean | Conversation$jobArgs<ExtArgs>
     messages?: boolean | Conversation$messagesArgs<ExtArgs>
     lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
-    job?: boolean | Conversation$jobArgs<ExtArgs>
     _count?: boolean | ConversationCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ConversationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
     job?: boolean | Conversation$jobArgs<ExtArgs>
+    lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
   }
   export type ConversationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
     job?: boolean | Conversation$jobArgs<ExtArgs>
+    lastMessage?: boolean | Conversation$lastMessageArgs<ExtArgs>
   }
 
   export type $ConversationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Conversation"
     objects: {
+      job: Prisma.$JobPayload<ExtArgs> | null
       messages: Prisma.$MessagePayload<ExtArgs>[]
       lastMessage: Prisma.$MessagePayload<ExtArgs> | null
-      job: Prisma.$JobPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8602,9 +8705,9 @@ export namespace Prisma {
    */
   export interface Prisma__ConversationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    job<T extends Conversation$jobArgs<ExtArgs> = {}>(args?: Subset<T, Conversation$jobArgs<ExtArgs>>): Prisma__JobClient<$Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     messages<T extends Conversation$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Conversation$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     lastMessage<T extends Conversation$lastMessageArgs<ExtArgs> = {}>(args?: Subset<T, Conversation$lastMessageArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    job<T extends Conversation$jobArgs<ExtArgs> = {}>(args?: Subset<T, Conversation$jobArgs<ExtArgs>>): Prisma__JobClient<$Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9038,6 +9141,25 @@ export namespace Prisma {
   }
 
   /**
+   * Conversation.job
+   */
+  export type Conversation$jobArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Job
+     */
+    select?: JobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Job
+     */
+    omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    where?: JobWhereInput
+  }
+
+  /**
    * Conversation.messages
    */
   export type Conversation$messagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9081,25 +9203,6 @@ export namespace Prisma {
   }
 
   /**
-   * Conversation.job
-   */
-  export type Conversation$jobArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Job
-     */
-    select?: JobSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Job
-     */
-    omit?: JobOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: JobInclude<ExtArgs> | null
-    where?: JobWhereInput
-  }
-
-  /**
    * Conversation without action
    */
   export type ConversationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9134,9 +9237,9 @@ export namespace Prisma {
     senderEmail: string | null
     receiverEmail: string | null
     conversationId: string | null
-    jobId: string | null
     isRead: boolean | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type MessageMaxAggregateOutputType = {
@@ -9145,9 +9248,9 @@ export namespace Prisma {
     senderEmail: string | null
     receiverEmail: string | null
     conversationId: string | null
-    jobId: string | null
     isRead: boolean | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type MessageCountAggregateOutputType = {
@@ -9156,9 +9259,9 @@ export namespace Prisma {
     senderEmail: number
     receiverEmail: number
     conversationId: number
-    jobId: number
     isRead: number
     createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -9169,9 +9272,9 @@ export namespace Prisma {
     senderEmail?: true
     receiverEmail?: true
     conversationId?: true
-    jobId?: true
     isRead?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type MessageMaxAggregateInputType = {
@@ -9180,9 +9283,9 @@ export namespace Prisma {
     senderEmail?: true
     receiverEmail?: true
     conversationId?: true
-    jobId?: true
     isRead?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type MessageCountAggregateInputType = {
@@ -9191,9 +9294,9 @@ export namespace Prisma {
     senderEmail?: true
     receiverEmail?: true
     conversationId?: true
-    jobId?: true
     isRead?: true
     createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -9275,9 +9378,9 @@ export namespace Prisma {
     senderEmail: string
     receiverEmail: string
     conversationId: string
-    jobId: string | null
     isRead: boolean
     createdAt: Date
+    updatedAt: Date
     _count: MessageCountAggregateOutputType | null
     _min: MessageMinAggregateOutputType | null
     _max: MessageMaxAggregateOutputType | null
@@ -9303,13 +9406,14 @@ export namespace Prisma {
     senderEmail?: boolean
     receiverEmail?: boolean
     conversationId?: boolean
-    jobId?: boolean
     isRead?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     sender?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
     conversation?: boolean | ConversationDefaultArgs<ExtArgs>
-    conversationAsLast?: boolean | Message$conversationAsLastArgs<ExtArgs>
+    conversationAsLastMessage?: boolean | Message$conversationAsLastMessageArgs<ExtArgs>
+    _count?: boolean | MessageCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["message"]>
 
   export type MessageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -9318,9 +9422,9 @@ export namespace Prisma {
     senderEmail?: boolean
     receiverEmail?: boolean
     conversationId?: boolean
-    jobId?: boolean
     isRead?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     sender?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
     conversation?: boolean | ConversationDefaultArgs<ExtArgs>
@@ -9332,9 +9436,9 @@ export namespace Prisma {
     senderEmail?: boolean
     receiverEmail?: boolean
     conversationId?: boolean
-    jobId?: boolean
     isRead?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     sender?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
     conversation?: boolean | ConversationDefaultArgs<ExtArgs>
@@ -9346,17 +9450,18 @@ export namespace Prisma {
     senderEmail?: boolean
     receiverEmail?: boolean
     conversationId?: boolean
-    jobId?: boolean
     isRead?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "content" | "senderEmail" | "receiverEmail" | "conversationId" | "jobId" | "isRead" | "createdAt", ExtArgs["result"]["message"]>
+  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "content" | "senderEmail" | "receiverEmail" | "conversationId" | "isRead" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
   export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sender?: boolean | UserDefaultArgs<ExtArgs>
     receiver?: boolean | UserDefaultArgs<ExtArgs>
     conversation?: boolean | ConversationDefaultArgs<ExtArgs>
-    conversationAsLast?: boolean | Message$conversationAsLastArgs<ExtArgs>
+    conversationAsLastMessage?: boolean | Message$conversationAsLastMessageArgs<ExtArgs>
+    _count?: boolean | MessageCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type MessageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sender?: boolean | UserDefaultArgs<ExtArgs>
@@ -9375,7 +9480,7 @@ export namespace Prisma {
       sender: Prisma.$UserPayload<ExtArgs>
       receiver: Prisma.$UserPayload<ExtArgs>
       conversation: Prisma.$ConversationPayload<ExtArgs>
-      conversationAsLast: Prisma.$ConversationPayload<ExtArgs> | null
+      conversationAsLastMessage: Prisma.$ConversationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9383,9 +9488,9 @@ export namespace Prisma {
       senderEmail: string
       receiverEmail: string
       conversationId: string
-      jobId: string | null
       isRead: boolean
       createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["message"]>
     composites: {}
   }
@@ -9783,7 +9888,7 @@ export namespace Prisma {
     sender<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     receiver<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     conversation<T extends ConversationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ConversationDefaultArgs<ExtArgs>>): Prisma__ConversationClient<$Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    conversationAsLast<T extends Message$conversationAsLastArgs<ExtArgs> = {}>(args?: Subset<T, Message$conversationAsLastArgs<ExtArgs>>): Prisma__ConversationClient<$Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    conversationAsLastMessage<T extends Message$conversationAsLastMessageArgs<ExtArgs> = {}>(args?: Subset<T, Message$conversationAsLastMessageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9818,9 +9923,9 @@ export namespace Prisma {
     readonly senderEmail: FieldRef<"Message", 'String'>
     readonly receiverEmail: FieldRef<"Message", 'String'>
     readonly conversationId: FieldRef<"Message", 'String'>
-    readonly jobId: FieldRef<"Message", 'String'>
     readonly isRead: FieldRef<"Message", 'Boolean'>
     readonly createdAt: FieldRef<"Message", 'DateTime'>
+    readonly updatedAt: FieldRef<"Message", 'DateTime'>
   }
     
 
@@ -10217,9 +10322,9 @@ export namespace Prisma {
   }
 
   /**
-   * Message.conversationAsLast
+   * Message.conversationAsLastMessage
    */
-  export type Message$conversationAsLastArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Message$conversationAsLastMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Conversation
      */
@@ -10233,6 +10338,11 @@ export namespace Prisma {
      */
     include?: ConversationInclude<ExtArgs> | null
     where?: ConversationWhereInput
+    orderBy?: ConversationOrderByWithRelationInput | ConversationOrderByWithRelationInput[]
+    cursor?: ConversationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ConversationScalarFieldEnum | ConversationScalarFieldEnum[]
   }
 
   /**
@@ -10272,6 +10382,7 @@ export namespace Prisma {
     isRead: boolean | null
     userId: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type NotificationMaxAggregateOutputType = {
@@ -10282,6 +10393,7 @@ export namespace Prisma {
     isRead: boolean | null
     userId: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type NotificationCountAggregateOutputType = {
@@ -10292,6 +10404,7 @@ export namespace Prisma {
     isRead: number
     userId: number
     createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -10304,6 +10417,7 @@ export namespace Prisma {
     isRead?: true
     userId?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type NotificationMaxAggregateInputType = {
@@ -10314,6 +10428,7 @@ export namespace Prisma {
     isRead?: true
     userId?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type NotificationCountAggregateInputType = {
@@ -10324,6 +10439,7 @@ export namespace Prisma {
     isRead?: true
     userId?: true
     createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -10407,6 +10523,7 @@ export namespace Prisma {
     isRead: boolean
     userId: string
     createdAt: Date
+    updatedAt: Date
     _count: NotificationCountAggregateOutputType | null
     _min: NotificationMinAggregateOutputType | null
     _max: NotificationMaxAggregateOutputType | null
@@ -10434,6 +10551,7 @@ export namespace Prisma {
     isRead?: boolean
     userId?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
@@ -10445,6 +10563,7 @@ export namespace Prisma {
     isRead?: boolean
     userId?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
@@ -10456,6 +10575,7 @@ export namespace Prisma {
     isRead?: boolean
     userId?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
@@ -10467,9 +10587,10 @@ export namespace Prisma {
     isRead?: boolean
     userId?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "message" | "type" | "isRead" | "userId" | "createdAt", ExtArgs["result"]["notification"]>
+  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "message" | "type" | "isRead" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["notification"]>
   export type NotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -10493,6 +10614,7 @@ export namespace Prisma {
       isRead: boolean
       userId: string
       createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["notification"]>
     composites: {}
   }
@@ -10924,6 +11046,7 @@ export namespace Prisma {
     readonly isRead: FieldRef<"Notification", 'Boolean'>
     readonly userId: FieldRef<"Notification", 'String'>
     readonly createdAt: FieldRef<"Notification", 'DateTime'>
+    readonly updatedAt: FieldRef<"Notification", 'DateTime'>
   }
     
 
@@ -12491,7 +12614,11 @@ export namespace Prisma {
     workingHours: 'workingHours',
     workingDays: 'workingDays',
     minimumProjectBudget: 'minimumProjectBudget',
-    specialRequirements: 'specialRequirements'
+    specialRequirements: 'specialRequirements',
+    idDocument: 'idDocument',
+    addressProof: 'addressProof',
+    taxInformation: 'taxInformation',
+    phoneVerified: 'phoneVerified'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -12557,9 +12684,9 @@ export namespace Prisma {
     id: 'id',
     rating: 'rating',
     comment: 'comment',
-    jobId: 'jobId',
     authorId: 'authorId',
     receiverId: 'receiverId',
+    jobId: 'jobId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -12587,9 +12714,9 @@ export namespace Prisma {
     senderEmail: 'senderEmail',
     receiverEmail: 'receiverEmail',
     conversationId: 'conversationId',
-    jobId: 'jobId',
     isRead: 'isRead',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
@@ -12602,7 +12729,8 @@ export namespace Prisma {
     type: 'type',
     isRead: 'isRead',
     userId: 'userId',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
@@ -12904,6 +13032,10 @@ export namespace Prisma {
     workingDays?: StringNullableListFilter<"User">
     minimumProjectBudget?: StringNullableFilter<"User"> | string | null
     specialRequirements?: StringNullableFilter<"User"> | string | null
+    idDocument?: StringNullableFilter<"User"> | string | null
+    addressProof?: StringNullableFilter<"User"> | string | null
+    taxInformation?: StringNullableFilter<"User"> | string | null
+    phoneVerified?: BoolFilter<"User"> | boolean
     jobsPosted?: JobListRelationFilter
     proposals?: ProposalListRelationFilter
     reviews?: ReviewListRelationFilter
@@ -13002,6 +13134,10 @@ export namespace Prisma {
     workingDays?: SortOrder
     minimumProjectBudget?: SortOrderInput | SortOrder
     specialRequirements?: SortOrderInput | SortOrder
+    idDocument?: SortOrderInput | SortOrder
+    addressProof?: SortOrderInput | SortOrder
+    taxInformation?: SortOrderInput | SortOrder
+    phoneVerified?: SortOrder
     jobsPosted?: JobOrderByRelationAggregateInput
     proposals?: ProposalOrderByRelationAggregateInput
     reviews?: ReviewOrderByRelationAggregateInput
@@ -13103,6 +13239,10 @@ export namespace Prisma {
     workingDays?: StringNullableListFilter<"User">
     minimumProjectBudget?: StringNullableFilter<"User"> | string | null
     specialRequirements?: StringNullableFilter<"User"> | string | null
+    idDocument?: StringNullableFilter<"User"> | string | null
+    addressProof?: StringNullableFilter<"User"> | string | null
+    taxInformation?: StringNullableFilter<"User"> | string | null
+    phoneVerified?: BoolFilter<"User"> | boolean
     jobsPosted?: JobListRelationFilter
     proposals?: ProposalListRelationFilter
     reviews?: ReviewListRelationFilter
@@ -13201,6 +13341,10 @@ export namespace Prisma {
     workingDays?: SortOrder
     minimumProjectBudget?: SortOrderInput | SortOrder
     specialRequirements?: SortOrderInput | SortOrder
+    idDocument?: SortOrderInput | SortOrder
+    addressProof?: SortOrderInput | SortOrder
+    taxInformation?: SortOrderInput | SortOrder
+    phoneVerified?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -13298,6 +13442,10 @@ export namespace Prisma {
     workingDays?: StringNullableListFilter<"User">
     minimumProjectBudget?: StringNullableWithAggregatesFilter<"User"> | string | null
     specialRequirements?: StringNullableWithAggregatesFilter<"User"> | string | null
+    idDocument?: StringNullableWithAggregatesFilter<"User"> | string | null
+    addressProof?: StringNullableWithAggregatesFilter<"User"> | string | null
+    taxInformation?: StringNullableWithAggregatesFilter<"User"> | string | null
+    phoneVerified?: BoolWithAggregatesFilter<"User"> | boolean
   }
 
   export type JobWhereInput = {
@@ -13603,28 +13751,28 @@ export namespace Prisma {
     id?: StringFilter<"Review"> | string
     rating?: IntFilter<"Review"> | number
     comment?: StringFilter<"Review"> | string
-    jobId?: StringFilter<"Review"> | string
     authorId?: StringFilter<"Review"> | string
     receiverId?: StringFilter<"Review"> | string
+    jobId?: StringNullableFilter<"Review"> | string | null
     createdAt?: DateTimeFilter<"Review"> | Date | string
     updatedAt?: DateTimeFilter<"Review"> | Date | string
-    job?: XOR<JobScalarRelationFilter, JobWhereInput>
     author?: XOR<UserScalarRelationFilter, UserWhereInput>
     receiver?: XOR<UserScalarRelationFilter, UserWhereInput>
+    job?: XOR<JobNullableScalarRelationFilter, JobWhereInput> | null
   }
 
   export type ReviewOrderByWithRelationInput = {
     id?: SortOrder
     rating?: SortOrder
     comment?: SortOrder
-    jobId?: SortOrder
     authorId?: SortOrder
     receiverId?: SortOrder
+    jobId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    job?: JobOrderByWithRelationInput
     author?: UserOrderByWithRelationInput
     receiver?: UserOrderByWithRelationInput
+    job?: JobOrderByWithRelationInput
   }
 
   export type ReviewWhereUniqueInput = Prisma.AtLeast<{
@@ -13634,23 +13782,23 @@ export namespace Prisma {
     NOT?: ReviewWhereInput | ReviewWhereInput[]
     rating?: IntFilter<"Review"> | number
     comment?: StringFilter<"Review"> | string
-    jobId?: StringFilter<"Review"> | string
     authorId?: StringFilter<"Review"> | string
     receiverId?: StringFilter<"Review"> | string
+    jobId?: StringNullableFilter<"Review"> | string | null
     createdAt?: DateTimeFilter<"Review"> | Date | string
     updatedAt?: DateTimeFilter<"Review"> | Date | string
-    job?: XOR<JobScalarRelationFilter, JobWhereInput>
     author?: XOR<UserScalarRelationFilter, UserWhereInput>
     receiver?: XOR<UserScalarRelationFilter, UserWhereInput>
+    job?: XOR<JobNullableScalarRelationFilter, JobWhereInput> | null
   }, "id">
 
   export type ReviewOrderByWithAggregationInput = {
     id?: SortOrder
     rating?: SortOrder
     comment?: SortOrder
-    jobId?: SortOrder
     authorId?: SortOrder
     receiverId?: SortOrder
+    jobId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ReviewCountOrderByAggregateInput
@@ -13667,9 +13815,9 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Review"> | string
     rating?: IntWithAggregatesFilter<"Review"> | number
     comment?: StringWithAggregatesFilter<"Review"> | string
-    jobId?: StringWithAggregatesFilter<"Review"> | string
     authorId?: StringWithAggregatesFilter<"Review"> | string
     receiverId?: StringWithAggregatesFilter<"Review"> | string
+    jobId?: StringNullableWithAggregatesFilter<"Review"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Review"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Review"> | Date | string
   }
@@ -13686,9 +13834,9 @@ export namespace Prisma {
     lastMessageId?: StringNullableFilter<"Conversation"> | string | null
     createdAt?: DateTimeFilter<"Conversation"> | Date | string
     updatedAt?: DateTimeFilter<"Conversation"> | Date | string
+    job?: XOR<JobNullableScalarRelationFilter, JobWhereInput> | null
     messages?: MessageListRelationFilter
     lastMessage?: XOR<MessageNullableScalarRelationFilter, MessageWhereInput> | null
-    job?: XOR<JobNullableScalarRelationFilter, JobWhereInput> | null
   }
 
   export type ConversationOrderByWithRelationInput = {
@@ -13700,14 +13848,13 @@ export namespace Prisma {
     lastMessageId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    job?: JobOrderByWithRelationInput
     messages?: MessageOrderByRelationAggregateInput
     lastMessage?: MessageOrderByWithRelationInput
-    job?: JobOrderByWithRelationInput
   }
 
   export type ConversationWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    lastMessageId?: string
     AND?: ConversationWhereInput | ConversationWhereInput[]
     OR?: ConversationWhereInput[]
     NOT?: ConversationWhereInput | ConversationWhereInput[]
@@ -13715,12 +13862,13 @@ export namespace Prisma {
     jobId?: StringNullableFilter<"Conversation"> | string | null
     projectName?: StringNullableFilter<"Conversation"> | string | null
     isActive?: BoolFilter<"Conversation"> | boolean
+    lastMessageId?: StringNullableFilter<"Conversation"> | string | null
     createdAt?: DateTimeFilter<"Conversation"> | Date | string
     updatedAt?: DateTimeFilter<"Conversation"> | Date | string
+    job?: XOR<JobNullableScalarRelationFilter, JobWhereInput> | null
     messages?: MessageListRelationFilter
     lastMessage?: XOR<MessageNullableScalarRelationFilter, MessageWhereInput> | null
-    job?: XOR<JobNullableScalarRelationFilter, JobWhereInput> | null
-  }, "id" | "lastMessageId">
+  }, "id">
 
   export type ConversationOrderByWithAggregationInput = {
     id?: SortOrder
@@ -13759,13 +13907,13 @@ export namespace Prisma {
     senderEmail?: StringFilter<"Message"> | string
     receiverEmail?: StringFilter<"Message"> | string
     conversationId?: StringFilter<"Message"> | string
-    jobId?: StringNullableFilter<"Message"> | string | null
     isRead?: BoolFilter<"Message"> | boolean
     createdAt?: DateTimeFilter<"Message"> | Date | string
+    updatedAt?: DateTimeFilter<"Message"> | Date | string
     sender?: XOR<UserScalarRelationFilter, UserWhereInput>
     receiver?: XOR<UserScalarRelationFilter, UserWhereInput>
     conversation?: XOR<ConversationScalarRelationFilter, ConversationWhereInput>
-    conversationAsLast?: XOR<ConversationNullableScalarRelationFilter, ConversationWhereInput> | null
+    conversationAsLastMessage?: ConversationListRelationFilter
   }
 
   export type MessageOrderByWithRelationInput = {
@@ -13774,13 +13922,13 @@ export namespace Prisma {
     senderEmail?: SortOrder
     receiverEmail?: SortOrder
     conversationId?: SortOrder
-    jobId?: SortOrderInput | SortOrder
     isRead?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     sender?: UserOrderByWithRelationInput
     receiver?: UserOrderByWithRelationInput
     conversation?: ConversationOrderByWithRelationInput
-    conversationAsLast?: ConversationOrderByWithRelationInput
+    conversationAsLastMessage?: ConversationOrderByRelationAggregateInput
   }
 
   export type MessageWhereUniqueInput = Prisma.AtLeast<{
@@ -13792,13 +13940,13 @@ export namespace Prisma {
     senderEmail?: StringFilter<"Message"> | string
     receiverEmail?: StringFilter<"Message"> | string
     conversationId?: StringFilter<"Message"> | string
-    jobId?: StringNullableFilter<"Message"> | string | null
     isRead?: BoolFilter<"Message"> | boolean
     createdAt?: DateTimeFilter<"Message"> | Date | string
+    updatedAt?: DateTimeFilter<"Message"> | Date | string
     sender?: XOR<UserScalarRelationFilter, UserWhereInput>
     receiver?: XOR<UserScalarRelationFilter, UserWhereInput>
     conversation?: XOR<ConversationScalarRelationFilter, ConversationWhereInput>
-    conversationAsLast?: XOR<ConversationNullableScalarRelationFilter, ConversationWhereInput> | null
+    conversationAsLastMessage?: ConversationListRelationFilter
   }, "id">
 
   export type MessageOrderByWithAggregationInput = {
@@ -13807,9 +13955,9 @@ export namespace Prisma {
     senderEmail?: SortOrder
     receiverEmail?: SortOrder
     conversationId?: SortOrder
-    jobId?: SortOrderInput | SortOrder
     isRead?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: MessageCountOrderByAggregateInput
     _max?: MessageMaxOrderByAggregateInput
     _min?: MessageMinOrderByAggregateInput
@@ -13824,9 +13972,9 @@ export namespace Prisma {
     senderEmail?: StringWithAggregatesFilter<"Message"> | string
     receiverEmail?: StringWithAggregatesFilter<"Message"> | string
     conversationId?: StringWithAggregatesFilter<"Message"> | string
-    jobId?: StringNullableWithAggregatesFilter<"Message"> | string | null
     isRead?: BoolWithAggregatesFilter<"Message"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
   }
 
   export type NotificationWhereInput = {
@@ -13840,6 +13988,7 @@ export namespace Prisma {
     isRead?: BoolFilter<"Notification"> | boolean
     userId?: StringFilter<"Notification"> | string
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    updatedAt?: DateTimeFilter<"Notification"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
@@ -13851,6 +14000,7 @@ export namespace Prisma {
     isRead?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
   }
 
@@ -13865,6 +14015,7 @@ export namespace Prisma {
     isRead?: BoolFilter<"Notification"> | boolean
     userId?: StringFilter<"Notification"> | string
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    updatedAt?: DateTimeFilter<"Notification"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
@@ -13876,6 +14027,7 @@ export namespace Prisma {
     isRead?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: NotificationCountOrderByAggregateInput
     _max?: NotificationMaxOrderByAggregateInput
     _min?: NotificationMinOrderByAggregateInput
@@ -13892,6 +14044,7 @@ export namespace Prisma {
     isRead?: BoolWithAggregatesFilter<"Notification"> | boolean
     userId?: StringWithAggregatesFilter<"Notification"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
   }
 
   export type SavedFreelancerWhereInput = {
@@ -14035,6 +14188,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -14133,6 +14290,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -14231,6 +14392,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -14329,6 +14494,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -14427,6 +14596,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
   }
 
   export type UserUpdateManyMutationInput = {
@@ -14516,6 +14689,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -14605,6 +14782,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type JobCreateInput = {
@@ -14972,18 +15153,18 @@ export namespace Prisma {
     comment: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    job: JobCreateNestedOneWithoutReviewsInput
     author: UserCreateNestedOneWithoutReviewsInput
     receiver: UserCreateNestedOneWithoutReceivedReviewsInput
+    job?: JobCreateNestedOneWithoutReviewsInput
   }
 
   export type ReviewUncheckedCreateInput = {
     id?: string
     rating: number
     comment: string
-    jobId: string
     authorId: string
     receiverId: string
+    jobId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14994,18 +15175,18 @@ export namespace Prisma {
     comment?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    job?: JobUpdateOneRequiredWithoutReviewsNestedInput
     author?: UserUpdateOneRequiredWithoutReviewsNestedInput
     receiver?: UserUpdateOneRequiredWithoutReceivedReviewsNestedInput
+    job?: JobUpdateOneWithoutReviewsNestedInput
   }
 
   export type ReviewUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     rating?: IntFieldUpdateOperationsInput | number
     comment?: StringFieldUpdateOperationsInput | string
-    jobId?: StringFieldUpdateOperationsInput | string
     authorId?: StringFieldUpdateOperationsInput | string
     receiverId?: StringFieldUpdateOperationsInput | string
+    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15014,9 +15195,9 @@ export namespace Prisma {
     id?: string
     rating: number
     comment: string
-    jobId: string
     authorId: string
     receiverId: string
+    jobId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -15033,9 +15214,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rating?: IntFieldUpdateOperationsInput | number
     comment?: StringFieldUpdateOperationsInput | string
-    jobId?: StringFieldUpdateOperationsInput | string
     authorId?: StringFieldUpdateOperationsInput | string
     receiverId?: StringFieldUpdateOperationsInput | string
+    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15047,9 +15228,9 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    messages?: MessageCreateNestedManyWithoutConversationInput
-    lastMessage?: MessageCreateNestedOneWithoutConversationAsLastInput
     job?: JobCreateNestedOneWithoutConversationInput
+    messages?: MessageCreateNestedManyWithoutConversationInput
+    lastMessage?: MessageCreateNestedOneWithoutConversationAsLastMessageInput
   }
 
   export type ConversationUncheckedCreateInput = {
@@ -15071,9 +15252,9 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    messages?: MessageUpdateManyWithoutConversationNestedInput
-    lastMessage?: MessageUpdateOneWithoutConversationAsLastNestedInput
     job?: JobUpdateOneWithoutConversationNestedInput
+    messages?: MessageUpdateManyWithoutConversationNestedInput
+    lastMessage?: MessageUpdateOneWithoutConversationAsLastMessageNestedInput
   }
 
   export type ConversationUncheckedUpdateInput = {
@@ -15122,13 +15303,13 @@ export namespace Prisma {
   export type MessageCreateInput = {
     id?: string
     content: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
     sender: UserCreateNestedOneWithoutMessagesInput
     receiver: UserCreateNestedOneWithoutReceivedMessagesInput
     conversation: ConversationCreateNestedOneWithoutMessagesInput
-    conversationAsLast?: ConversationCreateNestedOneWithoutLastMessageInput
+    conversationAsLastMessage?: ConversationCreateNestedManyWithoutLastMessageInput
   }
 
   export type MessageUncheckedCreateInput = {
@@ -15137,22 +15318,22 @@ export namespace Prisma {
     senderEmail: string
     receiverEmail: string
     conversationId: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
-    conversationAsLast?: ConversationUncheckedCreateNestedOneWithoutLastMessageInput
+    updatedAt?: Date | string
+    conversationAsLastMessage?: ConversationUncheckedCreateNestedManyWithoutLastMessageInput
   }
 
   export type MessageUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sender?: UserUpdateOneRequiredWithoutMessagesNestedInput
     receiver?: UserUpdateOneRequiredWithoutReceivedMessagesNestedInput
     conversation?: ConversationUpdateOneRequiredWithoutMessagesNestedInput
-    conversationAsLast?: ConversationUpdateOneWithoutLastMessageNestedInput
+    conversationAsLastMessage?: ConversationUpdateManyWithoutLastMessageNestedInput
   }
 
   export type MessageUncheckedUpdateInput = {
@@ -15161,10 +15342,10 @@ export namespace Prisma {
     senderEmail?: StringFieldUpdateOperationsInput | string
     receiverEmail?: StringFieldUpdateOperationsInput | string
     conversationId?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    conversationAsLast?: ConversationUncheckedUpdateOneWithoutLastMessageNestedInput
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationAsLastMessage?: ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
   }
 
   export type MessageCreateManyInput = {
@@ -15173,17 +15354,17 @@ export namespace Prisma {
     senderEmail: string
     receiverEmail: string
     conversationId: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type MessageUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MessageUncheckedUpdateManyInput = {
@@ -15192,9 +15373,9 @@ export namespace Prisma {
     senderEmail?: StringFieldUpdateOperationsInput | string
     receiverEmail?: StringFieldUpdateOperationsInput | string
     conversationId?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type NotificationCreateInput = {
@@ -15204,6 +15385,7 @@ export namespace Prisma {
     type: $Enums.NotificationType
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
     user: UserCreateNestedOneWithoutNotificationsInput
   }
 
@@ -15215,6 +15397,7 @@ export namespace Prisma {
     isRead?: boolean
     userId: string
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type NotificationUpdateInput = {
@@ -15224,6 +15407,7 @@ export namespace Prisma {
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
   }
 
@@ -15235,6 +15419,7 @@ export namespace Prisma {
     isRead?: BoolFieldUpdateOperationsInput | boolean
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type NotificationCreateManyInput = {
@@ -15245,6 +15430,7 @@ export namespace Prisma {
     isRead?: boolean
     userId: string
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type NotificationUpdateManyMutationInput = {
@@ -15254,6 +15440,7 @@ export namespace Prisma {
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type NotificationUncheckedUpdateManyInput = {
@@ -15264,6 +15451,7 @@ export namespace Prisma {
     isRead?: BoolFieldUpdateOperationsInput | boolean
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SavedFreelancerCreateInput = {
@@ -15582,6 +15770,10 @@ export namespace Prisma {
     workingDays?: SortOrder
     minimumProjectBudget?: SortOrder
     specialRequirements?: SortOrder
+    idDocument?: SortOrder
+    addressProof?: SortOrder
+    taxInformation?: SortOrder
+    phoneVerified?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -15663,6 +15855,10 @@ export namespace Prisma {
     hoursPerWeek?: SortOrder
     minimumProjectBudget?: SortOrder
     specialRequirements?: SortOrder
+    idDocument?: SortOrder
+    addressProof?: SortOrder
+    taxInformation?: SortOrder
+    phoneVerified?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -15731,6 +15927,10 @@ export namespace Prisma {
     hoursPerWeek?: SortOrder
     minimumProjectBudget?: SortOrder
     specialRequirements?: SortOrder
+    idDocument?: SortOrder
+    addressProof?: SortOrder
+    taxInformation?: SortOrder
+    phoneVerified?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -16171,13 +16371,18 @@ export namespace Prisma {
     _max?: NestedEnumProposalStatusFilter<$PrismaModel>
   }
 
+  export type JobNullableScalarRelationFilter = {
+    is?: JobWhereInput | null
+    isNot?: JobWhereInput | null
+  }
+
   export type ReviewCountOrderByAggregateInput = {
     id?: SortOrder
     rating?: SortOrder
     comment?: SortOrder
-    jobId?: SortOrder
     authorId?: SortOrder
     receiverId?: SortOrder
+    jobId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16190,9 +16395,9 @@ export namespace Prisma {
     id?: SortOrder
     rating?: SortOrder
     comment?: SortOrder
-    jobId?: SortOrder
     authorId?: SortOrder
     receiverId?: SortOrder
+    jobId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16201,9 +16406,9 @@ export namespace Prisma {
     id?: SortOrder
     rating?: SortOrder
     comment?: SortOrder
-    jobId?: SortOrder
     authorId?: SortOrder
     receiverId?: SortOrder
+    jobId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16215,11 +16420,6 @@ export namespace Prisma {
   export type MessageNullableScalarRelationFilter = {
     is?: MessageWhereInput | null
     isNot?: MessageWhereInput | null
-  }
-
-  export type JobNullableScalarRelationFilter = {
-    is?: JobWhereInput | null
-    isNot?: JobWhereInput | null
   }
 
   export type ConversationCountOrderByAggregateInput = {
@@ -16258,20 +16458,15 @@ export namespace Prisma {
     isNot?: ConversationWhereInput
   }
 
-  export type ConversationNullableScalarRelationFilter = {
-    is?: ConversationWhereInput | null
-    isNot?: ConversationWhereInput | null
-  }
-
   export type MessageCountOrderByAggregateInput = {
     id?: SortOrder
     content?: SortOrder
     senderEmail?: SortOrder
     receiverEmail?: SortOrder
     conversationId?: SortOrder
-    jobId?: SortOrder
     isRead?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type MessageMaxOrderByAggregateInput = {
@@ -16280,9 +16475,9 @@ export namespace Prisma {
     senderEmail?: SortOrder
     receiverEmail?: SortOrder
     conversationId?: SortOrder
-    jobId?: SortOrder
     isRead?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type MessageMinOrderByAggregateInput = {
@@ -16291,9 +16486,9 @@ export namespace Prisma {
     senderEmail?: SortOrder
     receiverEmail?: SortOrder
     conversationId?: SortOrder
-    jobId?: SortOrder
     isRead?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type EnumNotificationTypeFilter<$PrismaModel = never> = {
@@ -16311,6 +16506,7 @@ export namespace Prisma {
     isRead?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type NotificationMaxOrderByAggregateInput = {
@@ -16321,6 +16517,7 @@ export namespace Prisma {
     isRead?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type NotificationMinOrderByAggregateInput = {
@@ -16331,6 +16528,7 @@ export namespace Prisma {
     isRead?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type EnumNotificationTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -17100,12 +17298,6 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProposalsInput, UserUpdateWithoutProposalsInput>, UserUncheckedUpdateWithoutProposalsInput>
   }
 
-  export type JobCreateNestedOneWithoutReviewsInput = {
-    create?: XOR<JobCreateWithoutReviewsInput, JobUncheckedCreateWithoutReviewsInput>
-    connectOrCreate?: JobCreateOrConnectWithoutReviewsInput
-    connect?: JobWhereUniqueInput
-  }
-
   export type UserCreateNestedOneWithoutReviewsInput = {
     create?: XOR<UserCreateWithoutReviewsInput, UserUncheckedCreateWithoutReviewsInput>
     connectOrCreate?: UserCreateOrConnectWithoutReviewsInput
@@ -17118,12 +17310,10 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type JobUpdateOneRequiredWithoutReviewsNestedInput = {
+  export type JobCreateNestedOneWithoutReviewsInput = {
     create?: XOR<JobCreateWithoutReviewsInput, JobUncheckedCreateWithoutReviewsInput>
     connectOrCreate?: JobCreateOrConnectWithoutReviewsInput
-    upsert?: JobUpsertWithoutReviewsInput
     connect?: JobWhereUniqueInput
-    update?: XOR<XOR<JobUpdateToOneWithWhereWithoutReviewsInput, JobUpdateWithoutReviewsInput>, JobUncheckedUpdateWithoutReviewsInput>
   }
 
   export type UserUpdateOneRequiredWithoutReviewsNestedInput = {
@@ -17142,8 +17332,24 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutReceivedReviewsInput, UserUpdateWithoutReceivedReviewsInput>, UserUncheckedUpdateWithoutReceivedReviewsInput>
   }
 
+  export type JobUpdateOneWithoutReviewsNestedInput = {
+    create?: XOR<JobCreateWithoutReviewsInput, JobUncheckedCreateWithoutReviewsInput>
+    connectOrCreate?: JobCreateOrConnectWithoutReviewsInput
+    upsert?: JobUpsertWithoutReviewsInput
+    disconnect?: JobWhereInput | boolean
+    delete?: JobWhereInput | boolean
+    connect?: JobWhereUniqueInput
+    update?: XOR<XOR<JobUpdateToOneWithWhereWithoutReviewsInput, JobUpdateWithoutReviewsInput>, JobUncheckedUpdateWithoutReviewsInput>
+  }
+
   export type ConversationCreateparticipantsInput = {
     set: string[]
+  }
+
+  export type JobCreateNestedOneWithoutConversationInput = {
+    create?: XOR<JobCreateWithoutConversationInput, JobUncheckedCreateWithoutConversationInput>
+    connectOrCreate?: JobCreateOrConnectWithoutConversationInput
+    connect?: JobWhereUniqueInput
   }
 
   export type MessageCreateNestedManyWithoutConversationInput = {
@@ -17153,16 +17359,10 @@ export namespace Prisma {
     connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
   }
 
-  export type MessageCreateNestedOneWithoutConversationAsLastInput = {
-    create?: XOR<MessageCreateWithoutConversationAsLastInput, MessageUncheckedCreateWithoutConversationAsLastInput>
-    connectOrCreate?: MessageCreateOrConnectWithoutConversationAsLastInput
+  export type MessageCreateNestedOneWithoutConversationAsLastMessageInput = {
+    create?: XOR<MessageCreateWithoutConversationAsLastMessageInput, MessageUncheckedCreateWithoutConversationAsLastMessageInput>
+    connectOrCreate?: MessageCreateOrConnectWithoutConversationAsLastMessageInput
     connect?: MessageWhereUniqueInput
-  }
-
-  export type JobCreateNestedOneWithoutConversationInput = {
-    create?: XOR<JobCreateWithoutConversationInput, JobUncheckedCreateWithoutConversationInput>
-    connectOrCreate?: JobCreateOrConnectWithoutConversationInput
-    connect?: JobWhereUniqueInput
   }
 
   export type MessageUncheckedCreateNestedManyWithoutConversationInput = {
@@ -17175,6 +17375,16 @@ export namespace Prisma {
   export type ConversationUpdateparticipantsInput = {
     set?: string[]
     push?: string | string[]
+  }
+
+  export type JobUpdateOneWithoutConversationNestedInput = {
+    create?: XOR<JobCreateWithoutConversationInput, JobUncheckedCreateWithoutConversationInput>
+    connectOrCreate?: JobCreateOrConnectWithoutConversationInput
+    upsert?: JobUpsertWithoutConversationInput
+    disconnect?: JobWhereInput | boolean
+    delete?: JobWhereInput | boolean
+    connect?: JobWhereUniqueInput
+    update?: XOR<XOR<JobUpdateToOneWithWhereWithoutConversationInput, JobUpdateWithoutConversationInput>, JobUncheckedUpdateWithoutConversationInput>
   }
 
   export type MessageUpdateManyWithoutConversationNestedInput = {
@@ -17191,24 +17401,14 @@ export namespace Prisma {
     deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
-  export type MessageUpdateOneWithoutConversationAsLastNestedInput = {
-    create?: XOR<MessageCreateWithoutConversationAsLastInput, MessageUncheckedCreateWithoutConversationAsLastInput>
-    connectOrCreate?: MessageCreateOrConnectWithoutConversationAsLastInput
-    upsert?: MessageUpsertWithoutConversationAsLastInput
+  export type MessageUpdateOneWithoutConversationAsLastMessageNestedInput = {
+    create?: XOR<MessageCreateWithoutConversationAsLastMessageInput, MessageUncheckedCreateWithoutConversationAsLastMessageInput>
+    connectOrCreate?: MessageCreateOrConnectWithoutConversationAsLastMessageInput
+    upsert?: MessageUpsertWithoutConversationAsLastMessageInput
     disconnect?: MessageWhereInput | boolean
     delete?: MessageWhereInput | boolean
     connect?: MessageWhereUniqueInput
-    update?: XOR<XOR<MessageUpdateToOneWithWhereWithoutConversationAsLastInput, MessageUpdateWithoutConversationAsLastInput>, MessageUncheckedUpdateWithoutConversationAsLastInput>
-  }
-
-  export type JobUpdateOneWithoutConversationNestedInput = {
-    create?: XOR<JobCreateWithoutConversationInput, JobUncheckedCreateWithoutConversationInput>
-    connectOrCreate?: JobCreateOrConnectWithoutConversationInput
-    upsert?: JobUpsertWithoutConversationInput
-    disconnect?: JobWhereInput | boolean
-    delete?: JobWhereInput | boolean
-    connect?: JobWhereUniqueInput
-    update?: XOR<XOR<JobUpdateToOneWithWhereWithoutConversationInput, JobUpdateWithoutConversationInput>, JobUncheckedUpdateWithoutConversationInput>
+    update?: XOR<XOR<MessageUpdateToOneWithWhereWithoutConversationAsLastMessageInput, MessageUpdateWithoutConversationAsLastMessageInput>, MessageUncheckedUpdateWithoutConversationAsLastMessageInput>
   }
 
   export type MessageUncheckedUpdateManyWithoutConversationNestedInput = {
@@ -17243,16 +17443,18 @@ export namespace Prisma {
     connect?: ConversationWhereUniqueInput
   }
 
-  export type ConversationCreateNestedOneWithoutLastMessageInput = {
-    create?: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput>
-    connectOrCreate?: ConversationCreateOrConnectWithoutLastMessageInput
-    connect?: ConversationWhereUniqueInput
+  export type ConversationCreateNestedManyWithoutLastMessageInput = {
+    create?: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput> | ConversationCreateWithoutLastMessageInput[] | ConversationUncheckedCreateWithoutLastMessageInput[]
+    connectOrCreate?: ConversationCreateOrConnectWithoutLastMessageInput | ConversationCreateOrConnectWithoutLastMessageInput[]
+    createMany?: ConversationCreateManyLastMessageInputEnvelope
+    connect?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
   }
 
-  export type ConversationUncheckedCreateNestedOneWithoutLastMessageInput = {
-    create?: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput>
-    connectOrCreate?: ConversationCreateOrConnectWithoutLastMessageInput
-    connect?: ConversationWhereUniqueInput
+  export type ConversationUncheckedCreateNestedManyWithoutLastMessageInput = {
+    create?: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput> | ConversationCreateWithoutLastMessageInput[] | ConversationUncheckedCreateWithoutLastMessageInput[]
+    connectOrCreate?: ConversationCreateOrConnectWithoutLastMessageInput | ConversationCreateOrConnectWithoutLastMessageInput[]
+    createMany?: ConversationCreateManyLastMessageInputEnvelope
+    connect?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
   }
 
   export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
@@ -17279,24 +17481,32 @@ export namespace Prisma {
     update?: XOR<XOR<ConversationUpdateToOneWithWhereWithoutMessagesInput, ConversationUpdateWithoutMessagesInput>, ConversationUncheckedUpdateWithoutMessagesInput>
   }
 
-  export type ConversationUpdateOneWithoutLastMessageNestedInput = {
-    create?: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput>
-    connectOrCreate?: ConversationCreateOrConnectWithoutLastMessageInput
-    upsert?: ConversationUpsertWithoutLastMessageInput
-    disconnect?: ConversationWhereInput | boolean
-    delete?: ConversationWhereInput | boolean
-    connect?: ConversationWhereUniqueInput
-    update?: XOR<XOR<ConversationUpdateToOneWithWhereWithoutLastMessageInput, ConversationUpdateWithoutLastMessageInput>, ConversationUncheckedUpdateWithoutLastMessageInput>
+  export type ConversationUpdateManyWithoutLastMessageNestedInput = {
+    create?: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput> | ConversationCreateWithoutLastMessageInput[] | ConversationUncheckedCreateWithoutLastMessageInput[]
+    connectOrCreate?: ConversationCreateOrConnectWithoutLastMessageInput | ConversationCreateOrConnectWithoutLastMessageInput[]
+    upsert?: ConversationUpsertWithWhereUniqueWithoutLastMessageInput | ConversationUpsertWithWhereUniqueWithoutLastMessageInput[]
+    createMany?: ConversationCreateManyLastMessageInputEnvelope
+    set?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
+    disconnect?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
+    delete?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
+    connect?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
+    update?: ConversationUpdateWithWhereUniqueWithoutLastMessageInput | ConversationUpdateWithWhereUniqueWithoutLastMessageInput[]
+    updateMany?: ConversationUpdateManyWithWhereWithoutLastMessageInput | ConversationUpdateManyWithWhereWithoutLastMessageInput[]
+    deleteMany?: ConversationScalarWhereInput | ConversationScalarWhereInput[]
   }
 
-  export type ConversationUncheckedUpdateOneWithoutLastMessageNestedInput = {
-    create?: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput>
-    connectOrCreate?: ConversationCreateOrConnectWithoutLastMessageInput
-    upsert?: ConversationUpsertWithoutLastMessageInput
-    disconnect?: ConversationWhereInput | boolean
-    delete?: ConversationWhereInput | boolean
-    connect?: ConversationWhereUniqueInput
-    update?: XOR<XOR<ConversationUpdateToOneWithWhereWithoutLastMessageInput, ConversationUpdateWithoutLastMessageInput>, ConversationUncheckedUpdateWithoutLastMessageInput>
+  export type ConversationUncheckedUpdateManyWithoutLastMessageNestedInput = {
+    create?: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput> | ConversationCreateWithoutLastMessageInput[] | ConversationUncheckedCreateWithoutLastMessageInput[]
+    connectOrCreate?: ConversationCreateOrConnectWithoutLastMessageInput | ConversationCreateOrConnectWithoutLastMessageInput[]
+    upsert?: ConversationUpsertWithWhereUniqueWithoutLastMessageInput | ConversationUpsertWithWhereUniqueWithoutLastMessageInput[]
+    createMany?: ConversationCreateManyLastMessageInputEnvelope
+    set?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
+    disconnect?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
+    delete?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
+    connect?: ConversationWhereUniqueInput | ConversationWhereUniqueInput[]
+    update?: ConversationUpdateWithWhereUniqueWithoutLastMessageInput | ConversationUpdateWithWhereUniqueWithoutLastMessageInput[]
+    updateMany?: ConversationUpdateManyWithWhereWithoutLastMessageInput | ConversationUpdateManyWithWhereWithoutLastMessageInput[]
+    deleteMany?: ConversationScalarWhereInput | ConversationScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutNotificationsInput = {
@@ -17814,16 +18024,16 @@ export namespace Prisma {
     comment: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    job: JobCreateNestedOneWithoutReviewsInput
     receiver: UserCreateNestedOneWithoutReceivedReviewsInput
+    job?: JobCreateNestedOneWithoutReviewsInput
   }
 
   export type ReviewUncheckedCreateWithoutAuthorInput = {
     id?: string
     rating: number
     comment: string
-    jobId: string
     receiverId: string
+    jobId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17844,16 +18054,16 @@ export namespace Prisma {
     comment: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    job: JobCreateNestedOneWithoutReviewsInput
     author: UserCreateNestedOneWithoutReviewsInput
+    job?: JobCreateNestedOneWithoutReviewsInput
   }
 
   export type ReviewUncheckedCreateWithoutReceiverInput = {
     id?: string
     rating: number
     comment: string
-    jobId: string
     authorId: string
+    jobId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17871,12 +18081,12 @@ export namespace Prisma {
   export type MessageCreateWithoutSenderInput = {
     id?: string
     content: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
     receiver: UserCreateNestedOneWithoutReceivedMessagesInput
     conversation: ConversationCreateNestedOneWithoutMessagesInput
-    conversationAsLast?: ConversationCreateNestedOneWithoutLastMessageInput
+    conversationAsLastMessage?: ConversationCreateNestedManyWithoutLastMessageInput
   }
 
   export type MessageUncheckedCreateWithoutSenderInput = {
@@ -17884,10 +18094,10 @@ export namespace Prisma {
     content: string
     receiverEmail: string
     conversationId: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
-    conversationAsLast?: ConversationUncheckedCreateNestedOneWithoutLastMessageInput
+    updatedAt?: Date | string
+    conversationAsLastMessage?: ConversationUncheckedCreateNestedManyWithoutLastMessageInput
   }
 
   export type MessageCreateOrConnectWithoutSenderInput = {
@@ -17903,12 +18113,12 @@ export namespace Prisma {
   export type MessageCreateWithoutReceiverInput = {
     id?: string
     content: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
     sender: UserCreateNestedOneWithoutMessagesInput
     conversation: ConversationCreateNestedOneWithoutMessagesInput
-    conversationAsLast?: ConversationCreateNestedOneWithoutLastMessageInput
+    conversationAsLastMessage?: ConversationCreateNestedManyWithoutLastMessageInput
   }
 
   export type MessageUncheckedCreateWithoutReceiverInput = {
@@ -17916,10 +18126,10 @@ export namespace Prisma {
     content: string
     senderEmail: string
     conversationId: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
-    conversationAsLast?: ConversationUncheckedCreateNestedOneWithoutLastMessageInput
+    updatedAt?: Date | string
+    conversationAsLastMessage?: ConversationUncheckedCreateNestedManyWithoutLastMessageInput
   }
 
   export type MessageCreateOrConnectWithoutReceiverInput = {
@@ -17939,6 +18149,7 @@ export namespace Prisma {
     type: $Enums.NotificationType
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type NotificationUncheckedCreateWithoutUserInput = {
@@ -17948,6 +18159,7 @@ export namespace Prisma {
     type: $Enums.NotificationType
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type NotificationCreateOrConnectWithoutUserInput = {
@@ -18115,9 +18327,9 @@ export namespace Prisma {
     id?: StringFilter<"Review"> | string
     rating?: IntFilter<"Review"> | number
     comment?: StringFilter<"Review"> | string
-    jobId?: StringFilter<"Review"> | string
     authorId?: StringFilter<"Review"> | string
     receiverId?: StringFilter<"Review"> | string
+    jobId?: StringNullableFilter<"Review"> | string | null
     createdAt?: DateTimeFilter<"Review"> | Date | string
     updatedAt?: DateTimeFilter<"Review"> | Date | string
   }
@@ -18163,9 +18375,9 @@ export namespace Prisma {
     senderEmail?: StringFilter<"Message"> | string
     receiverEmail?: StringFilter<"Message"> | string
     conversationId?: StringFilter<"Message"> | string
-    jobId?: StringNullableFilter<"Message"> | string | null
     isRead?: BoolFilter<"Message"> | boolean
     createdAt?: DateTimeFilter<"Message"> | Date | string
+    updatedAt?: DateTimeFilter<"Message"> | Date | string
   }
 
   export type MessageUpsertWithWhereUniqueWithoutReceiverInput = {
@@ -18211,6 +18423,7 @@ export namespace Prisma {
     isRead?: BoolFilter<"Notification"> | boolean
     userId?: StringFilter<"Notification"> | string
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    updatedAt?: DateTimeFilter<"Notification"> | Date | string
   }
 
   export type SavedFreelancerUpsertWithWhereUniqueWithoutUserInput = {
@@ -18263,7 +18476,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     messages?: MessageCreateNestedManyWithoutConversationInput
-    lastMessage?: MessageCreateNestedOneWithoutConversationAsLastInput
+    lastMessage?: MessageCreateNestedOneWithoutConversationAsLastMessageInput
   }
 
   export type ConversationUncheckedCreateWithoutJobInput = {
@@ -18374,6 +18587,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
@@ -18471,6 +18688,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
@@ -18694,6 +18915,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
@@ -18791,6 +19016,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
@@ -18987,6 +19216,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
@@ -19084,6 +19317,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
@@ -19270,6 +19507,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
@@ -19367,6 +19608,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
@@ -19375,73 +19620,6 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
-  }
-
-  export type JobCreateWithoutReviewsInput = {
-    id?: string
-    title: string
-    description: string
-    requirements?: JobCreaterequirementsInput | string[]
-    budget: $Enums.BudgetType
-    minBudget?: number | null
-    maxBudget?: number | null
-    hourlyRate?: number | null
-    duration?: string | null
-    skills?: JobCreateskillsInput | string[]
-    category: string
-    subcategory?: string | null
-    projectType?: string | null
-    experienceLevel?: string | null
-    workingHours?: string | null
-    timezone?: string | null
-    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
-    location?: string | null
-    isRemote?: boolean
-    status?: $Enums.JobStatus
-    isUrgent?: boolean
-    visibility?: string
-    applicationDeadline?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    conversation?: ConversationCreateNestedManyWithoutJobInput
-    client: UserCreateNestedOneWithoutJobsPostedInput
-    proposals?: ProposalCreateNestedManyWithoutJobInput
-  }
-
-  export type JobUncheckedCreateWithoutReviewsInput = {
-    id?: string
-    title: string
-    description: string
-    requirements?: JobCreaterequirementsInput | string[]
-    budget: $Enums.BudgetType
-    minBudget?: number | null
-    maxBudget?: number | null
-    hourlyRate?: number | null
-    duration?: string | null
-    skills?: JobCreateskillsInput | string[]
-    category: string
-    subcategory?: string | null
-    projectType?: string | null
-    experienceLevel?: string | null
-    workingHours?: string | null
-    timezone?: string | null
-    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
-    location?: string | null
-    isRemote?: boolean
-    status?: $Enums.JobStatus
-    isUrgent?: boolean
-    visibility?: string
-    applicationDeadline?: Date | string | null
-    clientId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    conversation?: ConversationUncheckedCreateNestedManyWithoutJobInput
-    proposals?: ProposalUncheckedCreateNestedManyWithoutJobInput
-  }
-
-  export type JobCreateOrConnectWithoutReviewsInput = {
-    where: JobWhereUniqueInput
-    create: XOR<JobCreateWithoutReviewsInput, JobUncheckedCreateWithoutReviewsInput>
   }
 
   export type UserCreateWithoutReviewsInput = {
@@ -19531,6 +19709,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
@@ -19628,6 +19810,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
@@ -19730,6 +19916,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -19827,6 +20017,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -19842,77 +20036,71 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutReceivedReviewsInput, UserUncheckedCreateWithoutReceivedReviewsInput>
   }
 
-  export type JobUpsertWithoutReviewsInput = {
-    update: XOR<JobUpdateWithoutReviewsInput, JobUncheckedUpdateWithoutReviewsInput>
+  export type JobCreateWithoutReviewsInput = {
+    id?: string
+    title: string
+    description: string
+    requirements?: JobCreaterequirementsInput | string[]
+    budget: $Enums.BudgetType
+    minBudget?: number | null
+    maxBudget?: number | null
+    hourlyRate?: number | null
+    duration?: string | null
+    skills?: JobCreateskillsInput | string[]
+    category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
+    location?: string | null
+    isRemote?: boolean
+    status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    conversation?: ConversationCreateNestedManyWithoutJobInput
+    client: UserCreateNestedOneWithoutJobsPostedInput
+    proposals?: ProposalCreateNestedManyWithoutJobInput
+  }
+
+  export type JobUncheckedCreateWithoutReviewsInput = {
+    id?: string
+    title: string
+    description: string
+    requirements?: JobCreaterequirementsInput | string[]
+    budget: $Enums.BudgetType
+    minBudget?: number | null
+    maxBudget?: number | null
+    hourlyRate?: number | null
+    duration?: string | null
+    skills?: JobCreateskillsInput | string[]
+    category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
+    location?: string | null
+    isRemote?: boolean
+    status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
+    clientId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    conversation?: ConversationUncheckedCreateNestedManyWithoutJobInput
+    proposals?: ProposalUncheckedCreateNestedManyWithoutJobInput
+  }
+
+  export type JobCreateOrConnectWithoutReviewsInput = {
+    where: JobWhereUniqueInput
     create: XOR<JobCreateWithoutReviewsInput, JobUncheckedCreateWithoutReviewsInput>
-    where?: JobWhereInput
-  }
-
-  export type JobUpdateToOneWithWhereWithoutReviewsInput = {
-    where?: JobWhereInput
-    data: XOR<JobUpdateWithoutReviewsInput, JobUncheckedUpdateWithoutReviewsInput>
-  }
-
-  export type JobUpdateWithoutReviewsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    requirements?: JobUpdaterequirementsInput | string[]
-    budget?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
-    minBudget?: NullableFloatFieldUpdateOperationsInput | number | null
-    maxBudget?: NullableFloatFieldUpdateOperationsInput | number | null
-    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
-    duration?: NullableStringFieldUpdateOperationsInput | string | null
-    skills?: JobUpdateskillsInput | string[]
-    category?: StringFieldUpdateOperationsInput | string
-    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
-    projectType?: NullableStringFieldUpdateOperationsInput | string | null
-    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
-    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
-    timezone?: NullableStringFieldUpdateOperationsInput | string | null
-    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
-    location?: NullableStringFieldUpdateOperationsInput | string | null
-    isRemote?: BoolFieldUpdateOperationsInput | boolean
-    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
-    isUrgent?: BoolFieldUpdateOperationsInput | boolean
-    visibility?: StringFieldUpdateOperationsInput | string
-    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    conversation?: ConversationUpdateManyWithoutJobNestedInput
-    client?: UserUpdateOneRequiredWithoutJobsPostedNestedInput
-    proposals?: ProposalUpdateManyWithoutJobNestedInput
-  }
-
-  export type JobUncheckedUpdateWithoutReviewsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    title?: StringFieldUpdateOperationsInput | string
-    description?: StringFieldUpdateOperationsInput | string
-    requirements?: JobUpdaterequirementsInput | string[]
-    budget?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
-    minBudget?: NullableFloatFieldUpdateOperationsInput | number | null
-    maxBudget?: NullableFloatFieldUpdateOperationsInput | number | null
-    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
-    duration?: NullableStringFieldUpdateOperationsInput | string | null
-    skills?: JobUpdateskillsInput | string[]
-    category?: StringFieldUpdateOperationsInput | string
-    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
-    projectType?: NullableStringFieldUpdateOperationsInput | string | null
-    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
-    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
-    timezone?: NullableStringFieldUpdateOperationsInput | string | null
-    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
-    location?: NullableStringFieldUpdateOperationsInput | string | null
-    isRemote?: BoolFieldUpdateOperationsInput | boolean
-    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
-    isUrgent?: BoolFieldUpdateOperationsInput | boolean
-    visibility?: StringFieldUpdateOperationsInput | string
-    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    clientId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    conversation?: ConversationUncheckedUpdateManyWithoutJobNestedInput
-    proposals?: ProposalUncheckedUpdateManyWithoutJobNestedInput
   }
 
   export type UserUpsertWithoutReviewsInput = {
@@ -20013,6 +20201,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
@@ -20110,6 +20302,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
@@ -20218,6 +20414,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -20315,6 +20515,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -20325,63 +20529,77 @@ export namespace Prisma {
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
-  export type MessageCreateWithoutConversationInput = {
-    id?: string
-    content: string
-    jobId?: string | null
-    isRead?: boolean
-    createdAt?: Date | string
-    sender: UserCreateNestedOneWithoutMessagesInput
-    receiver: UserCreateNestedOneWithoutReceivedMessagesInput
-    conversationAsLast?: ConversationCreateNestedOneWithoutLastMessageInput
+  export type JobUpsertWithoutReviewsInput = {
+    update: XOR<JobUpdateWithoutReviewsInput, JobUncheckedUpdateWithoutReviewsInput>
+    create: XOR<JobCreateWithoutReviewsInput, JobUncheckedCreateWithoutReviewsInput>
+    where?: JobWhereInput
   }
 
-  export type MessageUncheckedCreateWithoutConversationInput = {
-    id?: string
-    content: string
-    senderEmail: string
-    receiverEmail: string
-    jobId?: string | null
-    isRead?: boolean
-    createdAt?: Date | string
-    conversationAsLast?: ConversationUncheckedCreateNestedOneWithoutLastMessageInput
+  export type JobUpdateToOneWithWhereWithoutReviewsInput = {
+    where?: JobWhereInput
+    data: XOR<JobUpdateWithoutReviewsInput, JobUncheckedUpdateWithoutReviewsInput>
   }
 
-  export type MessageCreateOrConnectWithoutConversationInput = {
-    where: MessageWhereUniqueInput
-    create: XOR<MessageCreateWithoutConversationInput, MessageUncheckedCreateWithoutConversationInput>
+  export type JobUpdateWithoutReviewsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    requirements?: JobUpdaterequirementsInput | string[]
+    budget?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
+    minBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    maxBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    duration?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: JobUpdateskillsInput | string[]
+    category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isRemote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversation?: ConversationUpdateManyWithoutJobNestedInput
+    client?: UserUpdateOneRequiredWithoutJobsPostedNestedInput
+    proposals?: ProposalUpdateManyWithoutJobNestedInput
   }
 
-  export type MessageCreateManyConversationInputEnvelope = {
-    data: MessageCreateManyConversationInput | MessageCreateManyConversationInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type MessageCreateWithoutConversationAsLastInput = {
-    id?: string
-    content: string
-    jobId?: string | null
-    isRead?: boolean
-    createdAt?: Date | string
-    sender: UserCreateNestedOneWithoutMessagesInput
-    receiver: UserCreateNestedOneWithoutReceivedMessagesInput
-    conversation: ConversationCreateNestedOneWithoutMessagesInput
-  }
-
-  export type MessageUncheckedCreateWithoutConversationAsLastInput = {
-    id?: string
-    content: string
-    senderEmail: string
-    receiverEmail: string
-    conversationId: string
-    jobId?: string | null
-    isRead?: boolean
-    createdAt?: Date | string
-  }
-
-  export type MessageCreateOrConnectWithoutConversationAsLastInput = {
-    where: MessageWhereUniqueInput
-    create: XOR<MessageCreateWithoutConversationAsLastInput, MessageUncheckedCreateWithoutConversationAsLastInput>
+  export type JobUncheckedUpdateWithoutReviewsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    requirements?: JobUpdaterequirementsInput | string[]
+    budget?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
+    minBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    maxBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    duration?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: JobUpdateskillsInput | string[]
+    category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isRemote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    clientId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversation?: ConversationUncheckedUpdateManyWithoutJobNestedInput
+    proposals?: ProposalUncheckedUpdateManyWithoutJobNestedInput
   }
 
   export type JobCreateWithoutConversationInput = {
@@ -20451,53 +20669,63 @@ export namespace Prisma {
     create: XOR<JobCreateWithoutConversationInput, JobUncheckedCreateWithoutConversationInput>
   }
 
-  export type MessageUpsertWithWhereUniqueWithoutConversationInput = {
+  export type MessageCreateWithoutConversationInput = {
+    id?: string
+    content: string
+    isRead?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sender: UserCreateNestedOneWithoutMessagesInput
+    receiver: UserCreateNestedOneWithoutReceivedMessagesInput
+    conversationAsLastMessage?: ConversationCreateNestedManyWithoutLastMessageInput
+  }
+
+  export type MessageUncheckedCreateWithoutConversationInput = {
+    id?: string
+    content: string
+    senderEmail: string
+    receiverEmail: string
+    isRead?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    conversationAsLastMessage?: ConversationUncheckedCreateNestedManyWithoutLastMessageInput
+  }
+
+  export type MessageCreateOrConnectWithoutConversationInput = {
     where: MessageWhereUniqueInput
-    update: XOR<MessageUpdateWithoutConversationInput, MessageUncheckedUpdateWithoutConversationInput>
     create: XOR<MessageCreateWithoutConversationInput, MessageUncheckedCreateWithoutConversationInput>
   }
 
-  export type MessageUpdateWithWhereUniqueWithoutConversationInput = {
+  export type MessageCreateManyConversationInputEnvelope = {
+    data: MessageCreateManyConversationInput | MessageCreateManyConversationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MessageCreateWithoutConversationAsLastMessageInput = {
+    id?: string
+    content: string
+    isRead?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sender: UserCreateNestedOneWithoutMessagesInput
+    receiver: UserCreateNestedOneWithoutReceivedMessagesInput
+    conversation: ConversationCreateNestedOneWithoutMessagesInput
+  }
+
+  export type MessageUncheckedCreateWithoutConversationAsLastMessageInput = {
+    id?: string
+    content: string
+    senderEmail: string
+    receiverEmail: string
+    conversationId: string
+    isRead?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MessageCreateOrConnectWithoutConversationAsLastMessageInput = {
     where: MessageWhereUniqueInput
-    data: XOR<MessageUpdateWithoutConversationInput, MessageUncheckedUpdateWithoutConversationInput>
-  }
-
-  export type MessageUpdateManyWithWhereWithoutConversationInput = {
-    where: MessageScalarWhereInput
-    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutConversationInput>
-  }
-
-  export type MessageUpsertWithoutConversationAsLastInput = {
-    update: XOR<MessageUpdateWithoutConversationAsLastInput, MessageUncheckedUpdateWithoutConversationAsLastInput>
-    create: XOR<MessageCreateWithoutConversationAsLastInput, MessageUncheckedCreateWithoutConversationAsLastInput>
-    where?: MessageWhereInput
-  }
-
-  export type MessageUpdateToOneWithWhereWithoutConversationAsLastInput = {
-    where?: MessageWhereInput
-    data: XOR<MessageUpdateWithoutConversationAsLastInput, MessageUncheckedUpdateWithoutConversationAsLastInput>
-  }
-
-  export type MessageUpdateWithoutConversationAsLastInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
-    isRead?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    sender?: UserUpdateOneRequiredWithoutMessagesNestedInput
-    receiver?: UserUpdateOneRequiredWithoutReceivedMessagesNestedInput
-    conversation?: ConversationUpdateOneRequiredWithoutMessagesNestedInput
-  }
-
-  export type MessageUncheckedUpdateWithoutConversationAsLastInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    content?: StringFieldUpdateOperationsInput | string
-    senderEmail?: StringFieldUpdateOperationsInput | string
-    receiverEmail?: StringFieldUpdateOperationsInput | string
-    conversationId?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
-    isRead?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    create: XOR<MessageCreateWithoutConversationAsLastMessageInput, MessageUncheckedCreateWithoutConversationAsLastMessageInput>
   }
 
   export type JobUpsertWithoutConversationInput = {
@@ -20571,6 +20799,55 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     proposals?: ProposalUncheckedUpdateManyWithoutJobNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutJobNestedInput
+  }
+
+  export type MessageUpsertWithWhereUniqueWithoutConversationInput = {
+    where: MessageWhereUniqueInput
+    update: XOR<MessageUpdateWithoutConversationInput, MessageUncheckedUpdateWithoutConversationInput>
+    create: XOR<MessageCreateWithoutConversationInput, MessageUncheckedCreateWithoutConversationInput>
+  }
+
+  export type MessageUpdateWithWhereUniqueWithoutConversationInput = {
+    where: MessageWhereUniqueInput
+    data: XOR<MessageUpdateWithoutConversationInput, MessageUncheckedUpdateWithoutConversationInput>
+  }
+
+  export type MessageUpdateManyWithWhereWithoutConversationInput = {
+    where: MessageScalarWhereInput
+    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutConversationInput>
+  }
+
+  export type MessageUpsertWithoutConversationAsLastMessageInput = {
+    update: XOR<MessageUpdateWithoutConversationAsLastMessageInput, MessageUncheckedUpdateWithoutConversationAsLastMessageInput>
+    create: XOR<MessageCreateWithoutConversationAsLastMessageInput, MessageUncheckedCreateWithoutConversationAsLastMessageInput>
+    where?: MessageWhereInput
+  }
+
+  export type MessageUpdateToOneWithWhereWithoutConversationAsLastMessageInput = {
+    where?: MessageWhereInput
+    data: XOR<MessageUpdateWithoutConversationAsLastMessageInput, MessageUncheckedUpdateWithoutConversationAsLastMessageInput>
+  }
+
+  export type MessageUpdateWithoutConversationAsLastMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sender?: UserUpdateOneRequiredWithoutMessagesNestedInput
+    receiver?: UserUpdateOneRequiredWithoutReceivedMessagesNestedInput
+    conversation?: ConversationUpdateOneRequiredWithoutMessagesNestedInput
+  }
+
+  export type MessageUncheckedUpdateWithoutConversationAsLastMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    senderEmail?: StringFieldUpdateOperationsInput | string
+    receiverEmail?: StringFieldUpdateOperationsInput | string
+    conversationId?: StringFieldUpdateOperationsInput | string
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserCreateWithoutMessagesInput = {
@@ -20660,6 +20937,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -20757,6 +21038,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -20859,6 +21144,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -20956,6 +21245,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -20978,8 +21271,8 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    lastMessage?: MessageCreateNestedOneWithoutConversationAsLastInput
     job?: JobCreateNestedOneWithoutConversationInput
+    lastMessage?: MessageCreateNestedOneWithoutConversationAsLastMessageInput
   }
 
   export type ConversationUncheckedCreateWithoutMessagesInput = {
@@ -21005,8 +21298,8 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    messages?: MessageCreateNestedManyWithoutConversationInput
     job?: JobCreateNestedOneWithoutConversationInput
+    messages?: MessageCreateNestedManyWithoutConversationInput
   }
 
   export type ConversationUncheckedCreateWithoutLastMessageInput = {
@@ -21023,6 +21316,11 @@ export namespace Prisma {
   export type ConversationCreateOrConnectWithoutLastMessageInput = {
     where: ConversationWhereUniqueInput
     create: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput>
+  }
+
+  export type ConversationCreateManyLastMessageInputEnvelope = {
+    data: ConversationCreateManyLastMessageInput | ConversationCreateManyLastMessageInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutMessagesInput = {
@@ -21123,6 +21421,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -21220,6 +21522,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -21328,6 +21634,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -21425,6 +21735,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -21453,8 +21767,8 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastMessage?: MessageUpdateOneWithoutConversationAsLastNestedInput
     job?: JobUpdateOneWithoutConversationNestedInput
+    lastMessage?: MessageUpdateOneWithoutConversationAsLastMessageNestedInput
   }
 
   export type ConversationUncheckedUpdateWithoutMessagesInput = {
@@ -21468,37 +21782,20 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type ConversationUpsertWithoutLastMessageInput = {
+  export type ConversationUpsertWithWhereUniqueWithoutLastMessageInput = {
+    where: ConversationWhereUniqueInput
     update: XOR<ConversationUpdateWithoutLastMessageInput, ConversationUncheckedUpdateWithoutLastMessageInput>
     create: XOR<ConversationCreateWithoutLastMessageInput, ConversationUncheckedCreateWithoutLastMessageInput>
-    where?: ConversationWhereInput
   }
 
-  export type ConversationUpdateToOneWithWhereWithoutLastMessageInput = {
-    where?: ConversationWhereInput
+  export type ConversationUpdateWithWhereUniqueWithoutLastMessageInput = {
+    where: ConversationWhereUniqueInput
     data: XOR<ConversationUpdateWithoutLastMessageInput, ConversationUncheckedUpdateWithoutLastMessageInput>
   }
 
-  export type ConversationUpdateWithoutLastMessageInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    participants?: ConversationUpdateparticipantsInput | string[]
-    projectName?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    messages?: MessageUpdateManyWithoutConversationNestedInput
-    job?: JobUpdateOneWithoutConversationNestedInput
-  }
-
-  export type ConversationUncheckedUpdateWithoutLastMessageInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    participants?: ConversationUpdateparticipantsInput | string[]
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
-    projectName?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    messages?: MessageUncheckedUpdateManyWithoutConversationNestedInput
+  export type ConversationUpdateManyWithWhereWithoutLastMessageInput = {
+    where: ConversationScalarWhereInput
+    data: XOR<ConversationUpdateManyMutationInput, ConversationUncheckedUpdateManyWithoutLastMessageInput>
   }
 
   export type UserCreateWithoutNotificationsInput = {
@@ -21588,6 +21885,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -21685,6 +21986,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -21798,6 +22103,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -21895,6 +22204,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -21992,6 +22305,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -22089,6 +22406,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -22191,6 +22512,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobCreateNestedManyWithoutClientInput
     proposals?: ProposalCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewCreateNestedManyWithoutAuthorInput
@@ -22288,6 +22613,10 @@ export namespace Prisma {
     workingDays?: UserCreateworkingDaysInput | string[]
     minimumProjectBudget?: string | null
     specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
     jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -22401,6 +22730,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -22498,6 +22831,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -22606,6 +22943,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUpdateManyWithoutClientNestedInput
     proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUpdateManyWithoutAuthorNestedInput
@@ -22703,6 +23044,10 @@ export namespace Prisma {
     workingDays?: UserUpdateworkingDaysInput | string[]
     minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
     specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
     jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -22765,8 +23110,8 @@ export namespace Prisma {
     id?: string
     rating: number
     comment: string
-    jobId: string
     receiverId: string
+    jobId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -22775,8 +23120,8 @@ export namespace Prisma {
     id?: string
     rating: number
     comment: string
-    jobId: string
     authorId: string
+    jobId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -22786,9 +23131,9 @@ export namespace Prisma {
     content: string
     receiverEmail: string
     conversationId: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type MessageCreateManyReceiverInput = {
@@ -22796,9 +23141,9 @@ export namespace Prisma {
     content: string
     senderEmail: string
     conversationId: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type NotificationCreateManyUserInput = {
@@ -22808,6 +23153,7 @@ export namespace Prisma {
     type: $Enums.NotificationType
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type SavedFreelancerCreateManyUserInput = {
@@ -22978,16 +23324,16 @@ export namespace Prisma {
     comment?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    job?: JobUpdateOneRequiredWithoutReviewsNestedInput
     receiver?: UserUpdateOneRequiredWithoutReceivedReviewsNestedInput
+    job?: JobUpdateOneWithoutReviewsNestedInput
   }
 
   export type ReviewUncheckedUpdateWithoutAuthorInput = {
     id?: StringFieldUpdateOperationsInput | string
     rating?: IntFieldUpdateOperationsInput | number
     comment?: StringFieldUpdateOperationsInput | string
-    jobId?: StringFieldUpdateOperationsInput | string
     receiverId?: StringFieldUpdateOperationsInput | string
+    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22996,8 +23342,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rating?: IntFieldUpdateOperationsInput | number
     comment?: StringFieldUpdateOperationsInput | string
-    jobId?: StringFieldUpdateOperationsInput | string
     receiverId?: StringFieldUpdateOperationsInput | string
+    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -23008,16 +23354,16 @@ export namespace Prisma {
     comment?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    job?: JobUpdateOneRequiredWithoutReviewsNestedInput
     author?: UserUpdateOneRequiredWithoutReviewsNestedInput
+    job?: JobUpdateOneWithoutReviewsNestedInput
   }
 
   export type ReviewUncheckedUpdateWithoutReceiverInput = {
     id?: StringFieldUpdateOperationsInput | string
     rating?: IntFieldUpdateOperationsInput | number
     comment?: StringFieldUpdateOperationsInput | string
-    jobId?: StringFieldUpdateOperationsInput | string
     authorId?: StringFieldUpdateOperationsInput | string
+    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -23026,8 +23372,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rating?: IntFieldUpdateOperationsInput | number
     comment?: StringFieldUpdateOperationsInput | string
-    jobId?: StringFieldUpdateOperationsInput | string
     authorId?: StringFieldUpdateOperationsInput | string
+    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -23035,12 +23381,12 @@ export namespace Prisma {
   export type MessageUpdateWithoutSenderInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     receiver?: UserUpdateOneRequiredWithoutReceivedMessagesNestedInput
     conversation?: ConversationUpdateOneRequiredWithoutMessagesNestedInput
-    conversationAsLast?: ConversationUpdateOneWithoutLastMessageNestedInput
+    conversationAsLastMessage?: ConversationUpdateManyWithoutLastMessageNestedInput
   }
 
   export type MessageUncheckedUpdateWithoutSenderInput = {
@@ -23048,10 +23394,10 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     receiverEmail?: StringFieldUpdateOperationsInput | string
     conversationId?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    conversationAsLast?: ConversationUncheckedUpdateOneWithoutLastMessageNestedInput
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationAsLastMessage?: ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
   }
 
   export type MessageUncheckedUpdateManyWithoutSenderInput = {
@@ -23059,20 +23405,20 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     receiverEmail?: StringFieldUpdateOperationsInput | string
     conversationId?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MessageUpdateWithoutReceiverInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sender?: UserUpdateOneRequiredWithoutMessagesNestedInput
     conversation?: ConversationUpdateOneRequiredWithoutMessagesNestedInput
-    conversationAsLast?: ConversationUpdateOneWithoutLastMessageNestedInput
+    conversationAsLastMessage?: ConversationUpdateManyWithoutLastMessageNestedInput
   }
 
   export type MessageUncheckedUpdateWithoutReceiverInput = {
@@ -23080,10 +23426,10 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     senderEmail?: StringFieldUpdateOperationsInput | string
     conversationId?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    conversationAsLast?: ConversationUncheckedUpdateOneWithoutLastMessageNestedInput
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationAsLastMessage?: ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
   }
 
   export type MessageUncheckedUpdateManyWithoutReceiverInput = {
@@ -23091,9 +23437,9 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     senderEmail?: StringFieldUpdateOperationsInput | string
     conversationId?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type NotificationUpdateWithoutUserInput = {
@@ -23103,6 +23449,7 @@ export namespace Prisma {
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type NotificationUncheckedUpdateWithoutUserInput = {
@@ -23112,6 +23459,7 @@ export namespace Prisma {
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type NotificationUncheckedUpdateManyWithoutUserInput = {
@@ -23121,6 +23469,7 @@ export namespace Prisma {
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SavedFreelancerUpdateWithoutUserInput = {
@@ -23207,7 +23556,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     messages?: MessageUpdateManyWithoutConversationNestedInput
-    lastMessage?: MessageUpdateOneWithoutConversationAsLastNestedInput
+    lastMessage?: MessageUpdateOneWithoutConversationAsLastMessageNestedInput
   }
 
   export type ConversationUncheckedUpdateWithoutJobInput = {
@@ -23326,20 +23675,20 @@ export namespace Prisma {
     content: string
     senderEmail: string
     receiverEmail: string
-    jobId?: string | null
     isRead?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type MessageUpdateWithoutConversationInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sender?: UserUpdateOneRequiredWithoutMessagesNestedInput
     receiver?: UserUpdateOneRequiredWithoutReceivedMessagesNestedInput
-    conversationAsLast?: ConversationUpdateOneWithoutLastMessageNestedInput
+    conversationAsLastMessage?: ConversationUpdateManyWithoutLastMessageNestedInput
   }
 
   export type MessageUncheckedUpdateWithoutConversationInput = {
@@ -23347,10 +23696,10 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     senderEmail?: StringFieldUpdateOperationsInput | string
     receiverEmail?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    conversationAsLast?: ConversationUncheckedUpdateOneWithoutLastMessageNestedInput
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversationAsLastMessage?: ConversationUncheckedUpdateManyWithoutLastMessageNestedInput
   }
 
   export type MessageUncheckedUpdateManyWithoutConversationInput = {
@@ -23358,9 +23707,51 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     senderEmail?: StringFieldUpdateOperationsInput | string
     receiverEmail?: StringFieldUpdateOperationsInput | string
-    jobId?: NullableStringFieldUpdateOperationsInput | string | null
     isRead?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConversationCreateManyLastMessageInput = {
+    id?: string
+    participants?: ConversationCreateparticipantsInput | string[]
+    jobId?: string | null
+    projectName?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ConversationUpdateWithoutLastMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    participants?: ConversationUpdateparticipantsInput | string[]
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    job?: JobUpdateOneWithoutConversationNestedInput
+    messages?: MessageUpdateManyWithoutConversationNestedInput
+  }
+
+  export type ConversationUncheckedUpdateWithoutLastMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    participants?: ConversationUpdateparticipantsInput | string[]
+    jobId?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messages?: MessageUncheckedUpdateManyWithoutConversationNestedInput
+  }
+
+  export type ConversationUncheckedUpdateManyWithoutLastMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    participants?: ConversationUpdateparticipantsInput | string[]
+    jobId?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

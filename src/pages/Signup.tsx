@@ -6,11 +6,13 @@ import { Label } from "../components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { User, Briefcase, Loader2, CheckCircle } from "lucide-react";
-import axios from "axios";
+import { useAuth } from "@/hooks/AuthContext";
+import { toast } from "sonner";
 
 const Signup = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { register } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -53,43 +55,39 @@ const Signup = () => {
       setError(null);
 
       try {
-        // Create user account
-        const signupResponse = await axios.post('/auth/register', {
+        // Create user account using auth context
+        const registerData = {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
-          userType: formData.userType.toUpperCase()
-        });
+          userType: formData.userType.toUpperCase() as 'FREELANCER' | 'CLIENT',
+          ...onboardingData // Include any additional onboarding data
+        };
 
-        const signupResult = signupResponse.data;
+        const result = await register(registerData);
 
-        if (!(signupResult.status === 200)) {
-          throw new Error(signupResult.message || 'Failed to create account');
+        if (result.success) {
+          setSuccess(true);
+          toast.success("Account created successfully!");
+          
+          // Redirect after a short delay
+          setTimeout(() => {
+            if (result.user?.isOnboarded) {
+              const dashboardPath = result.user.userType === 'FREELANCER' ? '/dashboard' : '/client-dashboard';
+              navigate(dashboardPath, { replace: true });
+            } else {
+              navigate('/onboarding', { replace: true });
+            }
+          }, 2000);
+        } else {
+          setError(result.message || "Failed to create account");
         }
-
-        // If we have onboarding data, apply it to the user profile
-        if (Object.keys(onboardingData).length > 0) {
-          await applyOnboardingData(onboardingData);
-        }
-
-        setSuccess(true);
-        
-        // Redirect after a short delay
-        setTimeout(() => {
-          if (formData.userType === 'freelancer') {
-            navigate('/dashboard');
-          } else {
-            navigate('/client-dashboard');
-          }
-        }, 2000);
-
-      } catch (err) {
+      } catch (err: any) {
         const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
-        if(err.response.status === 400){
-          setError(err.response.data.message)
-        }
-        else{
+        if (err.response?.status === 400) {
+          setError(err.response.data.message);
+        } else {
           setError(errorMessage);
         }
       } finally {
@@ -98,134 +96,16 @@ const Signup = () => {
     }
   };
 
-  const applyOnboardingData = async (data: any) => {
-    try {
-      // Apply onboarding data step by step
-      if (data.userType === 'freelancer') {
-        // Basic info
-        if (data.firstName || data.lastName || data.email || data.phone || data.country || data.city || data.timezone || data.profilePhoto || data.title || data.overview) {
-          await axios.put('/onboarding/freelancer/basic', {
-              firstName: data.firstName,
-              lastName: data.lastName,
-              email: data.email,
-              phone: data.phone,
-              country: data.country,
-              city: data.city,
-              timezone: data.timezone,
-              profilePhoto: data.profilePhoto,
-              title: data.title,
-              overview: data.overview,
-          });
-        }
-
-        // Professional info
-        if (data.category || data.subcategory || data.experienceLevel || data.workExperience || data.education || data.certifications || data.languages) {
-          await axios.put('/onboarding/freelancer/professional', {
-              category: data.category,
-              subcategory: data.subcategory,
-              experienceLevel: data.experienceLevel,
-              workExperience: data.workExperience,
-              education: data.education,
-              certifications: data.certifications,
-              languages: data.languages,
-          });
-        }
-
-        // Skills
-        if (data.skills || data.topSkills || data.serviceOfferings) {
-          await axios.put('/onboarding/freelancer/skills', {
-              skills: data.skills,
-              topSkills: data.topSkills,
-              serviceOfferings: data.serviceOfferings,
-          });
-        }
-
-        // Portfolio
-        if (data.portfolio || data.socialLinks) {
-          await axios.put('/onboarding/freelancer/portfolio', {
-              portfolio: data.portfolio,
-              socialLinks: data.socialLinks,
-          });
-        }
-
-        // Rates
-        if (data.hourlyRate || data.availability) {
-          await axios.put('/onboarding/freelancer/rates', {
-              hourlyRate: data.hourlyRate,
-              availability: data.availability,
-          });
-        }
-
-        // Verification
-        await axios.put('/onboarding/freelancer/verification');
-
-        // Complete onboarding
-        await axios.put('/onboarding/complete');
-
-      } else if (data.userType === 'client') {
-        // Basic info
-        if (data.firstName || data.lastName || data.email || data.phone || data.country || data.city || data.timezone || data.profilePhoto || data.clientType || data.howDidYouHear) {
-          await axios.put('/onboarding/client/basic', {
-              firstName: data.firstName,
-              email: data.email,
-              lastName: data.lastName,
-              phone: data.phone,
-              country: data.country,
-              city: data.city,
-              timezone: data.timezone,
-              profilePhoto: data.profilePhoto,
-              howDidYouHear: data.howDidYouHear,
-              clientType: data.clientType,
-          });
-        }
-
-        // Company info
-        if (data.companyName || data.companySize || data.industry || data.companyWebsite || data.companyDescription) {
-          await axios.put('/onboarding/client/company', {
-              companyName: data.companyName,
-              companySize: data.companySize,
-              industry: data.industry,
-              companyWebsite: data.companyWebsite,
-              companyDescription: data.companyDescription,
-          });
-        }
-
-        // Projects
-        if (data.projectTypes || data.preferredSkills) {
-          await axios.put('/onboarding/client/projects', {
-              projectTypes: data.projectTypes,
-              preferredSkills: data.preferredSkills,
-          });
-        }
-
-        // Budget
-        if (data.budgetRange) {
-          await axios.put('/onboarding/client/budget', {
-              budgetRange: data.budgetRange,
-          });
-        }
-
-        // Verification
-        await axios.put('/onboarding/client/verification');
-
-        // Complete onboarding
-        await axios.put('/onboarding/complete');
-      }
-    } catch (err) {
-      console.error('Failed to apply onboarding data:', err);
-    }
-  };
-
   // Show success state
   if (success) {
-  return (
+    return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Account Created Successfully!
-        </h2>
+            </h2>
             <p className="text-gray-600 mb-4">
               Your account has been created and your profile has been set up.
             </p>
@@ -286,8 +166,8 @@ const Signup = () => {
                     <p className="text-sm font-medium text-center">Client</p>
                     <p className="text-xs text-gray-500 text-center">I want to hire</p>
                   </div>
-            </div>
-          </div>
+                </div>
+              </div>
             )}
 
             <div className="grid grid-cols-2 gap-4">
@@ -327,10 +207,10 @@ const Signup = () => {
 
             <div>
               <Label htmlFor="password">Password *</Label>
-                <Input
+              <Input
                 id="password"
                 type="password"
-                  value={formData.password}
+                value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className={errors.password ? "border-red-500" : ""}
               />

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { FileText, Download, Eye, Clock, CheckCircle, XCircle, DollarSign, Calendar, User, Building } from "lucide-react";
-import Navbar from "../components/layout/Navbar";
+
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -134,7 +134,7 @@ const Contracts = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+
       
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="mb-6">

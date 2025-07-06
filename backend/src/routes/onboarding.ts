@@ -382,15 +382,28 @@ router.put('/freelancer/rates', protect, [
 // @access  Private
 router.put('/freelancer/verification', protect, (async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    // This step is mainly for verification documents and identity verification
-    // For now, we'll just mark the step as complete
+    const { 
+      phoneNumber, idDocument, addressProof, taxInformation,
+      agreedToTerms, agreedToPrivacy, agreedToFees 
+    } = req.body;
+
     const updatedUser = await prisma.user.update({
       where: { id: req.user!.id },
       data: {
+        phone: phoneNumber,
+        idDocument,
+        addressProof,
+        taxInformation,
+        phoneVerified: true, // Mark as verified when documents are uploaded
         onboardingStep: 7
       },
       select: {
         id: true,
+        phone: true,
+        idDocument: true,
+        addressProof: true,
+        taxInformation: true,
+        phoneVerified: true,
         onboardingStep: true
       }
     });
@@ -604,15 +617,21 @@ router.put('/client/budget', protect, [
 // @access  Private
 router.put('/client/verification', protect, (async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    // This step is mainly for verification documents and identity verification
-    // For now, we'll just mark the step as complete
+    const { 
+      phoneNumber, agreedToTerms, agreedToPrivacy, agreedToFees 
+    } = req.body;
+
     const updatedUser = await prisma.user.update({
       where: { id: req.user!.id },
       data: {
+        phone: phoneNumber,
+        phoneVerified: true, // Mark as verified when verification is completed
         onboardingStep: 6
       },
       select: {
         id: true,
+        phone: true,
+        phoneVerified: true,
         onboardingStep: true
       }
     });
@@ -882,7 +901,7 @@ router.post('/complete-with-data', [
 
     res.status(201).json({
       success: true,
-      data: user,
+      user,
       token
     });
   } catch (error) {

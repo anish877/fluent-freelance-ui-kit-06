@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Save, Bell, Shield, CreditCard, User, Globe, Eye, Mail, Smartphone } from "lucide-react";
-import Navbar from "../components/layout/Navbar";
+
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -67,7 +67,7 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

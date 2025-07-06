@@ -20,6 +20,115 @@ import ClientBudgetTimeline from "../components/onboarding/ClientBudgetTimeline"
 import ClientVerification from "../components/onboarding/ClientVerification";
 import OnboardingComplete from "../components/onboarding/OnboardingComplete";
 
+// Define interfaces for step data - using the same structure as OnboardingData
+interface StepData {
+  userType?: 'freelancer' | 'client';
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  timezone?: string;
+  profilePhoto?: string;
+  title?: string;
+  overview?: string;
+  category?: string;
+  subcategory?: string;
+  experienceLevel?: string;
+  skills?: Array<{
+    name: string;
+    category: string;
+    level: string;
+    yearsOfExperience: number;
+  }>;
+  topSkills?: string[];
+  serviceOfferings?: string[];
+  portfolio?: string;
+  socialLinks?: {
+    linkedin?: string;
+    github?: string;
+    website?: string;
+    behance?: string;
+    dribbble?: string;
+  };
+  hourlyRate?: number; // Changed to number to match OnboardingData
+  projectBasedRates?: {
+    small: string;
+    medium: string;
+    large: string;
+  };
+  availability?: string;
+  hoursPerWeek?: string;
+  workingHours?: {
+    start: string;
+    end: string;
+  };
+  workingDays?: string[];
+  responseTime?: string;
+  minimumProjectBudget?: string;
+  specialRequirements?: string;
+  coverImage?: string;
+  hourlyRateRange?: string;
+  availabilityStatus?: string;
+  // Client specific fields
+  clientType?: string;
+  howDidYouHear?: string;
+  companyName?: string;
+  industry?: string;
+  companySize?: string;
+  companyWebsite?: string;
+  companyDescription?: string;
+  foundedYear?: string;
+  annualRevenue?: string;
+  interestedCategories?: string[];
+  projectTypes?: string[];
+  urgencyLevel?: string;
+  preferredWorkingStyle?: string;
+  communicationPreference?: string[];
+  projectDescription?: string;
+  budgetRange?: string;
+  paymentPreference?: string;
+  projectFrequency?: string;
+  averageProjectDuration?: string;
+  maxHourlyRate?: string;
+  totalMonthlyBudget?: string;
+  // Verification fields
+  phoneNumber?: string;
+  phoneVerified?: boolean;
+  idDocument?: string;
+  idDocumentType?: string;
+  addressProof?: string;
+  taxInformation?: string;
+  agreedToTerms?: boolean;
+  agreedToPrivacy?: boolean;
+  agreedToFees?: boolean;
+  [key: string]: string | number | boolean | string[] | object | undefined;
+}
+
+interface ComponentProps {
+  data?: StepData;
+  userType?: "freelancer" | "client" | null;
+  onNext?: (data: StepData) => void;
+  onBack?: () => void;
+  canGoBack?: boolean;
+  onComplete?: (password: string) => void;
+  loading?: boolean;
+  error?: string | null;
+}
+
+interface UserTypeSelectionProps {
+  onNext: (type: "freelancer" | "client") => void;
+}
+
+interface OnboardingCompleteProps {
+  data?: StepData;
+  userType?: "freelancer" | "client" | null;
+  onComplete?: (password: string) => void;
+  loading?: boolean;
+  error?: string | null;
+}
+
 const Onboarding = () => {
 
   // Use the onboarding hook
@@ -69,9 +178,9 @@ const Onboarding = () => {
   const steps = userType === "freelancer" ? freelancerSteps : clientSteps;
   const progress = ((currentStep + 1) / steps.length) * 100;
 
-  const handleNext = (data: any) => {
+  const handleNext = (data: StepData) => {
     if (currentStep === 0) {
-      updateUserType(data.userType);
+      updateUserType(data.userType as "freelancer" | "client");
     } else if (userType === "freelancer") {
       switch (currentStep) {
         case 1:
@@ -140,28 +249,28 @@ const Onboarding = () => {
     if (currentStep === 0) {
       return {
         onNext: handleUserTypeSelect
-      };
+      } as UserTypeSelectionProps;
     }
 
     // Last step (OnboardingComplete) has different props
     if (currentStep === steps.length - 1) {
       return {
-        data: onboardingData,
+        data: onboardingData as StepData,
         userType: userType,
         onComplete: handleComplete,
         loading: loading,
         error: error
-      };
+      } as OnboardingCompleteProps;
     }
 
     // All other steps have standard props
     return {
-      data: onboardingData,
+      data: onboardingData as StepData,
       userType: userType,
       onNext: handleNext,
       onBack: handleBack,
       canGoBack: currentStep > 0
-    };
+    } as ComponentProps;
   };
 
   // Show loading state

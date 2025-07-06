@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Edit, Camera, MapPin, Star, Calendar, DollarSign, Award, Users, Clock, CheckCircle, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/layout/Navbar";
+
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -214,7 +214,6 @@ const ExpandableText = ({ text, maxLength = 200, className = "" }: {
 // 1. Enhanced Loading State with Skeleton Components
 const ProfileSkeleton = () => (
   <div className="min-h-screen bg-gray-50">
-    <Navbar />
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Profile Header Skeleton */}
       <Card className="mb-8">
@@ -276,7 +275,6 @@ const ErrorState = ({ error, onRetry }: { error: string; onRetry: () => void }) 
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center bg-white rounded-lg shadow-sm p-8">
           <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
@@ -1065,7 +1063,6 @@ const Profile = () => {
   if (!userProfile) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Profile Not Found</h1>
@@ -1079,8 +1076,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProfileHeader userProfile={userProfile} onEditClick={() => handleEditClick()} />
         <ProfileTabs userProfile={userProfile} onEditClick={handleEditClick} />

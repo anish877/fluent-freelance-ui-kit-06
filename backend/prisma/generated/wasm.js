@@ -206,7 +206,11 @@ exports.Prisma.UserScalarFieldEnum = {
   workingHours: 'workingHours',
   workingDays: 'workingDays',
   minimumProjectBudget: 'minimumProjectBudget',
-  specialRequirements: 'specialRequirements'
+  specialRequirements: 'specialRequirements',
+  idDocument: 'idDocument',
+  addressProof: 'addressProof',
+  taxInformation: 'taxInformation',
+  phoneVerified: 'phoneVerified'
 };
 
 exports.Prisma.JobScalarFieldEnum = {
@@ -263,9 +267,9 @@ exports.Prisma.ReviewScalarFieldEnum = {
   id: 'id',
   rating: 'rating',
   comment: 'comment',
-  jobId: 'jobId',
   authorId: 'authorId',
   receiverId: 'receiverId',
+  jobId: 'jobId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -287,9 +291,9 @@ exports.Prisma.MessageScalarFieldEnum = {
   senderEmail: 'senderEmail',
   receiverEmail: 'receiverEmail',
   conversationId: 'conversationId',
-  jobId: 'jobId',
   isRead: 'isRead',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.NotificationScalarFieldEnum = {
@@ -299,7 +303,8 @@ exports.Prisma.NotificationScalarFieldEnum = {
   type: 'type',
   isRead: 'isRead',
   userId: 'userId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SavedFreelancerScalarFieldEnum = {
@@ -363,8 +368,9 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   PROPOSAL_ACCEPTED: 'PROPOSAL_ACCEPTED',
   PROPOSAL_REJECTED: 'PROPOSAL_REJECTED',
   MESSAGE_RECEIVED: 'MESSAGE_RECEIVED',
-  JOB_COMPLETED: 'JOB_COMPLETED',
-  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED'
+  JOB_POSTED: 'JOB_POSTED',
+  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
+  SYSTEM_UPDATE: 'SYSTEM_UPDATE'
 };
 
 exports.Prisma.ModelName = {

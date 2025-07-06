@@ -4,7 +4,8 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { ArrowRight, Upload, Camera } from "lucide-react";
+import { ArrowRight, Upload, Camera, Loader2 } from "lucide-react";
+import { uploadService } from "../../lib/uploadService";
 
 interface ClientBasicInfoData {
   firstName?: string;
@@ -41,6 +42,7 @@ const ClientBasicInfo = ({ onNext, data }: ClientBasicInfoProps) => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
 
   const countries = [
     "United States", "Canada", "United Kingdom", "Australia", "Germany", 
@@ -92,14 +94,34 @@ const ClientBasicInfo = ({ onNext, data }: ClientBasicInfoProps) => {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData({ ...formData, profilePhoto: e.target?.result as string });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Validate file
+    const validation = uploadService.validateFile(file);
+    if (!validation.isValid) {
+      setErrors({ profilePhoto: validation.error });
+      return;
+    }
+
+    setUploading(true);
+    setErrors({});
+
+    try {
+      // Upload to Cloudinary
+      const result = await uploadService.uploadSingle(file);
+      
+      if (result.success) {
+        setFormData({ ...formData, profilePhoto: result.data.url });
+      } else {
+        setErrors({ profilePhoto: 'Upload failed. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setErrors({ profilePhoto: 'Upload failed. Please try again.' });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -130,16 +152,24 @@ const ClientBasicInfo = ({ onNext, data }: ClientBasicInfoProps) => {
               </div>
             )}
             <label className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors">
-              <Upload className="h-4 w-4" />
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileUpload}
                 className="hidden"
+                disabled={uploading}
               />
             </label>
           </div>
           <p className="text-sm text-gray-500 mt-2">Upload your photo (optional)</p>
+          {errors.profilePhoto && (
+            <p className="text-red-500 text-sm mt-1">{errors.profilePhoto}</p>
+          )}
         </div>
 
         {/* Basic Information */}
@@ -258,7 +288,7 @@ const ClientBasicInfo = ({ onNext, data }: ClientBasicInfoProps) => {
           </Select>
         </div>
 
-        <Button type="submit" className="w-full" size="lg">
+        <Button type="submit" className="w-full" size="lg" disabled={uploading}>
           Continue
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>

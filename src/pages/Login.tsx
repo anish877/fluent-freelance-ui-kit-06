@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -7,16 +7,20 @@ import { useAuth } from "@/hooks/AuthContext";
 import { toast } from "sonner";
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { login, login_google } = useAuth()
+  const { login, login_google } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
+
+  // Get the intended destination from location state, or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,23 +28,26 @@ const Login = () => {
     setError(null);
 
     try {
-      const { success, message, status } = await login(formData.email, formData.password)
-      if(success){
+      const { success, message, user } = await login(formData.email, formData.password);
+      
+      if (success) {
         setFormData({
           email: "",
           password: ""
         });
-        toast.success(message)
-        navigate("/jobs")
+        toast.success(message || "Successfully signed in!");
+        
+        // Navigate based on user type and onboarding status
+        if (!user?.isOnboarded) {
+          navigate("/onboarding", { replace: true });
+        } else {
+          // Navigate to intended destination or appropriate dashboard
+          const dashboardPath = user.userType === 'FREELANCER' ? '/dashboard' : '/client-dashboard';
+          navigate(from === "/login" ? dashboardPath : from, { replace: true });
+        }
+      } else {
+        setError(message || "Login failed");
       }
-      else if (status === 401){
-        setError("Invalid Credentials")
-      }
-      else{
-        setError(message)
-        navigate('/onboarding', { replace: true });
-      }
-
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);
@@ -80,8 +87,8 @@ const Login = () => {
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Or{' '}
-          <Link to="/signup" className="font-medium text-teal-600 hover:text-teal-500">
-            create a new account
+          <Link to="/onboarding" className="font-medium text-teal-600 hover:text-teal-500">
+            get started with onboarding
           </Link>
         </p>
       </div>
