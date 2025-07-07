@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Filter, MapPin, Star, Verified, Calendar, DollarSign, Eye, MessageCircle, Heart, Award, Shield, Clock, TrendingUp, Users, Globe, Briefcase, CheckCircle, Video, Phone, Mail } from "lucide-react";
 
 import Footer from "../components/layout/Footer";
@@ -63,6 +64,7 @@ interface PlatformStats {
 
 const Talent = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedAvailability, setSelectedAvailability] = useState("all");
@@ -90,6 +92,11 @@ const Talent = () => {
     total: 0,
     pages: 0
   });
+
+  // Handle view profile navigation
+  const handleViewProfile = (freelancerId: string) => {
+    navigate(`/freelancer/${freelancerId}`);
+  };
 
   // Fetch freelancers
   const fetchFreelancers = async (page = 1) => {
@@ -649,7 +656,7 @@ const Talent = () => {
                             <MessageCircle className="h-4 w-4 mr-2" />
                             Contact
                           </Button>
-                          <Button variant="outline" size="sm" className="flex-1">
+                          <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewProfile(freelancer.id)}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Profile
                           </Button>
@@ -849,7 +856,7 @@ const Talent = () => {
                               <MessageCircle className="h-4 w-4 mr-2" />
                               Contact
                             </Button>
-                            <Button variant="outline" size="sm" className="flex-1">
+                            <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewProfile(freelancer.id)}>
                               <Eye className="h-4 w-4 mr-2" />
                               View Profile
                             </Button>
@@ -1022,7 +1029,7 @@ const Talent = () => {
                               <MessageCircle className="h-4 w-4 mr-2" />
                               Contact
                             </Button>
-                            <Button variant="outline" size="sm" className="flex-1">
+                            <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewProfile(freelancer.id)}>
                               <Eye className="h-4 w-4 mr-2" />
                               View Profile
                             </Button>

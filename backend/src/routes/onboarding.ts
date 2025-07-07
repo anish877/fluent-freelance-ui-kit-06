@@ -779,122 +779,220 @@ router.post('/complete-with-data', [
       where: { email }
     });
 
+    let user;
+    let isNewUser = false;
+
     if (existingUser) {
-      console.log('User already exists:', email);
-      res.status(400).json({ message: 'User with this email already exists' });
-      return;
+      console.log('User already exists, updating profile:', email);
+      
+      // Update existing user with onboarding data
+      user = await prisma.user.update({
+        where: { email },
+        data: {
+          firstName,
+          lastName,
+          avatar: profilePhoto,
+          phone,
+          country,
+          city,
+          timezone,
+          title,
+          overview,
+          userType,
+          isOnboarded: true,
+          onboardingStep: userType === 'FREELANCER' ? 8 : 7,
+          
+          // Freelancer fields - use correct field names
+          category,
+          subcategory,
+          experienceLevel,
+          workHistory: workExperience || [], // Map workExperience to workHistory for profile display
+          workExperience: workExperience || [], // Keep original field for backward compatibility
+          employmentHistory: employment || employmentHistory || [],
+          education: education || [],
+          certifications: certifications || [],
+          languages: languages || [],
+          skills,
+          topSkills: topSkills || [],
+          serviceOfferings: serviceOfferings || [],
+          portfolio: portfolio || null,
+          portfolioProjects: portfolioProjects || portfolio || [],
+          socialLinks,
+          hourlyRate: hourlyRate ? parseFloat(hourlyRate.toString()) : null,
+          availability,
+          
+          // Additional freelancer fields
+          projectBasedRates,
+          hoursPerWeek,
+          workingHours,
+          workingDays: workingDays || [],
+          responseTime,
+          minimumProjectBudget,
+          specialRequirements,
+          
+          // Client fields
+          clientType,
+          howDidYouHear,
+          companyName,
+          companySize,
+          industry,
+          companyWebsite,
+          companyDescription,
+          projectTypes: projectTypes || [],
+          preferredSkills: preferredSkills || [],
+          budgetRange,
+          
+          // Additional client fields
+          interestedCategories: interestedCategories || [],
+          urgencyLevel,
+          preferredWorkingStyle,
+          communicationPreference: communicationPreference || [],
+          projectDescription,
+          paymentPreference,
+          projectFrequency,
+          averageProjectDuration,
+          maxHourlyRate,
+          totalMonthlyBudget
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          userType: true,
+          isOnboarded: true,
+          onboardingStep: true,
+          avatar: true,
+          title: true,
+          overview: true,
+          skills: true,
+          hourlyRate: true,
+          portfolio: true,
+          portfolioProjects: true,
+          workExperience: true,
+          employmentHistory: true,
+          education: true,
+          certifications: true,
+          companyName: true,
+          companySize: true,
+          industry: true
+        }
+      });
+    } else {
+      console.log('Creating new user:', email);
+      isNewUser = true;
+      
+      // Hash password using the same method as auth route
+      const hashPassword = (password: string): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const salt = crypto.randomBytes(16).toString('hex');
+          crypto.scrypt(password, salt, 64, (err: any, derivedKey: any) => {
+            if (err) reject(err);
+            resolve(salt + ':' + derivedKey.toString('hex'));
+          });
+        });
+      };
+      
+      const hashedPassword = await hashPassword(password);
+      console.log('Password hashed successfully');
+
+      // Create new user with all onboarding data
+      user = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          firstName,
+          lastName,
+          avatar: profilePhoto,
+          phone,
+          country,
+          city,
+          timezone,
+          title,
+          overview,
+          userType,
+          isOnboarded: true,
+          onboardingStep: userType === 'FREELANCER' ? 8 : 7,
+          
+          // Freelancer fields - use correct field names
+          category,
+          subcategory,
+          experienceLevel,
+          workHistory: workExperience || [], // Map workExperience to workHistory for profile display
+          workExperience: workExperience || [], // Keep original field for backward compatibility
+          employmentHistory: employment || employmentHistory || [],
+          education: education || [],
+          certifications: certifications || [],
+          languages: languages || [],
+          skills,
+          topSkills: topSkills || [],
+          serviceOfferings: serviceOfferings || [],
+          portfolio: portfolio || null,
+          portfolioProjects: portfolioProjects || portfolio || [],
+          socialLinks,
+          hourlyRate: hourlyRate ? parseFloat(hourlyRate.toString()) : null,
+          availability,
+          
+          // Additional freelancer fields
+          projectBasedRates,
+          hoursPerWeek,
+          workingHours,
+          workingDays: workingDays || [],
+          responseTime,
+          minimumProjectBudget,
+          specialRequirements,
+          
+          // Client fields
+          clientType,
+          howDidYouHear,
+          companyName,
+          companySize,
+          industry,
+          companyWebsite,
+          companyDescription,
+          projectTypes: projectTypes || [],
+          preferredSkills: preferredSkills || [],
+          budgetRange,
+          
+          // Additional client fields
+          interestedCategories: interestedCategories || [],
+          urgencyLevel,
+          preferredWorkingStyle,
+          communicationPreference: communicationPreference || [],
+          projectDescription,
+          paymentPreference,
+          projectFrequency,
+          averageProjectDuration,
+          maxHourlyRate,
+          totalMonthlyBudget
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          userType: true,
+          isOnboarded: true,
+          onboardingStep: true,
+          avatar: true,
+          title: true,
+          overview: true,
+          skills: true,
+          hourlyRate: true,
+          portfolio: true,
+          portfolioProjects: true,
+          workExperience: true,
+          employmentHistory: true,
+          education: true,
+          certifications: true,
+          companyName: true,
+          companySize: true,
+          industry: true
+        }
+      });
     }
 
-    // Hash password using the same method as auth route
-    const hashPassword = (password: string): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        const salt = crypto.randomBytes(16).toString('hex');
-        crypto.scrypt(password, salt, 64, (err: any, derivedKey: any) => {
-          if (err) reject(err);
-          resolve(salt + ':' + derivedKey.toString('hex'));
-        });
-      });
-    };
-    
-    const hashedPassword = await hashPassword(password);
-    console.log('Password hashed successfully');
-
-    // Create user with all onboarding data - use correct field mappings
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        firstName,
-        lastName,
-        avatar: profilePhoto,
-        phone,
-        country,
-        city,
-        timezone,
-        title,
-        overview,
-        userType,
-        isOnboarded: true,
-        onboardingStep: userType === 'FREELANCER' ? 8 : 7,
-        
-        // Freelancer fields - use correct field names
-        category,
-        subcategory,
-        experienceLevel,
-        workHistory: workExperience || [], // Map workExperience to workHistory for profile display
-        workExperience: workExperience || [], // Keep original field for backward compatibility
-        employmentHistory: employment || employmentHistory || [],
-        education: education || [],
-        certifications: certifications || [],
-        languages: languages || [],
-        skills,
-        topSkills: topSkills || [],
-        serviceOfferings: serviceOfferings || [],
-        portfolio: portfolio || null,
-        portfolioProjects: portfolioProjects || portfolio || [],
-        socialLinks,
-        hourlyRate: hourlyRate ? parseFloat(hourlyRate.toString()) : null,
-        availability,
-        
-        // Additional freelancer fields
-        projectBasedRates,
-        hoursPerWeek,
-        workingHours,
-        workingDays: workingDays || [],
-        responseTime,
-        minimumProjectBudget,
-        specialRequirements,
-        
-        // Client fields
-        clientType,
-        howDidYouHear,
-        companyName,
-        companySize,
-        industry,
-        companyWebsite,
-        companyDescription,
-        projectTypes: projectTypes || [],
-        preferredSkills: preferredSkills || [],
-        budgetRange,
-        
-        // Additional client fields
-        interestedCategories: interestedCategories || [],
-        urgencyLevel,
-        preferredWorkingStyle,
-        communicationPreference: communicationPreference || [],
-        projectDescription,
-        paymentPreference,
-        projectFrequency,
-        averageProjectDuration,
-        maxHourlyRate,
-        totalMonthlyBudget
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        userType: true,
-        isOnboarded: true,
-        onboardingStep: true,
-        avatar: true,
-        title: true,
-        overview: true,
-        skills: true,
-        hourlyRate: true,
-        portfolio: true,
-        portfolioProjects: true,
-        workExperience: true,
-        employmentHistory: true,
-        education: true,
-        certifications: true,
-        companyName: true,
-        companySize: true,
-        industry: true
-      }
-    });
-
-    console.log('User created successfully:', user.id);
+    console.log('User processed successfully:', user.id);
 
     // Generate JWT token
     const jwt = require('jsonwebtoken');
@@ -914,10 +1012,11 @@ router.post('/complete-with-data', [
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
 
-    res.status(201).json({
+    res.status(isNewUser ? 201 : 200).json({
       success: true,
       user,
-      token
+      token,
+      message: isNewUser ? 'User created successfully' : 'User profile updated successfully'
     });
   } catch (error) {
     console.error('Error in complete-with-data:', error);
