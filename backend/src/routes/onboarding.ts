@@ -2,6 +2,7 @@ import express, { Request, Response, RequestHandler, Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma.js';
 import { protect, AuthRequest } from '../middleware/auth.js';
+import crypto from 'crypto';
 
 const router: Router = express.Router();
 
@@ -785,7 +786,6 @@ router.post('/complete-with-data', [
     }
 
     // Hash password using the same method as auth route
-    const crypto = require('crypto');
     const hashPassword = (password: string): Promise<string> => {
       return new Promise((resolve, reject) => {
         const salt = crypto.randomBytes(16).toString('hex');
