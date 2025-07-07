@@ -82,7 +82,7 @@ interface WebSocketProviderProps {
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ 
   children, 
-  wsUrl = 'ws://localhost:8080',
+  wsUrl = import.meta.env.VITE_WS_URL || ((window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host),
   maxRetries = 5
 }) => {
   // Connection state
