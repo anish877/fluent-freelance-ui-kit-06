@@ -59,7 +59,15 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      connectSrc: ["'self'", "wss:", "ws:"],
+      connectSrc: [
+        "'self'",
+        "wss:",
+        "ws:",
+        "https://taskmotive-a193fd395c98.herokuapp.com",
+        "wss://taskmotive-a193fd395c98.herokuapp.com",
+        "https://taskmotive.com",
+        "wss://taskmotive.com"
+      ],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "https:"],
