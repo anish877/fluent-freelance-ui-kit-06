@@ -63,6 +63,7 @@ interface WebSocketContextType {
   
   // Actions
   joinConversation: (conversationId: string) => void;
+  createConversation: (otherUserEmail: string, projectName?: string) => Promise<string | null>;
   sendMessage: (content: string, type?: 'text' | 'file' | 'image') => void;
   startTyping: () => void;
   stopTyping: () => void;
@@ -472,6 +473,35 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
   }, []);
 
+  const createConversation = useCallback(async (otherUserEmail: string, projectName?: string): Promise<string | null> => {
+    try {
+      const response = await fetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          otherUserEmail,
+          projectName: projectName || `Project with ${otherUserEmail}`
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('Conversation created successfully:', data.data.id);
+        return data.data.id;
+      } else {
+        console.error('Failed to create conversation:', data.message);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      return null;
+    }
+  }, []);
+
   const sendMessage = useCallback((content: string, type: 'text' | 'file' | 'image' = 'text') => {
     console.log(socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim())
     if (socketRef.current?.readyState === WebSocket.OPEN && content.trim()) {
@@ -563,6 +593,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     isUserOnline,
     // Actions
     joinConversation,
+    createConversation,
     sendMessage,
     startTyping,
     stopTyping,

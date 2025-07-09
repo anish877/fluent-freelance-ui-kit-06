@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Search, Filter, MapPin, Star, Verified, Calendar, DollarSign, Eye, MessageCircle, Heart, Award, Shield, Clock, TrendingUp, Users, Globe, Briefcase, CheckCircle, Video, Phone, Mail } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -9,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Separator } from "../components/ui/separator";
 import { Progress } from "../components/ui/progress";
 import { useAuth } from "../hooks/AuthContext";
+import { useWebSocket } from "../hooks/socketContext";
 
 interface Freelancer {
   id: string;
@@ -29,6 +31,7 @@ interface Freelancer {
   verified: boolean;
   topRated: boolean;
   risingTalent: boolean;
+  email?: string;
   portfolio: {
     title: string;
     image: string;
@@ -63,6 +66,8 @@ interface PlatformStats {
 
 const Talent = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { createConversation } = useWebSocket();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedAvailability, setSelectedAvailability] = useState("all");
@@ -72,6 +77,7 @@ const Talent = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
   const [activeTab, setActiveTab] = useState("browse");
+  const [contactingFreelancer, setContactingFreelancer] = useState<string | null>(null);
   
   // Data states
   const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
@@ -230,6 +236,36 @@ const Talent = () => {
       fetchSavedFreelancers();
     } else if (tab === 'hired') {
       fetchHiredFreelancers();
+    }
+  };
+
+  // Handle contact freelancer
+  const handleContactFreelancer = async (freelancer: Freelancer) => {
+    if (!user) {
+      alert('Please log in to contact freelancers');
+      return;
+    }
+
+    setContactingFreelancer(freelancer.id);
+    
+    try {
+      // Create conversation with the freelancer
+      const conversationId = await createConversation(
+        freelancer.email || `${freelancer.name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
+        `Project with ${freelancer.name}`
+      );
+
+      if (conversationId) {
+        // Navigate to messages page with the new conversation
+        navigate(`/messages/${conversationId}`);
+      } else {
+        alert('Failed to create conversation. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error contacting freelancer:', error);
+      alert('Failed to contact freelancer. Please try again.');
+    } finally {
+      setContactingFreelancer(null);
     }
   };
 
@@ -645,9 +681,14 @@ const Talent = () => {
                       {/* Contact Actions */}
                       <div className="space-y-2">
                         <div className="flex gap-2">
-                          <Button size="sm" className="flex-1 bg-teal-600 hover:bg-teal-700">
+                          <Button 
+                            size="sm" 
+                            className="flex-1 bg-teal-600 hover:bg-teal-700"
+                            onClick={() => handleContactFreelancer(freelancer)}
+                            disabled={contactingFreelancer === freelancer.id}
+                          >
                             <MessageCircle className="h-4 w-4 mr-2" />
-                            Contact
+                            {contactingFreelancer === freelancer.id ? 'Contacting...' : 'Contact'}
                           </Button>
                           <Button variant="outline" size="sm" className="flex-1">
                             <Eye className="h-4 w-4 mr-2" />
@@ -845,9 +886,14 @@ const Talent = () => {
                         {/* Contact Actions */}
                         <div className="space-y-2">
                           <div className="flex gap-2">
-                            <Button size="sm" className="flex-1 bg-teal-600 hover:bg-teal-700">
+                            <Button 
+                              size="sm" 
+                              className="flex-1 bg-teal-600 hover:bg-teal-700"
+                              onClick={() => handleContactFreelancer(freelancer)}
+                              disabled={contactingFreelancer === freelancer.id}
+                            >
                               <MessageCircle className="h-4 w-4 mr-2" />
-                              Contact
+                              {contactingFreelancer === freelancer.id ? 'Contacting...' : 'Contact'}
                             </Button>
                             <Button variant="outline" size="sm" className="flex-1">
                               <Eye className="h-4 w-4 mr-2" />
@@ -1018,9 +1064,14 @@ const Talent = () => {
                         {/* Contact Actions */}
                         <div className="space-y-2">
                           <div className="flex gap-2">
-                            <Button size="sm" className="flex-1 bg-teal-600 hover:bg-teal-700">
+                            <Button 
+                              size="sm" 
+                              className="flex-1 bg-teal-600 hover:bg-teal-700"
+                              onClick={() => handleContactFreelancer(freelancer)}
+                              disabled={contactingFreelancer === freelancer.id}
+                            >
                               <MessageCircle className="h-4 w-4 mr-2" />
-                              Contact
+                              {contactingFreelancer === freelancer.id ? 'Contacting...' : 'Contact'}
                             </Button>
                             <Button variant="outline" size="sm" className="flex-1">
                               <Eye className="h-4 w-4 mr-2" />
