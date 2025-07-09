@@ -76,7 +76,13 @@ app.use(helmet({
   },
 }));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || ['http://localhost:3000', 'http://localhost:3002'],
+  origin: [
+    'https://taskmotive.com',
+    'https://www.taskmotive.com',
+    'https://taskmotive-a193fd395c98.herokuapp.com',
+    'http://localhost:3000',
+    'http://localhost:3002'
+  ],
   credentials: true
 }));
 
