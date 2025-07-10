@@ -95,6 +95,16 @@ const Navbar = () => {
               >
                 Dashboard
               </Link>
+              {user?.userType === 'FREELANCER' && (
+                <Link 
+                  to="/job-invitations" 
+                  className={`font-medium transition-colors ${
+                    isActive('/job-invitations') ? 'text-teal-600' : 'text-gray-700 hover:text-teal-600'
+                  }`}
+                >
+                  Job Invitations
+                </Link>
+              )}
             </div>
           )}
 
@@ -229,6 +239,15 @@ const Navbar = () => {
                   >
                     Dashboard
                   </Link>
+                  {user?.userType === 'FREELANCER' && (
+                    <Link 
+                      to="/job-invitations" 
+                      className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1 rounded transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Job Invitations
+                    </Link>
+                  )}
 
                   {/* User Actions */}
                   <div className="pt-4 border-t border-gray-200 space-y-2">

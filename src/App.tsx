@@ -29,6 +29,7 @@ import Messages from "./pages/Messages";
 import Contracts from "./pages/Contracts";
 import Reports from "./pages/Reports";
 import Help from "./pages/Help";
+import JobInvitations from "./pages/JobInvitations";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./hooks/ProtectedRoute";
 
@@ -109,6 +110,14 @@ const App = () => {
                       element={
                         <ProtectedRoute allowedUserTypes={['FREELANCER']}>
                           <Proposals />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/job-invitations" 
+                      element={
+                        <ProtectedRoute allowedUserTypes={['FREELANCER']}>
+                          <JobInvitations />
                         </ProtectedRoute>
                       } 
                     />

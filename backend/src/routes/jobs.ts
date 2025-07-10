@@ -96,6 +96,51 @@ router.get('/', (async (req: Request, res: Response): Promise<void> => {
   }
 }) as RequestHandler);
 
+// @desc    Get jobs for current client
+// @route   GET /api/jobs/client
+// @access  Private (Clients only)
+router.get('/client', protect, authorize('CLIENT'), (async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { status } = req.query;
+    const where: Prisma.JobWhereInput = {
+      clientId: req.user!.id
+    };
+    
+    if (status) {
+      where.status = status as 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+    }
+
+    const jobs = await prisma.job.findMany({
+      where,
+      include: {
+        client: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+            companyName: true
+          }
+        },
+        _count: {
+          select: {
+            proposals: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({
+      success: true,
+      data: jobs
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
 // @desc    Get job by ID
 // @route   GET /api/jobs/:id
 // @access  Public

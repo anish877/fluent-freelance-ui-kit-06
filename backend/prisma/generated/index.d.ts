@@ -53,6 +53,11 @@ export type Notification = $Result.DefaultSelection<Prisma.$NotificationPayload>
  * 
  */
 export type SavedFreelancer = $Result.DefaultSelection<Prisma.$SavedFreelancerPayload>
+/**
+ * Model JobInvitation
+ * 
+ */
+export type JobInvitation = $Result.DefaultSelection<Prisma.$JobInvitationPayload>
 
 /**
  * Enums
@@ -101,10 +106,20 @@ export const NotificationType: {
   MESSAGE_RECEIVED: 'MESSAGE_RECEIVED',
   JOB_POSTED: 'JOB_POSTED',
   PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
-  SYSTEM_UPDATE: 'SYSTEM_UPDATE'
+  SYSTEM_UPDATE: 'SYSTEM_UPDATE',
+  JOB_INVITATION: 'JOB_INVITATION'
 };
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const JobInvitationStatus: {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED'
+};
+
+export type JobInvitationStatus = (typeof JobInvitationStatus)[keyof typeof JobInvitationStatus]
 
 }
 
@@ -127,6 +142,10 @@ export const BudgetType: typeof $Enums.BudgetType
 export type NotificationType = $Enums.NotificationType
 
 export const NotificationType: typeof $Enums.NotificationType
+
+export type JobInvitationStatus = $Enums.JobInvitationStatus
+
+export const JobInvitationStatus: typeof $Enums.JobInvitationStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -332,6 +351,16 @@ export class PrismaClient<
     * ```
     */
   get savedFreelancer(): Prisma.SavedFreelancerDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobInvitation`: Exposes CRUD operations for the **JobInvitation** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobInvitations
+    * const jobInvitations = await prisma.jobInvitation.findMany()
+    * ```
+    */
+  get jobInvitation(): Prisma.JobInvitationDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -779,7 +808,8 @@ export namespace Prisma {
     Conversation: 'Conversation',
     Message: 'Message',
     Notification: 'Notification',
-    SavedFreelancer: 'SavedFreelancer'
+    SavedFreelancer: 'SavedFreelancer',
+    JobInvitation: 'JobInvitation'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -798,7 +828,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "job" | "proposal" | "review" | "conversation" | "message" | "notification" | "savedFreelancer"
+      modelProps: "user" | "job" | "proposal" | "review" | "conversation" | "message" | "notification" | "savedFreelancer" | "jobInvitation"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1394,6 +1424,80 @@ export namespace Prisma {
           }
         }
       }
+      JobInvitation: {
+        payload: Prisma.$JobInvitationPayload<ExtArgs>
+        fields: Prisma.JobInvitationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobInvitationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobInvitationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>
+          }
+          findFirst: {
+            args: Prisma.JobInvitationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobInvitationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>
+          }
+          findMany: {
+            args: Prisma.JobInvitationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>[]
+          }
+          create: {
+            args: Prisma.JobInvitationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>
+          }
+          createMany: {
+            args: Prisma.JobInvitationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.JobInvitationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>[]
+          }
+          delete: {
+            args: Prisma.JobInvitationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>
+          }
+          update: {
+            args: Prisma.JobInvitationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>
+          }
+          deleteMany: {
+            args: Prisma.JobInvitationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobInvitationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.JobInvitationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>[]
+          }
+          upsert: {
+            args: Prisma.JobInvitationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobInvitationPayload>
+          }
+          aggregate: {
+            args: Prisma.JobInvitationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobInvitation>
+          }
+          groupBy: {
+            args: Prisma.JobInvitationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobInvitationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobInvitationCountArgs<ExtArgs>
+            result: $Utils.Optional<JobInvitationCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1486,6 +1590,7 @@ export namespace Prisma {
     message?: MessageOmit
     notification?: NotificationOmit
     savedFreelancer?: SavedFreelancerOmit
+    jobInvitation?: JobInvitationOmit
   }
 
   /* Types for Logging */
@@ -1589,6 +1694,8 @@ export namespace Prisma {
     notifications: number
     savedFreelancers: number
     savedByUsers: number
+    jobInvitationsSent: number
+    jobInvitationsReceived: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1601,6 +1708,8 @@ export namespace Prisma {
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
     savedFreelancers?: boolean | UserCountOutputTypeCountSavedFreelancersArgs
     savedByUsers?: boolean | UserCountOutputTypeCountSavedByUsersArgs
+    jobInvitationsSent?: boolean | UserCountOutputTypeCountJobInvitationsSentArgs
+    jobInvitationsReceived?: boolean | UserCountOutputTypeCountJobInvitationsReceivedArgs
   }
 
   // Custom InputTypes
@@ -1677,6 +1786,20 @@ export namespace Prisma {
     where?: SavedFreelancerWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountJobInvitationsSentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobInvitationWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountJobInvitationsReceivedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobInvitationWhereInput
+  }
+
 
   /**
    * Count Type JobCountOutputType
@@ -1686,12 +1809,14 @@ export namespace Prisma {
     conversation: number
     proposals: number
     reviews: number
+    jobInvitations: number
   }
 
   export type JobCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     conversation?: boolean | JobCountOutputTypeCountConversationArgs
     proposals?: boolean | JobCountOutputTypeCountProposalsArgs
     reviews?: boolean | JobCountOutputTypeCountReviewsArgs
+    jobInvitations?: boolean | JobCountOutputTypeCountJobInvitationsArgs
   }
 
   // Custom InputTypes
@@ -1724,6 +1849,13 @@ export namespace Prisma {
    */
   export type JobCountOutputTypeCountReviewsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReviewWhereInput
+  }
+
+  /**
+   * JobCountOutputType without action
+   */
+  export type JobCountOutputTypeCountJobInvitationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobInvitationWhereInput
   }
 
 
@@ -2632,6 +2764,8 @@ export namespace Prisma {
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     savedFreelancers?: boolean | User$savedFreelancersArgs<ExtArgs>
     savedByUsers?: boolean | User$savedByUsersArgs<ExtArgs>
+    jobInvitationsSent?: boolean | User$jobInvitationsSentArgs<ExtArgs>
+    jobInvitationsReceived?: boolean | User$jobInvitationsReceivedArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2925,6 +3059,8 @@ export namespace Prisma {
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     savedFreelancers?: boolean | User$savedFreelancersArgs<ExtArgs>
     savedByUsers?: boolean | User$savedByUsersArgs<ExtArgs>
+    jobInvitationsSent?: boolean | User$jobInvitationsSentArgs<ExtArgs>
+    jobInvitationsReceived?: boolean | User$jobInvitationsReceivedArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2942,6 +3078,8 @@ export namespace Prisma {
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       savedFreelancers: Prisma.$SavedFreelancerPayload<ExtArgs>[]
       savedByUsers: Prisma.$SavedFreelancerPayload<ExtArgs>[]
+      jobInvitationsSent: Prisma.$JobInvitationPayload<ExtArgs>[]
+      jobInvitationsReceived: Prisma.$JobInvitationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3437,6 +3575,8 @@ export namespace Prisma {
     notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     savedFreelancers<T extends User$savedFreelancersArgs<ExtArgs> = {}>(args?: Subset<T, User$savedFreelancersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     savedByUsers<T extends User$savedByUsersArgs<ExtArgs> = {}>(args?: Subset<T, User$savedByUsersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFreelancerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobInvitationsSent<T extends User$jobInvitationsSentArgs<ExtArgs> = {}>(args?: Subset<T, User$jobInvitationsSentArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobInvitationsReceived<T extends User$jobInvitationsReceivedArgs<ExtArgs> = {}>(args?: Subset<T, User$jobInvitationsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4160,6 +4300,54 @@ export namespace Prisma {
   }
 
   /**
+   * User.jobInvitationsSent
+   */
+  export type User$jobInvitationsSentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    where?: JobInvitationWhereInput
+    orderBy?: JobInvitationOrderByWithRelationInput | JobInvitationOrderByWithRelationInput[]
+    cursor?: JobInvitationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobInvitationScalarFieldEnum | JobInvitationScalarFieldEnum[]
+  }
+
+  /**
+   * User.jobInvitationsReceived
+   */
+  export type User$jobInvitationsReceivedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    where?: JobInvitationWhereInput
+    orderBy?: JobInvitationOrderByWithRelationInput | JobInvitationOrderByWithRelationInput[]
+    cursor?: JobInvitationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobInvitationScalarFieldEnum | JobInvitationScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4544,6 +4732,7 @@ export namespace Prisma {
     client?: boolean | UserDefaultArgs<ExtArgs>
     proposals?: boolean | Job$proposalsArgs<ExtArgs>
     reviews?: boolean | Job$reviewsArgs<ExtArgs>
+    jobInvitations?: boolean | Job$jobInvitationsArgs<ExtArgs>
     _count?: boolean | JobCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["job"]>
 
@@ -4642,6 +4831,7 @@ export namespace Prisma {
     client?: boolean | UserDefaultArgs<ExtArgs>
     proposals?: boolean | Job$proposalsArgs<ExtArgs>
     reviews?: boolean | Job$reviewsArgs<ExtArgs>
+    jobInvitations?: boolean | Job$jobInvitationsArgs<ExtArgs>
     _count?: boolean | JobCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type JobIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4658,6 +4848,7 @@ export namespace Prisma {
       client: Prisma.$UserPayload<ExtArgs>
       proposals: Prisma.$ProposalPayload<ExtArgs>[]
       reviews: Prisma.$ReviewPayload<ExtArgs>[]
+      jobInvitations: Prisma.$JobInvitationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5084,6 +5275,7 @@ export namespace Prisma {
     client<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     proposals<T extends Job$proposalsArgs<ExtArgs> = {}>(args?: Subset<T, Job$proposalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProposalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     reviews<T extends Job$reviewsArgs<ExtArgs> = {}>(args?: Subset<T, Job$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobInvitations<T extends Job$jobInvitationsArgs<ExtArgs> = {}>(args?: Subset<T, Job$jobInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5604,6 +5796,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ReviewScalarFieldEnum | ReviewScalarFieldEnum[]
+  }
+
+  /**
+   * Job.jobInvitations
+   */
+  export type Job$jobInvitationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    where?: JobInvitationWhereInput
+    orderBy?: JobInvitationOrderByWithRelationInput | JobInvitationOrderByWithRelationInput[]
+    cursor?: JobInvitationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobInvitationScalarFieldEnum | JobInvitationScalarFieldEnum[]
   }
 
   /**
@@ -12515,6 +12731,1119 @@ export namespace Prisma {
 
 
   /**
+   * Model JobInvitation
+   */
+
+  export type AggregateJobInvitation = {
+    _count: JobInvitationCountAggregateOutputType | null
+    _min: JobInvitationMinAggregateOutputType | null
+    _max: JobInvitationMaxAggregateOutputType | null
+  }
+
+  export type JobInvitationMinAggregateOutputType = {
+    id: string | null
+    jobId: string | null
+    clientId: string | null
+    freelancerEmail: string | null
+    message: string | null
+    status: $Enums.JobInvitationStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobInvitationMaxAggregateOutputType = {
+    id: string | null
+    jobId: string | null
+    clientId: string | null
+    freelancerEmail: string | null
+    message: string | null
+    status: $Enums.JobInvitationStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobInvitationCountAggregateOutputType = {
+    id: number
+    jobId: number
+    clientId: number
+    freelancerEmail: number
+    message: number
+    status: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type JobInvitationMinAggregateInputType = {
+    id?: true
+    jobId?: true
+    clientId?: true
+    freelancerEmail?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobInvitationMaxAggregateInputType = {
+    id?: true
+    jobId?: true
+    clientId?: true
+    freelancerEmail?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobInvitationCountAggregateInputType = {
+    id?: true
+    jobId?: true
+    clientId?: true
+    freelancerEmail?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type JobInvitationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobInvitation to aggregate.
+     */
+    where?: JobInvitationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobInvitations to fetch.
+     */
+    orderBy?: JobInvitationOrderByWithRelationInput | JobInvitationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobInvitationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobInvitations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobInvitations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobInvitations
+    **/
+    _count?: true | JobInvitationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobInvitationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobInvitationMaxAggregateInputType
+  }
+
+  export type GetJobInvitationAggregateType<T extends JobInvitationAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobInvitation]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobInvitation[P]>
+      : GetScalarType<T[P], AggregateJobInvitation[P]>
+  }
+
+
+
+
+  export type JobInvitationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobInvitationWhereInput
+    orderBy?: JobInvitationOrderByWithAggregationInput | JobInvitationOrderByWithAggregationInput[]
+    by: JobInvitationScalarFieldEnum[] | JobInvitationScalarFieldEnum
+    having?: JobInvitationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobInvitationCountAggregateInputType | true
+    _min?: JobInvitationMinAggregateInputType
+    _max?: JobInvitationMaxAggregateInputType
+  }
+
+  export type JobInvitationGroupByOutputType = {
+    id: string
+    jobId: string
+    clientId: string
+    freelancerEmail: string
+    message: string | null
+    status: $Enums.JobInvitationStatus
+    createdAt: Date
+    updatedAt: Date
+    _count: JobInvitationCountAggregateOutputType | null
+    _min: JobInvitationMinAggregateOutputType | null
+    _max: JobInvitationMaxAggregateOutputType | null
+  }
+
+  type GetJobInvitationGroupByPayload<T extends JobInvitationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobInvitationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobInvitationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobInvitationGroupByOutputType[P]>
+            : GetScalarType<T[P], JobInvitationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobInvitationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    jobId?: boolean
+    clientId?: boolean
+    freelancerEmail?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    job?: boolean | JobDefaultArgs<ExtArgs>
+    client?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobInvitation"]>
+
+  export type JobInvitationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    jobId?: boolean
+    clientId?: boolean
+    freelancerEmail?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    job?: boolean | JobDefaultArgs<ExtArgs>
+    client?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobInvitation"]>
+
+  export type JobInvitationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    jobId?: boolean
+    clientId?: boolean
+    freelancerEmail?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    job?: boolean | JobDefaultArgs<ExtArgs>
+    client?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobInvitation"]>
+
+  export type JobInvitationSelectScalar = {
+    id?: boolean
+    jobId?: boolean
+    clientId?: boolean
+    freelancerEmail?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type JobInvitationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "jobId" | "clientId" | "freelancerEmail" | "message" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["jobInvitation"]>
+  export type JobInvitationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job?: boolean | JobDefaultArgs<ExtArgs>
+    client?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type JobInvitationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job?: boolean | JobDefaultArgs<ExtArgs>
+    client?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type JobInvitationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    job?: boolean | JobDefaultArgs<ExtArgs>
+    client?: boolean | UserDefaultArgs<ExtArgs>
+    freelancer?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $JobInvitationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobInvitation"
+    objects: {
+      job: Prisma.$JobPayload<ExtArgs>
+      client: Prisma.$UserPayload<ExtArgs>
+      freelancer: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      jobId: string
+      clientId: string
+      freelancerEmail: string
+      message: string | null
+      status: $Enums.JobInvitationStatus
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["jobInvitation"]>
+    composites: {}
+  }
+
+  type JobInvitationGetPayload<S extends boolean | null | undefined | JobInvitationDefaultArgs> = $Result.GetResult<Prisma.$JobInvitationPayload, S>
+
+  type JobInvitationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobInvitationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobInvitationCountAggregateInputType | true
+    }
+
+  export interface JobInvitationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobInvitation'], meta: { name: 'JobInvitation' } }
+    /**
+     * Find zero or one JobInvitation that matches the filter.
+     * @param {JobInvitationFindUniqueArgs} args - Arguments to find a JobInvitation
+     * @example
+     * // Get one JobInvitation
+     * const jobInvitation = await prisma.jobInvitation.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobInvitationFindUniqueArgs>(args: SelectSubset<T, JobInvitationFindUniqueArgs<ExtArgs>>): Prisma__JobInvitationClient<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobInvitation that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobInvitationFindUniqueOrThrowArgs} args - Arguments to find a JobInvitation
+     * @example
+     * // Get one JobInvitation
+     * const jobInvitation = await prisma.jobInvitation.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobInvitationFindUniqueOrThrowArgs>(args: SelectSubset<T, JobInvitationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobInvitationClient<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobInvitation that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobInvitationFindFirstArgs} args - Arguments to find a JobInvitation
+     * @example
+     * // Get one JobInvitation
+     * const jobInvitation = await prisma.jobInvitation.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobInvitationFindFirstArgs>(args?: SelectSubset<T, JobInvitationFindFirstArgs<ExtArgs>>): Prisma__JobInvitationClient<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobInvitation that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobInvitationFindFirstOrThrowArgs} args - Arguments to find a JobInvitation
+     * @example
+     * // Get one JobInvitation
+     * const jobInvitation = await prisma.jobInvitation.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobInvitationFindFirstOrThrowArgs>(args?: SelectSubset<T, JobInvitationFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobInvitationClient<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobInvitations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobInvitationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobInvitations
+     * const jobInvitations = await prisma.jobInvitation.findMany()
+     * 
+     * // Get first 10 JobInvitations
+     * const jobInvitations = await prisma.jobInvitation.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const jobInvitationWithIdOnly = await prisma.jobInvitation.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends JobInvitationFindManyArgs>(args?: SelectSubset<T, JobInvitationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobInvitation.
+     * @param {JobInvitationCreateArgs} args - Arguments to create a JobInvitation.
+     * @example
+     * // Create one JobInvitation
+     * const JobInvitation = await prisma.jobInvitation.create({
+     *   data: {
+     *     // ... data to create a JobInvitation
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobInvitationCreateArgs>(args: SelectSubset<T, JobInvitationCreateArgs<ExtArgs>>): Prisma__JobInvitationClient<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobInvitations.
+     * @param {JobInvitationCreateManyArgs} args - Arguments to create many JobInvitations.
+     * @example
+     * // Create many JobInvitations
+     * const jobInvitation = await prisma.jobInvitation.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobInvitationCreateManyArgs>(args?: SelectSubset<T, JobInvitationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many JobInvitations and returns the data saved in the database.
+     * @param {JobInvitationCreateManyAndReturnArgs} args - Arguments to create many JobInvitations.
+     * @example
+     * // Create many JobInvitations
+     * const jobInvitation = await prisma.jobInvitation.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many JobInvitations and only return the `id`
+     * const jobInvitationWithIdOnly = await prisma.jobInvitation.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends JobInvitationCreateManyAndReturnArgs>(args?: SelectSubset<T, JobInvitationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a JobInvitation.
+     * @param {JobInvitationDeleteArgs} args - Arguments to delete one JobInvitation.
+     * @example
+     * // Delete one JobInvitation
+     * const JobInvitation = await prisma.jobInvitation.delete({
+     *   where: {
+     *     // ... filter to delete one JobInvitation
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobInvitationDeleteArgs>(args: SelectSubset<T, JobInvitationDeleteArgs<ExtArgs>>): Prisma__JobInvitationClient<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobInvitation.
+     * @param {JobInvitationUpdateArgs} args - Arguments to update one JobInvitation.
+     * @example
+     * // Update one JobInvitation
+     * const jobInvitation = await prisma.jobInvitation.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobInvitationUpdateArgs>(args: SelectSubset<T, JobInvitationUpdateArgs<ExtArgs>>): Prisma__JobInvitationClient<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobInvitations.
+     * @param {JobInvitationDeleteManyArgs} args - Arguments to filter JobInvitations to delete.
+     * @example
+     * // Delete a few JobInvitations
+     * const { count } = await prisma.jobInvitation.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobInvitationDeleteManyArgs>(args?: SelectSubset<T, JobInvitationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobInvitations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobInvitationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobInvitations
+     * const jobInvitation = await prisma.jobInvitation.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobInvitationUpdateManyArgs>(args: SelectSubset<T, JobInvitationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobInvitations and returns the data updated in the database.
+     * @param {JobInvitationUpdateManyAndReturnArgs} args - Arguments to update many JobInvitations.
+     * @example
+     * // Update many JobInvitations
+     * const jobInvitation = await prisma.jobInvitation.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more JobInvitations and only return the `id`
+     * const jobInvitationWithIdOnly = await prisma.jobInvitation.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends JobInvitationUpdateManyAndReturnArgs>(args: SelectSubset<T, JobInvitationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one JobInvitation.
+     * @param {JobInvitationUpsertArgs} args - Arguments to update or create a JobInvitation.
+     * @example
+     * // Update or create a JobInvitation
+     * const jobInvitation = await prisma.jobInvitation.upsert({
+     *   create: {
+     *     // ... data to create a JobInvitation
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobInvitation we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobInvitationUpsertArgs>(args: SelectSubset<T, JobInvitationUpsertArgs<ExtArgs>>): Prisma__JobInvitationClient<$Result.GetResult<Prisma.$JobInvitationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobInvitations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobInvitationCountArgs} args - Arguments to filter JobInvitations to count.
+     * @example
+     * // Count the number of JobInvitations
+     * const count = await prisma.jobInvitation.count({
+     *   where: {
+     *     // ... the filter for the JobInvitations we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobInvitationCountArgs>(
+      args?: Subset<T, JobInvitationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobInvitationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobInvitation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobInvitationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobInvitationAggregateArgs>(args: Subset<T, JobInvitationAggregateArgs>): Prisma.PrismaPromise<GetJobInvitationAggregateType<T>>
+
+    /**
+     * Group by JobInvitation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobInvitationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobInvitationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobInvitationGroupByArgs['orderBy'] }
+        : { orderBy?: JobInvitationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobInvitationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobInvitationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobInvitation model
+   */
+  readonly fields: JobInvitationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobInvitation.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobInvitationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    job<T extends JobDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobDefaultArgs<ExtArgs>>): Prisma__JobClient<$Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    client<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    freelancer<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobInvitation model
+   */
+  interface JobInvitationFieldRefs {
+    readonly id: FieldRef<"JobInvitation", 'String'>
+    readonly jobId: FieldRef<"JobInvitation", 'String'>
+    readonly clientId: FieldRef<"JobInvitation", 'String'>
+    readonly freelancerEmail: FieldRef<"JobInvitation", 'String'>
+    readonly message: FieldRef<"JobInvitation", 'String'>
+    readonly status: FieldRef<"JobInvitation", 'JobInvitationStatus'>
+    readonly createdAt: FieldRef<"JobInvitation", 'DateTime'>
+    readonly updatedAt: FieldRef<"JobInvitation", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobInvitation findUnique
+   */
+  export type JobInvitationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobInvitation to fetch.
+     */
+    where: JobInvitationWhereUniqueInput
+  }
+
+  /**
+   * JobInvitation findUniqueOrThrow
+   */
+  export type JobInvitationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobInvitation to fetch.
+     */
+    where: JobInvitationWhereUniqueInput
+  }
+
+  /**
+   * JobInvitation findFirst
+   */
+  export type JobInvitationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobInvitation to fetch.
+     */
+    where?: JobInvitationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobInvitations to fetch.
+     */
+    orderBy?: JobInvitationOrderByWithRelationInput | JobInvitationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobInvitations.
+     */
+    cursor?: JobInvitationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobInvitations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobInvitations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobInvitations.
+     */
+    distinct?: JobInvitationScalarFieldEnum | JobInvitationScalarFieldEnum[]
+  }
+
+  /**
+   * JobInvitation findFirstOrThrow
+   */
+  export type JobInvitationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobInvitation to fetch.
+     */
+    where?: JobInvitationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobInvitations to fetch.
+     */
+    orderBy?: JobInvitationOrderByWithRelationInput | JobInvitationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobInvitations.
+     */
+    cursor?: JobInvitationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobInvitations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobInvitations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobInvitations.
+     */
+    distinct?: JobInvitationScalarFieldEnum | JobInvitationScalarFieldEnum[]
+  }
+
+  /**
+   * JobInvitation findMany
+   */
+  export type JobInvitationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobInvitations to fetch.
+     */
+    where?: JobInvitationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobInvitations to fetch.
+     */
+    orderBy?: JobInvitationOrderByWithRelationInput | JobInvitationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobInvitations.
+     */
+    cursor?: JobInvitationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobInvitations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobInvitations.
+     */
+    skip?: number
+    distinct?: JobInvitationScalarFieldEnum | JobInvitationScalarFieldEnum[]
+  }
+
+  /**
+   * JobInvitation create
+   */
+  export type JobInvitationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobInvitation.
+     */
+    data: XOR<JobInvitationCreateInput, JobInvitationUncheckedCreateInput>
+  }
+
+  /**
+   * JobInvitation createMany
+   */
+  export type JobInvitationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobInvitations.
+     */
+    data: JobInvitationCreateManyInput | JobInvitationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JobInvitation createManyAndReturn
+   */
+  export type JobInvitationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * The data used to create many JobInvitations.
+     */
+    data: JobInvitationCreateManyInput | JobInvitationCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * JobInvitation update
+   */
+  export type JobInvitationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobInvitation.
+     */
+    data: XOR<JobInvitationUpdateInput, JobInvitationUncheckedUpdateInput>
+    /**
+     * Choose, which JobInvitation to update.
+     */
+    where: JobInvitationWhereUniqueInput
+  }
+
+  /**
+   * JobInvitation updateMany
+   */
+  export type JobInvitationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobInvitations.
+     */
+    data: XOR<JobInvitationUpdateManyMutationInput, JobInvitationUncheckedUpdateManyInput>
+    /**
+     * Filter which JobInvitations to update
+     */
+    where?: JobInvitationWhereInput
+    /**
+     * Limit how many JobInvitations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobInvitation updateManyAndReturn
+   */
+  export type JobInvitationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * The data used to update JobInvitations.
+     */
+    data: XOR<JobInvitationUpdateManyMutationInput, JobInvitationUncheckedUpdateManyInput>
+    /**
+     * Filter which JobInvitations to update
+     */
+    where?: JobInvitationWhereInput
+    /**
+     * Limit how many JobInvitations to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * JobInvitation upsert
+   */
+  export type JobInvitationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobInvitation to update in case it exists.
+     */
+    where: JobInvitationWhereUniqueInput
+    /**
+     * In case the JobInvitation found by the `where` argument doesn't exist, create a new JobInvitation with this data.
+     */
+    create: XOR<JobInvitationCreateInput, JobInvitationUncheckedCreateInput>
+    /**
+     * In case the JobInvitation was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobInvitationUpdateInput, JobInvitationUncheckedUpdateInput>
+  }
+
+  /**
+   * JobInvitation delete
+   */
+  export type JobInvitationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+    /**
+     * Filter which JobInvitation to delete.
+     */
+    where: JobInvitationWhereUniqueInput
+  }
+
+  /**
+   * JobInvitation deleteMany
+   */
+  export type JobInvitationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobInvitations to delete
+     */
+    where?: JobInvitationWhereInput
+    /**
+     * Limit how many JobInvitations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobInvitation without action
+   */
+  export type JobInvitationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobInvitation
+     */
+    select?: JobInvitationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobInvitation
+     */
+    omit?: JobInvitationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInvitationInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -12746,6 +14075,20 @@ export namespace Prisma {
   export type SavedFreelancerScalarFieldEnum = (typeof SavedFreelancerScalarFieldEnum)[keyof typeof SavedFreelancerScalarFieldEnum]
 
 
+  export const JobInvitationScalarFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    clientId: 'clientId',
+    freelancerEmail: 'freelancerEmail',
+    message: 'message',
+    status: 'status',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type JobInvitationScalarFieldEnum = (typeof JobInvitationScalarFieldEnum)[keyof typeof JobInvitationScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -12937,6 +14280,20 @@ export namespace Prisma {
    */
   export type ListEnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationType[]'>
     
+
+
+  /**
+   * Reference to a field of type 'JobInvitationStatus'
+   */
+  export type EnumJobInvitationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobInvitationStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'JobInvitationStatus[]'
+   */
+  export type ListEnumJobInvitationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobInvitationStatus[]'>
+    
   /**
    * Deep Input Types
    */
@@ -13045,6 +14402,8 @@ export namespace Prisma {
     notifications?: NotificationListRelationFilter
     savedFreelancers?: SavedFreelancerListRelationFilter
     savedByUsers?: SavedFreelancerListRelationFilter
+    jobInvitationsSent?: JobInvitationListRelationFilter
+    jobInvitationsReceived?: JobInvitationListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -13147,6 +14506,8 @@ export namespace Prisma {
     notifications?: NotificationOrderByRelationAggregateInput
     savedFreelancers?: SavedFreelancerOrderByRelationAggregateInput
     savedByUsers?: SavedFreelancerOrderByRelationAggregateInput
+    jobInvitationsSent?: JobInvitationOrderByRelationAggregateInput
+    jobInvitationsReceived?: JobInvitationOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -13252,6 +14613,8 @@ export namespace Prisma {
     notifications?: NotificationListRelationFilter
     savedFreelancers?: SavedFreelancerListRelationFilter
     savedByUsers?: SavedFreelancerListRelationFilter
+    jobInvitationsSent?: JobInvitationListRelationFilter
+    jobInvitationsReceived?: JobInvitationListRelationFilter
   }, "id" | "googleId" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -13482,6 +14845,7 @@ export namespace Prisma {
     client?: XOR<UserScalarRelationFilter, UserWhereInput>
     proposals?: ProposalListRelationFilter
     reviews?: ReviewListRelationFilter
+    jobInvitations?: JobInvitationListRelationFilter
   }
 
   export type JobOrderByWithRelationInput = {
@@ -13515,6 +14879,7 @@ export namespace Prisma {
     client?: UserOrderByWithRelationInput
     proposals?: ProposalOrderByRelationAggregateInput
     reviews?: ReviewOrderByRelationAggregateInput
+    jobInvitations?: JobInvitationOrderByRelationAggregateInput
   }
 
   export type JobWhereUniqueInput = Prisma.AtLeast<{
@@ -13551,6 +14916,7 @@ export namespace Prisma {
     client?: XOR<UserScalarRelationFilter, UserWhereInput>
     proposals?: ProposalListRelationFilter
     reviews?: ReviewListRelationFilter
+    jobInvitations?: JobInvitationListRelationFilter
   }, "id">
 
   export type JobOrderByWithAggregationInput = {
@@ -14101,6 +15467,83 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"SavedFreelancer"> | Date | string
   }
 
+  export type JobInvitationWhereInput = {
+    AND?: JobInvitationWhereInput | JobInvitationWhereInput[]
+    OR?: JobInvitationWhereInput[]
+    NOT?: JobInvitationWhereInput | JobInvitationWhereInput[]
+    id?: StringFilter<"JobInvitation"> | string
+    jobId?: StringFilter<"JobInvitation"> | string
+    clientId?: StringFilter<"JobInvitation"> | string
+    freelancerEmail?: StringFilter<"JobInvitation"> | string
+    message?: StringNullableFilter<"JobInvitation"> | string | null
+    status?: EnumJobInvitationStatusFilter<"JobInvitation"> | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFilter<"JobInvitation"> | Date | string
+    updatedAt?: DateTimeFilter<"JobInvitation"> | Date | string
+    job?: XOR<JobScalarRelationFilter, JobWhereInput>
+    client?: XOR<UserScalarRelationFilter, UserWhereInput>
+    freelancer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type JobInvitationOrderByWithRelationInput = {
+    id?: SortOrder
+    jobId?: SortOrder
+    clientId?: SortOrder
+    freelancerEmail?: SortOrder
+    message?: SortOrderInput | SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    job?: JobOrderByWithRelationInput
+    client?: UserOrderByWithRelationInput
+    freelancer?: UserOrderByWithRelationInput
+  }
+
+  export type JobInvitationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    jobId_freelancerEmail?: JobInvitationJobIdFreelancerEmailCompoundUniqueInput
+    AND?: JobInvitationWhereInput | JobInvitationWhereInput[]
+    OR?: JobInvitationWhereInput[]
+    NOT?: JobInvitationWhereInput | JobInvitationWhereInput[]
+    jobId?: StringFilter<"JobInvitation"> | string
+    clientId?: StringFilter<"JobInvitation"> | string
+    freelancerEmail?: StringFilter<"JobInvitation"> | string
+    message?: StringNullableFilter<"JobInvitation"> | string | null
+    status?: EnumJobInvitationStatusFilter<"JobInvitation"> | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFilter<"JobInvitation"> | Date | string
+    updatedAt?: DateTimeFilter<"JobInvitation"> | Date | string
+    job?: XOR<JobScalarRelationFilter, JobWhereInput>
+    client?: XOR<UserScalarRelationFilter, UserWhereInput>
+    freelancer?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "jobId_freelancerEmail">
+
+  export type JobInvitationOrderByWithAggregationInput = {
+    id?: SortOrder
+    jobId?: SortOrder
+    clientId?: SortOrder
+    freelancerEmail?: SortOrder
+    message?: SortOrderInput | SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: JobInvitationCountOrderByAggregateInput
+    _max?: JobInvitationMaxOrderByAggregateInput
+    _min?: JobInvitationMinOrderByAggregateInput
+  }
+
+  export type JobInvitationScalarWhereWithAggregatesInput = {
+    AND?: JobInvitationScalarWhereWithAggregatesInput | JobInvitationScalarWhereWithAggregatesInput[]
+    OR?: JobInvitationScalarWhereWithAggregatesInput[]
+    NOT?: JobInvitationScalarWhereWithAggregatesInput | JobInvitationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"JobInvitation"> | string
+    jobId?: StringWithAggregatesFilter<"JobInvitation"> | string
+    clientId?: StringWithAggregatesFilter<"JobInvitation"> | string
+    freelancerEmail?: StringWithAggregatesFilter<"JobInvitation"> | string
+    message?: StringNullableWithAggregatesFilter<"JobInvitation"> | string | null
+    status?: EnumJobInvitationStatusWithAggregatesFilter<"JobInvitation"> | $Enums.JobInvitationStatus
+    createdAt?: DateTimeWithAggregatesFilter<"JobInvitation"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"JobInvitation"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     googleId?: string | null
@@ -14201,6 +15644,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -14303,6 +15748,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUpdateInput = {
@@ -14405,6 +15852,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -14507,6 +15956,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -14818,6 +16269,7 @@ export namespace Prisma {
     client: UserCreateNestedOneWithoutJobsPostedInput
     proposals?: ProposalCreateNestedManyWithoutJobInput
     reviews?: ReviewCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationCreateNestedManyWithoutJobInput
   }
 
   export type JobUncheckedCreateInput = {
@@ -14850,6 +16302,7 @@ export namespace Prisma {
     conversation?: ConversationUncheckedCreateNestedManyWithoutJobInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutJobInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationUncheckedCreateNestedManyWithoutJobInput
   }
 
   export type JobUpdateInput = {
@@ -14882,6 +16335,7 @@ export namespace Prisma {
     client?: UserUpdateOneRequiredWithoutJobsPostedNestedInput
     proposals?: ProposalUpdateManyWithoutJobNestedInput
     reviews?: ReviewUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUpdateManyWithoutJobNestedInput
   }
 
   export type JobUncheckedUpdateInput = {
@@ -14914,6 +16368,7 @@ export namespace Prisma {
     conversation?: ConversationUncheckedUpdateManyWithoutJobNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutJobNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUncheckedUpdateManyWithoutJobNestedInput
   }
 
   export type JobCreateManyInput = {
@@ -15501,6 +16956,80 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type JobInvitationCreateInput = {
+    id?: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    job: JobCreateNestedOneWithoutJobInvitationsInput
+    client: UserCreateNestedOneWithoutJobInvitationsSentInput
+    freelancer: UserCreateNestedOneWithoutJobInvitationsReceivedInput
+  }
+
+  export type JobInvitationUncheckedCreateInput = {
+    id?: string
+    jobId: string
+    clientId: string
+    freelancerEmail: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobInvitationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    job?: JobUpdateOneRequiredWithoutJobInvitationsNestedInput
+    client?: UserUpdateOneRequiredWithoutJobInvitationsSentNestedInput
+    freelancer?: UserUpdateOneRequiredWithoutJobInvitationsReceivedNestedInput
+  }
+
+  export type JobInvitationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    jobId?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    freelancerEmail?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobInvitationCreateManyInput = {
+    id?: string
+    jobId: string
+    clientId: string
+    freelancerEmail: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobInvitationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobInvitationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    jobId?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    freelancerEmail?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -15654,6 +17183,12 @@ export namespace Prisma {
     none?: SavedFreelancerWhereInput
   }
 
+  export type JobInvitationListRelationFilter = {
+    every?: JobInvitationWhereInput
+    some?: JobInvitationWhereInput
+    none?: JobInvitationWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -15680,6 +17215,10 @@ export namespace Prisma {
   }
 
   export type SavedFreelancerOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobInvitationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -16567,6 +18106,61 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type EnumJobInvitationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.JobInvitationStatus | EnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.JobInvitationStatus[] | ListEnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.JobInvitationStatus[] | ListEnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumJobInvitationStatusFilter<$PrismaModel> | $Enums.JobInvitationStatus
+  }
+
+  export type JobInvitationJobIdFreelancerEmailCompoundUniqueInput = {
+    jobId: string
+    freelancerEmail: string
+  }
+
+  export type JobInvitationCountOrderByAggregateInput = {
+    id?: SortOrder
+    jobId?: SortOrder
+    clientId?: SortOrder
+    freelancerEmail?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobInvitationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    jobId?: SortOrder
+    clientId?: SortOrder
+    freelancerEmail?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobInvitationMinOrderByAggregateInput = {
+    id?: SortOrder
+    jobId?: SortOrder
+    clientId?: SortOrder
+    freelancerEmail?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumJobInvitationStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.JobInvitationStatus | EnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.JobInvitationStatus[] | ListEnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.JobInvitationStatus[] | ListEnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumJobInvitationStatusWithAggregatesFilter<$PrismaModel> | $Enums.JobInvitationStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumJobInvitationStatusFilter<$PrismaModel>
+    _max?: NestedEnumJobInvitationStatusFilter<$PrismaModel>
+  }
+
   export type UserCreatetopSkillsInput = {
     set: string[]
   }
@@ -16666,6 +18260,20 @@ export namespace Prisma {
     connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
   }
 
+  export type JobInvitationCreateNestedManyWithoutClientInput = {
+    create?: XOR<JobInvitationCreateWithoutClientInput, JobInvitationUncheckedCreateWithoutClientInput> | JobInvitationCreateWithoutClientInput[] | JobInvitationUncheckedCreateWithoutClientInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutClientInput | JobInvitationCreateOrConnectWithoutClientInput[]
+    createMany?: JobInvitationCreateManyClientInputEnvelope
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+  }
+
+  export type JobInvitationCreateNestedManyWithoutFreelancerInput = {
+    create?: XOR<JobInvitationCreateWithoutFreelancerInput, JobInvitationUncheckedCreateWithoutFreelancerInput> | JobInvitationCreateWithoutFreelancerInput[] | JobInvitationUncheckedCreateWithoutFreelancerInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutFreelancerInput | JobInvitationCreateOrConnectWithoutFreelancerInput[]
+    createMany?: JobInvitationCreateManyFreelancerInputEnvelope
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+  }
+
   export type JobUncheckedCreateNestedManyWithoutClientInput = {
     create?: XOR<JobCreateWithoutClientInput, JobUncheckedCreateWithoutClientInput> | JobCreateWithoutClientInput[] | JobUncheckedCreateWithoutClientInput[]
     connectOrCreate?: JobCreateOrConnectWithoutClientInput | JobCreateOrConnectWithoutClientInput[]
@@ -16727,6 +18335,20 @@ export namespace Prisma {
     connectOrCreate?: SavedFreelancerCreateOrConnectWithoutFreelancerInput | SavedFreelancerCreateOrConnectWithoutFreelancerInput[]
     createMany?: SavedFreelancerCreateManyFreelancerInputEnvelope
     connect?: SavedFreelancerWhereUniqueInput | SavedFreelancerWhereUniqueInput[]
+  }
+
+  export type JobInvitationUncheckedCreateNestedManyWithoutClientInput = {
+    create?: XOR<JobInvitationCreateWithoutClientInput, JobInvitationUncheckedCreateWithoutClientInput> | JobInvitationCreateWithoutClientInput[] | JobInvitationUncheckedCreateWithoutClientInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutClientInput | JobInvitationCreateOrConnectWithoutClientInput[]
+    createMany?: JobInvitationCreateManyClientInputEnvelope
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+  }
+
+  export type JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput = {
+    create?: XOR<JobInvitationCreateWithoutFreelancerInput, JobInvitationUncheckedCreateWithoutFreelancerInput> | JobInvitationCreateWithoutFreelancerInput[] | JobInvitationUncheckedCreateWithoutFreelancerInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutFreelancerInput | JobInvitationCreateOrConnectWithoutFreelancerInput[]
+    createMany?: JobInvitationCreateManyFreelancerInputEnvelope
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -16944,6 +18566,34 @@ export namespace Prisma {
     deleteMany?: SavedFreelancerScalarWhereInput | SavedFreelancerScalarWhereInput[]
   }
 
+  export type JobInvitationUpdateManyWithoutClientNestedInput = {
+    create?: XOR<JobInvitationCreateWithoutClientInput, JobInvitationUncheckedCreateWithoutClientInput> | JobInvitationCreateWithoutClientInput[] | JobInvitationUncheckedCreateWithoutClientInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutClientInput | JobInvitationCreateOrConnectWithoutClientInput[]
+    upsert?: JobInvitationUpsertWithWhereUniqueWithoutClientInput | JobInvitationUpsertWithWhereUniqueWithoutClientInput[]
+    createMany?: JobInvitationCreateManyClientInputEnvelope
+    set?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    disconnect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    delete?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    update?: JobInvitationUpdateWithWhereUniqueWithoutClientInput | JobInvitationUpdateWithWhereUniqueWithoutClientInput[]
+    updateMany?: JobInvitationUpdateManyWithWhereWithoutClientInput | JobInvitationUpdateManyWithWhereWithoutClientInput[]
+    deleteMany?: JobInvitationScalarWhereInput | JobInvitationScalarWhereInput[]
+  }
+
+  export type JobInvitationUpdateManyWithoutFreelancerNestedInput = {
+    create?: XOR<JobInvitationCreateWithoutFreelancerInput, JobInvitationUncheckedCreateWithoutFreelancerInput> | JobInvitationCreateWithoutFreelancerInput[] | JobInvitationUncheckedCreateWithoutFreelancerInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutFreelancerInput | JobInvitationCreateOrConnectWithoutFreelancerInput[]
+    upsert?: JobInvitationUpsertWithWhereUniqueWithoutFreelancerInput | JobInvitationUpsertWithWhereUniqueWithoutFreelancerInput[]
+    createMany?: JobInvitationCreateManyFreelancerInputEnvelope
+    set?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    disconnect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    delete?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    update?: JobInvitationUpdateWithWhereUniqueWithoutFreelancerInput | JobInvitationUpdateWithWhereUniqueWithoutFreelancerInput[]
+    updateMany?: JobInvitationUpdateManyWithWhereWithoutFreelancerInput | JobInvitationUpdateManyWithWhereWithoutFreelancerInput[]
+    deleteMany?: JobInvitationScalarWhereInput | JobInvitationScalarWhereInput[]
+  }
+
   export type JobUncheckedUpdateManyWithoutClientNestedInput = {
     create?: XOR<JobCreateWithoutClientInput, JobUncheckedCreateWithoutClientInput> | JobCreateWithoutClientInput[] | JobUncheckedCreateWithoutClientInput[]
     connectOrCreate?: JobCreateOrConnectWithoutClientInput | JobCreateOrConnectWithoutClientInput[]
@@ -17070,6 +18720,34 @@ export namespace Prisma {
     deleteMany?: SavedFreelancerScalarWhereInput | SavedFreelancerScalarWhereInput[]
   }
 
+  export type JobInvitationUncheckedUpdateManyWithoutClientNestedInput = {
+    create?: XOR<JobInvitationCreateWithoutClientInput, JobInvitationUncheckedCreateWithoutClientInput> | JobInvitationCreateWithoutClientInput[] | JobInvitationUncheckedCreateWithoutClientInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutClientInput | JobInvitationCreateOrConnectWithoutClientInput[]
+    upsert?: JobInvitationUpsertWithWhereUniqueWithoutClientInput | JobInvitationUpsertWithWhereUniqueWithoutClientInput[]
+    createMany?: JobInvitationCreateManyClientInputEnvelope
+    set?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    disconnect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    delete?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    update?: JobInvitationUpdateWithWhereUniqueWithoutClientInput | JobInvitationUpdateWithWhereUniqueWithoutClientInput[]
+    updateMany?: JobInvitationUpdateManyWithWhereWithoutClientInput | JobInvitationUpdateManyWithWhereWithoutClientInput[]
+    deleteMany?: JobInvitationScalarWhereInput | JobInvitationScalarWhereInput[]
+  }
+
+  export type JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput = {
+    create?: XOR<JobInvitationCreateWithoutFreelancerInput, JobInvitationUncheckedCreateWithoutFreelancerInput> | JobInvitationCreateWithoutFreelancerInput[] | JobInvitationUncheckedCreateWithoutFreelancerInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutFreelancerInput | JobInvitationCreateOrConnectWithoutFreelancerInput[]
+    upsert?: JobInvitationUpsertWithWhereUniqueWithoutFreelancerInput | JobInvitationUpsertWithWhereUniqueWithoutFreelancerInput[]
+    createMany?: JobInvitationCreateManyFreelancerInputEnvelope
+    set?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    disconnect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    delete?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    update?: JobInvitationUpdateWithWhereUniqueWithoutFreelancerInput | JobInvitationUpdateWithWhereUniqueWithoutFreelancerInput[]
+    updateMany?: JobInvitationUpdateManyWithWhereWithoutFreelancerInput | JobInvitationUpdateManyWithWhereWithoutFreelancerInput[]
+    deleteMany?: JobInvitationScalarWhereInput | JobInvitationScalarWhereInput[]
+  }
+
   export type JobCreaterequirementsInput = {
     set: string[]
   }
@@ -17109,6 +18787,13 @@ export namespace Prisma {
     connect?: ReviewWhereUniqueInput | ReviewWhereUniqueInput[]
   }
 
+  export type JobInvitationCreateNestedManyWithoutJobInput = {
+    create?: XOR<JobInvitationCreateWithoutJobInput, JobInvitationUncheckedCreateWithoutJobInput> | JobInvitationCreateWithoutJobInput[] | JobInvitationUncheckedCreateWithoutJobInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutJobInput | JobInvitationCreateOrConnectWithoutJobInput[]
+    createMany?: JobInvitationCreateManyJobInputEnvelope
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+  }
+
   export type ConversationUncheckedCreateNestedManyWithoutJobInput = {
     create?: XOR<ConversationCreateWithoutJobInput, ConversationUncheckedCreateWithoutJobInput> | ConversationCreateWithoutJobInput[] | ConversationUncheckedCreateWithoutJobInput[]
     connectOrCreate?: ConversationCreateOrConnectWithoutJobInput | ConversationCreateOrConnectWithoutJobInput[]
@@ -17128,6 +18813,13 @@ export namespace Prisma {
     connectOrCreate?: ReviewCreateOrConnectWithoutJobInput | ReviewCreateOrConnectWithoutJobInput[]
     createMany?: ReviewCreateManyJobInputEnvelope
     connect?: ReviewWhereUniqueInput | ReviewWhereUniqueInput[]
+  }
+
+  export type JobInvitationUncheckedCreateNestedManyWithoutJobInput = {
+    create?: XOR<JobInvitationCreateWithoutJobInput, JobInvitationUncheckedCreateWithoutJobInput> | JobInvitationCreateWithoutJobInput[] | JobInvitationUncheckedCreateWithoutJobInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutJobInput | JobInvitationCreateOrConnectWithoutJobInput[]
+    createMany?: JobInvitationCreateManyJobInputEnvelope
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
   }
 
   export type JobUpdaterequirementsInput = {
@@ -17207,6 +18899,20 @@ export namespace Prisma {
     deleteMany?: ReviewScalarWhereInput | ReviewScalarWhereInput[]
   }
 
+  export type JobInvitationUpdateManyWithoutJobNestedInput = {
+    create?: XOR<JobInvitationCreateWithoutJobInput, JobInvitationUncheckedCreateWithoutJobInput> | JobInvitationCreateWithoutJobInput[] | JobInvitationUncheckedCreateWithoutJobInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutJobInput | JobInvitationCreateOrConnectWithoutJobInput[]
+    upsert?: JobInvitationUpsertWithWhereUniqueWithoutJobInput | JobInvitationUpsertWithWhereUniqueWithoutJobInput[]
+    createMany?: JobInvitationCreateManyJobInputEnvelope
+    set?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    disconnect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    delete?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    update?: JobInvitationUpdateWithWhereUniqueWithoutJobInput | JobInvitationUpdateWithWhereUniqueWithoutJobInput[]
+    updateMany?: JobInvitationUpdateManyWithWhereWithoutJobInput | JobInvitationUpdateManyWithWhereWithoutJobInput[]
+    deleteMany?: JobInvitationScalarWhereInput | JobInvitationScalarWhereInput[]
+  }
+
   export type ConversationUncheckedUpdateManyWithoutJobNestedInput = {
     create?: XOR<ConversationCreateWithoutJobInput, ConversationUncheckedCreateWithoutJobInput> | ConversationCreateWithoutJobInput[] | ConversationUncheckedCreateWithoutJobInput[]
     connectOrCreate?: ConversationCreateOrConnectWithoutJobInput | ConversationCreateOrConnectWithoutJobInput[]
@@ -17247,6 +18953,20 @@ export namespace Prisma {
     update?: ReviewUpdateWithWhereUniqueWithoutJobInput | ReviewUpdateWithWhereUniqueWithoutJobInput[]
     updateMany?: ReviewUpdateManyWithWhereWithoutJobInput | ReviewUpdateManyWithWhereWithoutJobInput[]
     deleteMany?: ReviewScalarWhereInput | ReviewScalarWhereInput[]
+  }
+
+  export type JobInvitationUncheckedUpdateManyWithoutJobNestedInput = {
+    create?: XOR<JobInvitationCreateWithoutJobInput, JobInvitationUncheckedCreateWithoutJobInput> | JobInvitationCreateWithoutJobInput[] | JobInvitationUncheckedCreateWithoutJobInput[]
+    connectOrCreate?: JobInvitationCreateOrConnectWithoutJobInput | JobInvitationCreateOrConnectWithoutJobInput[]
+    upsert?: JobInvitationUpsertWithWhereUniqueWithoutJobInput | JobInvitationUpsertWithWhereUniqueWithoutJobInput[]
+    createMany?: JobInvitationCreateManyJobInputEnvelope
+    set?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    disconnect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    delete?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    connect?: JobInvitationWhereUniqueInput | JobInvitationWhereUniqueInput[]
+    update?: JobInvitationUpdateWithWhereUniqueWithoutJobInput | JobInvitationUpdateWithWhereUniqueWithoutJobInput[]
+    updateMany?: JobInvitationUpdateManyWithWhereWithoutJobInput | JobInvitationUpdateManyWithWhereWithoutJobInput[]
+    deleteMany?: JobInvitationScalarWhereInput | JobInvitationScalarWhereInput[]
   }
 
   export type ProposalCreateattachmentsInput = {
@@ -17553,6 +19273,52 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutSavedByUsersInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSavedByUsersInput, UserUpdateWithoutSavedByUsersInput>, UserUncheckedUpdateWithoutSavedByUsersInput>
+  }
+
+  export type JobCreateNestedOneWithoutJobInvitationsInput = {
+    create?: XOR<JobCreateWithoutJobInvitationsInput, JobUncheckedCreateWithoutJobInvitationsInput>
+    connectOrCreate?: JobCreateOrConnectWithoutJobInvitationsInput
+    connect?: JobWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutJobInvitationsSentInput = {
+    create?: XOR<UserCreateWithoutJobInvitationsSentInput, UserUncheckedCreateWithoutJobInvitationsSentInput>
+    connectOrCreate?: UserCreateOrConnectWithoutJobInvitationsSentInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutJobInvitationsReceivedInput = {
+    create?: XOR<UserCreateWithoutJobInvitationsReceivedInput, UserUncheckedCreateWithoutJobInvitationsReceivedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutJobInvitationsReceivedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumJobInvitationStatusFieldUpdateOperationsInput = {
+    set?: $Enums.JobInvitationStatus
+  }
+
+  export type JobUpdateOneRequiredWithoutJobInvitationsNestedInput = {
+    create?: XOR<JobCreateWithoutJobInvitationsInput, JobUncheckedCreateWithoutJobInvitationsInput>
+    connectOrCreate?: JobCreateOrConnectWithoutJobInvitationsInput
+    upsert?: JobUpsertWithoutJobInvitationsInput
+    connect?: JobWhereUniqueInput
+    update?: XOR<XOR<JobUpdateToOneWithWhereWithoutJobInvitationsInput, JobUpdateWithoutJobInvitationsInput>, JobUncheckedUpdateWithoutJobInvitationsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutJobInvitationsSentNestedInput = {
+    create?: XOR<UserCreateWithoutJobInvitationsSentInput, UserUncheckedCreateWithoutJobInvitationsSentInput>
+    connectOrCreate?: UserCreateOrConnectWithoutJobInvitationsSentInput
+    upsert?: UserUpsertWithoutJobInvitationsSentInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutJobInvitationsSentInput, UserUpdateWithoutJobInvitationsSentInput>, UserUncheckedUpdateWithoutJobInvitationsSentInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutJobInvitationsReceivedNestedInput = {
+    create?: XOR<UserCreateWithoutJobInvitationsReceivedInput, UserUncheckedCreateWithoutJobInvitationsReceivedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutJobInvitationsReceivedInput
+    upsert?: UserUpsertWithoutJobInvitationsReceivedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutJobInvitationsReceivedInput, UserUpdateWithoutJobInvitationsReceivedInput>, UserUncheckedUpdateWithoutJobInvitationsReceivedInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -17896,6 +19662,23 @@ export namespace Prisma {
     _max?: NestedEnumNotificationTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumJobInvitationStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.JobInvitationStatus | EnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.JobInvitationStatus[] | ListEnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.JobInvitationStatus[] | ListEnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumJobInvitationStatusFilter<$PrismaModel> | $Enums.JobInvitationStatus
+  }
+
+  export type NestedEnumJobInvitationStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.JobInvitationStatus | EnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.JobInvitationStatus[] | ListEnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.JobInvitationStatus[] | ListEnumJobInvitationStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumJobInvitationStatusWithAggregatesFilter<$PrismaModel> | $Enums.JobInvitationStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumJobInvitationStatusFilter<$PrismaModel>
+    _max?: NestedEnumJobInvitationStatusFilter<$PrismaModel>
+  }
+
   export type JobCreateWithoutClientInput = {
     id?: string
     title: string
@@ -17925,6 +19708,7 @@ export namespace Prisma {
     conversation?: ConversationCreateNestedManyWithoutJobInput
     proposals?: ProposalCreateNestedManyWithoutJobInput
     reviews?: ReviewCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationCreateNestedManyWithoutJobInput
   }
 
   export type JobUncheckedCreateWithoutClientInput = {
@@ -17956,6 +19740,7 @@ export namespace Prisma {
     conversation?: ConversationUncheckedCreateNestedManyWithoutJobInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutJobInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationUncheckedCreateNestedManyWithoutJobInput
   }
 
   export type JobCreateOrConnectWithoutClientInput = {
@@ -18216,6 +20001,66 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type JobInvitationCreateWithoutClientInput = {
+    id?: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    job: JobCreateNestedOneWithoutJobInvitationsInput
+    freelancer: UserCreateNestedOneWithoutJobInvitationsReceivedInput
+  }
+
+  export type JobInvitationUncheckedCreateWithoutClientInput = {
+    id?: string
+    jobId: string
+    freelancerEmail: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobInvitationCreateOrConnectWithoutClientInput = {
+    where: JobInvitationWhereUniqueInput
+    create: XOR<JobInvitationCreateWithoutClientInput, JobInvitationUncheckedCreateWithoutClientInput>
+  }
+
+  export type JobInvitationCreateManyClientInputEnvelope = {
+    data: JobInvitationCreateManyClientInput | JobInvitationCreateManyClientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobInvitationCreateWithoutFreelancerInput = {
+    id?: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    job: JobCreateNestedOneWithoutJobInvitationsInput
+    client: UserCreateNestedOneWithoutJobInvitationsSentInput
+  }
+
+  export type JobInvitationUncheckedCreateWithoutFreelancerInput = {
+    id?: string
+    jobId: string
+    clientId: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobInvitationCreateOrConnectWithoutFreelancerInput = {
+    where: JobInvitationWhereUniqueInput
+    create: XOR<JobInvitationCreateWithoutFreelancerInput, JobInvitationUncheckedCreateWithoutFreelancerInput>
+  }
+
+  export type JobInvitationCreateManyFreelancerInputEnvelope = {
+    data: JobInvitationCreateManyFreelancerInput | JobInvitationCreateManyFreelancerInput[]
+    skipDuplicates?: boolean
+  }
+
   export type JobUpsertWithWhereUniqueWithoutClientInput = {
     where: JobWhereUniqueInput
     update: XOR<JobUpdateWithoutClientInput, JobUncheckedUpdateWithoutClientInput>
@@ -18468,6 +20313,52 @@ export namespace Prisma {
     data: XOR<SavedFreelancerUpdateManyMutationInput, SavedFreelancerUncheckedUpdateManyWithoutFreelancerInput>
   }
 
+  export type JobInvitationUpsertWithWhereUniqueWithoutClientInput = {
+    where: JobInvitationWhereUniqueInput
+    update: XOR<JobInvitationUpdateWithoutClientInput, JobInvitationUncheckedUpdateWithoutClientInput>
+    create: XOR<JobInvitationCreateWithoutClientInput, JobInvitationUncheckedCreateWithoutClientInput>
+  }
+
+  export type JobInvitationUpdateWithWhereUniqueWithoutClientInput = {
+    where: JobInvitationWhereUniqueInput
+    data: XOR<JobInvitationUpdateWithoutClientInput, JobInvitationUncheckedUpdateWithoutClientInput>
+  }
+
+  export type JobInvitationUpdateManyWithWhereWithoutClientInput = {
+    where: JobInvitationScalarWhereInput
+    data: XOR<JobInvitationUpdateManyMutationInput, JobInvitationUncheckedUpdateManyWithoutClientInput>
+  }
+
+  export type JobInvitationScalarWhereInput = {
+    AND?: JobInvitationScalarWhereInput | JobInvitationScalarWhereInput[]
+    OR?: JobInvitationScalarWhereInput[]
+    NOT?: JobInvitationScalarWhereInput | JobInvitationScalarWhereInput[]
+    id?: StringFilter<"JobInvitation"> | string
+    jobId?: StringFilter<"JobInvitation"> | string
+    clientId?: StringFilter<"JobInvitation"> | string
+    freelancerEmail?: StringFilter<"JobInvitation"> | string
+    message?: StringNullableFilter<"JobInvitation"> | string | null
+    status?: EnumJobInvitationStatusFilter<"JobInvitation"> | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFilter<"JobInvitation"> | Date | string
+    updatedAt?: DateTimeFilter<"JobInvitation"> | Date | string
+  }
+
+  export type JobInvitationUpsertWithWhereUniqueWithoutFreelancerInput = {
+    where: JobInvitationWhereUniqueInput
+    update: XOR<JobInvitationUpdateWithoutFreelancerInput, JobInvitationUncheckedUpdateWithoutFreelancerInput>
+    create: XOR<JobInvitationCreateWithoutFreelancerInput, JobInvitationUncheckedCreateWithoutFreelancerInput>
+  }
+
+  export type JobInvitationUpdateWithWhereUniqueWithoutFreelancerInput = {
+    where: JobInvitationWhereUniqueInput
+    data: XOR<JobInvitationUpdateWithoutFreelancerInput, JobInvitationUncheckedUpdateWithoutFreelancerInput>
+  }
+
+  export type JobInvitationUpdateManyWithWhereWithoutFreelancerInput = {
+    where: JobInvitationScalarWhereInput
+    data: XOR<JobInvitationUpdateManyMutationInput, JobInvitationUncheckedUpdateManyWithoutFreelancerInput>
+  }
+
   export type ConversationCreateWithoutJobInput = {
     id?: string
     participants?: ConversationCreateparticipantsInput | string[]
@@ -18599,6 +20490,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutJobsPostedInput = {
@@ -18700,6 +20593,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutJobsPostedInput = {
@@ -18784,6 +20679,36 @@ export namespace Prisma {
 
   export type ReviewCreateManyJobInputEnvelope = {
     data: ReviewCreateManyJobInput | ReviewCreateManyJobInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobInvitationCreateWithoutJobInput = {
+    id?: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    client: UserCreateNestedOneWithoutJobInvitationsSentInput
+    freelancer: UserCreateNestedOneWithoutJobInvitationsReceivedInput
+  }
+
+  export type JobInvitationUncheckedCreateWithoutJobInput = {
+    id?: string
+    clientId: string
+    freelancerEmail: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobInvitationCreateOrConnectWithoutJobInput = {
+    where: JobInvitationWhereUniqueInput
+    create: XOR<JobInvitationCreateWithoutJobInput, JobInvitationUncheckedCreateWithoutJobInput>
+  }
+
+  export type JobInvitationCreateManyJobInputEnvelope = {
+    data: JobInvitationCreateManyJobInput | JobInvitationCreateManyJobInput[]
     skipDuplicates?: boolean
   }
 
@@ -18927,6 +20852,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutJobsPostedInput = {
@@ -19028,6 +20955,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type ProposalUpsertWithWhereUniqueWithoutJobInput = {
@@ -19062,6 +20991,22 @@ export namespace Prisma {
     data: XOR<ReviewUpdateManyMutationInput, ReviewUncheckedUpdateManyWithoutJobInput>
   }
 
+  export type JobInvitationUpsertWithWhereUniqueWithoutJobInput = {
+    where: JobInvitationWhereUniqueInput
+    update: XOR<JobInvitationUpdateWithoutJobInput, JobInvitationUncheckedUpdateWithoutJobInput>
+    create: XOR<JobInvitationCreateWithoutJobInput, JobInvitationUncheckedCreateWithoutJobInput>
+  }
+
+  export type JobInvitationUpdateWithWhereUniqueWithoutJobInput = {
+    where: JobInvitationWhereUniqueInput
+    data: XOR<JobInvitationUpdateWithoutJobInput, JobInvitationUncheckedUpdateWithoutJobInput>
+  }
+
+  export type JobInvitationUpdateManyWithWhereWithoutJobInput = {
+    where: JobInvitationScalarWhereInput
+    data: XOR<JobInvitationUpdateManyMutationInput, JobInvitationUncheckedUpdateManyWithoutJobInput>
+  }
+
   export type JobCreateWithoutProposalsInput = {
     id?: string
     title: string
@@ -19091,6 +21036,7 @@ export namespace Prisma {
     conversation?: ConversationCreateNestedManyWithoutJobInput
     client: UserCreateNestedOneWithoutJobsPostedInput
     reviews?: ReviewCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationCreateNestedManyWithoutJobInput
   }
 
   export type JobUncheckedCreateWithoutProposalsInput = {
@@ -19122,6 +21068,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     conversation?: ConversationUncheckedCreateNestedManyWithoutJobInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationUncheckedCreateNestedManyWithoutJobInput
   }
 
   export type JobCreateOrConnectWithoutProposalsInput = {
@@ -19228,6 +21175,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutProposalsInput = {
@@ -19329,6 +21278,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutProposalsInput = {
@@ -19376,6 +21327,7 @@ export namespace Prisma {
     conversation?: ConversationUpdateManyWithoutJobNestedInput
     client?: UserUpdateOneRequiredWithoutJobsPostedNestedInput
     reviews?: ReviewUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUpdateManyWithoutJobNestedInput
   }
 
   export type JobUncheckedUpdateWithoutProposalsInput = {
@@ -19407,6 +21359,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUncheckedUpdateManyWithoutJobNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUncheckedUpdateManyWithoutJobNestedInput
   }
 
   export type UserUpsertWithoutProposalsInput = {
@@ -19519,6 +21472,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProposalsInput = {
@@ -19620,6 +21575,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserCreateWithoutReviewsInput = {
@@ -19721,6 +21678,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutReviewsInput = {
@@ -19822,6 +21781,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutReviewsInput = {
@@ -19928,6 +21889,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutReceivedReviewsInput = {
@@ -20029,6 +21992,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutReceivedReviewsInput = {
@@ -20065,6 +22030,7 @@ export namespace Prisma {
     conversation?: ConversationCreateNestedManyWithoutJobInput
     client: UserCreateNestedOneWithoutJobsPostedInput
     proposals?: ProposalCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationCreateNestedManyWithoutJobInput
   }
 
   export type JobUncheckedCreateWithoutReviewsInput = {
@@ -20096,6 +22062,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     conversation?: ConversationUncheckedCreateNestedManyWithoutJobInput
     proposals?: ProposalUncheckedCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationUncheckedCreateNestedManyWithoutJobInput
   }
 
   export type JobCreateOrConnectWithoutReviewsInput = {
@@ -20213,6 +22180,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviewsInput = {
@@ -20314,6 +22283,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUpsertWithoutReceivedReviewsInput = {
@@ -20426,6 +22397,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedReviewsInput = {
@@ -20527,6 +22500,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type JobUpsertWithoutReviewsInput = {
@@ -20569,6 +22544,7 @@ export namespace Prisma {
     conversation?: ConversationUpdateManyWithoutJobNestedInput
     client?: UserUpdateOneRequiredWithoutJobsPostedNestedInput
     proposals?: ProposalUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUpdateManyWithoutJobNestedInput
   }
 
   export type JobUncheckedUpdateWithoutReviewsInput = {
@@ -20600,6 +22576,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUncheckedUpdateManyWithoutJobNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUncheckedUpdateManyWithoutJobNestedInput
   }
 
   export type JobCreateWithoutConversationInput = {
@@ -20631,6 +22608,7 @@ export namespace Prisma {
     client: UserCreateNestedOneWithoutJobsPostedInput
     proposals?: ProposalCreateNestedManyWithoutJobInput
     reviews?: ReviewCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationCreateNestedManyWithoutJobInput
   }
 
   export type JobUncheckedCreateWithoutConversationInput = {
@@ -20662,6 +22640,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     proposals?: ProposalUncheckedCreateNestedManyWithoutJobInput
     reviews?: ReviewUncheckedCreateNestedManyWithoutJobInput
+    jobInvitations?: JobInvitationUncheckedCreateNestedManyWithoutJobInput
   }
 
   export type JobCreateOrConnectWithoutConversationInput = {
@@ -20768,6 +22747,7 @@ export namespace Prisma {
     client?: UserUpdateOneRequiredWithoutJobsPostedNestedInput
     proposals?: ProposalUpdateManyWithoutJobNestedInput
     reviews?: ReviewUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUpdateManyWithoutJobNestedInput
   }
 
   export type JobUncheckedUpdateWithoutConversationInput = {
@@ -20799,6 +22779,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     proposals?: ProposalUncheckedUpdateManyWithoutJobNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUncheckedUpdateManyWithoutJobNestedInput
   }
 
   export type MessageUpsertWithWhereUniqueWithoutConversationInput = {
@@ -20949,6 +22930,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -21050,6 +23033,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -21156,6 +23141,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutReceivedMessagesInput = {
@@ -21257,6 +23244,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutReceivedMessagesInput = {
@@ -21433,6 +23422,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -21534,6 +23525,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUpsertWithoutReceivedMessagesInput = {
@@ -21646,6 +23639,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -21747,6 +23742,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type ConversationUpsertWithoutMessagesInput = {
@@ -21897,6 +23894,8 @@ export namespace Prisma {
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -21998,6 +23997,8 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -22115,6 +24116,8 @@ export namespace Prisma {
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -22216,6 +24219,8 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserCreateWithoutSavedFreelancersInput = {
@@ -22317,6 +24322,8 @@ export namespace Prisma {
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutSavedFreelancersInput = {
@@ -22418,6 +24425,8 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutSavedFreelancersInput = {
@@ -22524,6 +24533,8 @@ export namespace Prisma {
     receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserUncheckedCreateWithoutSavedByUsersInput = {
@@ -22625,6 +24636,8 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
   }
 
   export type UserCreateOrConnectWithoutSavedByUsersInput = {
@@ -22742,6 +24755,8 @@ export namespace Prisma {
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSavedFreelancersInput = {
@@ -22843,6 +24858,8 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUpsertWithoutSavedByUsersInput = {
@@ -22955,6 +24972,8 @@ export namespace Prisma {
     receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSavedByUsersInput = {
@@ -23056,6 +25075,1008 @@ export namespace Prisma {
     receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
+  }
+
+  export type JobCreateWithoutJobInvitationsInput = {
+    id?: string
+    title: string
+    description: string
+    requirements?: JobCreaterequirementsInput | string[]
+    budget: $Enums.BudgetType
+    minBudget?: number | null
+    maxBudget?: number | null
+    hourlyRate?: number | null
+    duration?: string | null
+    skills?: JobCreateskillsInput | string[]
+    category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
+    location?: string | null
+    isRemote?: boolean
+    status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    conversation?: ConversationCreateNestedManyWithoutJobInput
+    client: UserCreateNestedOneWithoutJobsPostedInput
+    proposals?: ProposalCreateNestedManyWithoutJobInput
+    reviews?: ReviewCreateNestedManyWithoutJobInput
+  }
+
+  export type JobUncheckedCreateWithoutJobInvitationsInput = {
+    id?: string
+    title: string
+    description: string
+    requirements?: JobCreaterequirementsInput | string[]
+    budget: $Enums.BudgetType
+    minBudget?: number | null
+    maxBudget?: number | null
+    hourlyRate?: number | null
+    duration?: string | null
+    skills?: JobCreateskillsInput | string[]
+    category: string
+    subcategory?: string | null
+    projectType?: string | null
+    experienceLevel?: string | null
+    workingHours?: string | null
+    timezone?: string | null
+    communicationPreferences?: JobCreatecommunicationPreferencesInput | string[]
+    location?: string | null
+    isRemote?: boolean
+    status?: $Enums.JobStatus
+    isUrgent?: boolean
+    visibility?: string
+    applicationDeadline?: Date | string | null
+    clientId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    conversation?: ConversationUncheckedCreateNestedManyWithoutJobInput
+    proposals?: ProposalUncheckedCreateNestedManyWithoutJobInput
+    reviews?: ReviewUncheckedCreateNestedManyWithoutJobInput
+  }
+
+  export type JobCreateOrConnectWithoutJobInvitationsInput = {
+    where: JobWhereUniqueInput
+    create: XOR<JobCreateWithoutJobInvitationsInput, JobUncheckedCreateWithoutJobInvitationsInput>
+  }
+
+  export type UserCreateWithoutJobInvitationsSentInput = {
+    id?: string
+    googleId?: string | null
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    avatar?: string | null
+    bio?: string | null
+    location?: string | null
+    phone?: string | null
+    userType?: $Enums.UserType
+    isOnboarded?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    country?: string | null
+    city?: string | null
+    timezone?: string | null
+    title?: string | null
+    overview?: string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserCreatetopSkillsInput | string[]
+    serviceOfferings?: UserCreateserviceOfferingsInput | string[]
+    hourlyRate?: number | null
+    portfolio?: string | null
+    experience?: string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserCreatecertificationsInput | string[]
+    availability?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: string | null
+    subcategory?: string | null
+    experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    onBudget?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
+    companyName?: string | null
+    companySize?: string | null
+    industry?: string | null
+    companyWebsite?: string | null
+    companyDescription?: string | null
+    projectTypes?: UserCreateprojectTypesInput | string[]
+    preferredSkills?: UserCreatepreferredSkillsInput | string[]
+    budgetRange?: string | null
+    clientType?: string | null
+    howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
+    jobsPosted?: JobCreateNestedManyWithoutClientInput
+    proposals?: ProposalCreateNestedManyWithoutFreelancerInput
+    reviews?: ReviewCreateNestedManyWithoutAuthorInput
+    receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsReceived?: JobInvitationCreateNestedManyWithoutFreelancerInput
+  }
+
+  export type UserUncheckedCreateWithoutJobInvitationsSentInput = {
+    id?: string
+    googleId?: string | null
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    avatar?: string | null
+    bio?: string | null
+    location?: string | null
+    phone?: string | null
+    userType?: $Enums.UserType
+    isOnboarded?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    country?: string | null
+    city?: string | null
+    timezone?: string | null
+    title?: string | null
+    overview?: string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserCreatetopSkillsInput | string[]
+    serviceOfferings?: UserCreateserviceOfferingsInput | string[]
+    hourlyRate?: number | null
+    portfolio?: string | null
+    experience?: string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserCreatecertificationsInput | string[]
+    availability?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: string | null
+    subcategory?: string | null
+    experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    onBudget?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
+    companyName?: string | null
+    companySize?: string | null
+    industry?: string | null
+    companyWebsite?: string | null
+    companyDescription?: string | null
+    projectTypes?: UserCreateprojectTypesInput | string[]
+    preferredSkills?: UserCreatepreferredSkillsInput | string[]
+    budgetRange?: string | null
+    clientType?: string | null
+    howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
+    jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
+    proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
+    reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
+    receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsReceived?: JobInvitationUncheckedCreateNestedManyWithoutFreelancerInput
+  }
+
+  export type UserCreateOrConnectWithoutJobInvitationsSentInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutJobInvitationsSentInput, UserUncheckedCreateWithoutJobInvitationsSentInput>
+  }
+
+  export type UserCreateWithoutJobInvitationsReceivedInput = {
+    id?: string
+    googleId?: string | null
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    avatar?: string | null
+    bio?: string | null
+    location?: string | null
+    phone?: string | null
+    userType?: $Enums.UserType
+    isOnboarded?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    country?: string | null
+    city?: string | null
+    timezone?: string | null
+    title?: string | null
+    overview?: string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserCreatetopSkillsInput | string[]
+    serviceOfferings?: UserCreateserviceOfferingsInput | string[]
+    hourlyRate?: number | null
+    portfolio?: string | null
+    experience?: string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserCreatecertificationsInput | string[]
+    availability?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: string | null
+    subcategory?: string | null
+    experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    onBudget?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
+    companyName?: string | null
+    companySize?: string | null
+    industry?: string | null
+    companyWebsite?: string | null
+    companyDescription?: string | null
+    projectTypes?: UserCreateprojectTypesInput | string[]
+    preferredSkills?: UserCreatepreferredSkillsInput | string[]
+    budgetRange?: string | null
+    clientType?: string | null
+    howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
+    jobsPosted?: JobCreateNestedManyWithoutClientInput
+    proposals?: ProposalCreateNestedManyWithoutFreelancerInput
+    reviews?: ReviewCreateNestedManyWithoutAuthorInput
+    receivedReviews?: ReviewCreateNestedManyWithoutReceiverInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageCreateNestedManyWithoutReceiverInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationCreateNestedManyWithoutClientInput
+  }
+
+  export type UserUncheckedCreateWithoutJobInvitationsReceivedInput = {
+    id?: string
+    googleId?: string | null
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    avatar?: string | null
+    bio?: string | null
+    location?: string | null
+    phone?: string | null
+    userType?: $Enums.UserType
+    isOnboarded?: boolean
+    onboardingStep?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    country?: string | null
+    city?: string | null
+    timezone?: string | null
+    title?: string | null
+    overview?: string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserCreatetopSkillsInput | string[]
+    serviceOfferings?: UserCreateserviceOfferingsInput | string[]
+    hourlyRate?: number | null
+    portfolio?: string | null
+    experience?: string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserCreatecertificationsInput | string[]
+    availability?: string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: string | null
+    subcategory?: string | null
+    experienceLevel?: string | null
+    totalEarnings?: string | null
+    successRate?: number | null
+    completedJobs?: number | null
+    onTime?: number | null
+    onBudget?: number | null
+    responseTime?: string | null
+    lastActive?: string | null
+    topRatedPlus?: boolean
+    verified?: boolean
+    risingTalent?: boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserCreatespecializationsInput | string[]
+    memberSince?: string | null
+    profileStrength?: number | null
+    repeatHireRate?: number | null
+    rating?: number | null
+    reviewCount?: number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: string | null
+    isOnline?: boolean
+    hourlyRateRange?: string | null
+    availabilityStatus?: string | null
+    companyName?: string | null
+    companySize?: string | null
+    industry?: string | null
+    companyWebsite?: string | null
+    companyDescription?: string | null
+    projectTypes?: UserCreateprojectTypesInput | string[]
+    preferredSkills?: UserCreatepreferredSkillsInput | string[]
+    budgetRange?: string | null
+    clientType?: string | null
+    howDidYouHear?: string | null
+    interestedCategories?: UserCreateinterestedCategoriesInput | string[]
+    urgencyLevel?: string | null
+    preferredWorkingStyle?: string | null
+    communicationPreference?: UserCreatecommunicationPreferenceInput | string[]
+    projectDescription?: string | null
+    paymentPreference?: string | null
+    projectFrequency?: string | null
+    averageProjectDuration?: string | null
+    maxHourlyRate?: string | null
+    totalMonthlyBudget?: string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserCreateworkingDaysInput | string[]
+    minimumProjectBudget?: string | null
+    specialRequirements?: string | null
+    idDocument?: string | null
+    addressProof?: string | null
+    taxInformation?: string | null
+    phoneVerified?: boolean
+    jobsPosted?: JobUncheckedCreateNestedManyWithoutClientInput
+    proposals?: ProposalUncheckedCreateNestedManyWithoutFreelancerInput
+    reviews?: ReviewUncheckedCreateNestedManyWithoutAuthorInput
+    receivedReviews?: ReviewUncheckedCreateNestedManyWithoutReceiverInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    receivedMessages?: MessageUncheckedCreateNestedManyWithoutReceiverInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    savedFreelancers?: SavedFreelancerUncheckedCreateNestedManyWithoutUserInput
+    savedByUsers?: SavedFreelancerUncheckedCreateNestedManyWithoutFreelancerInput
+    jobInvitationsSent?: JobInvitationUncheckedCreateNestedManyWithoutClientInput
+  }
+
+  export type UserCreateOrConnectWithoutJobInvitationsReceivedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutJobInvitationsReceivedInput, UserUncheckedCreateWithoutJobInvitationsReceivedInput>
+  }
+
+  export type JobUpsertWithoutJobInvitationsInput = {
+    update: XOR<JobUpdateWithoutJobInvitationsInput, JobUncheckedUpdateWithoutJobInvitationsInput>
+    create: XOR<JobCreateWithoutJobInvitationsInput, JobUncheckedCreateWithoutJobInvitationsInput>
+    where?: JobWhereInput
+  }
+
+  export type JobUpdateToOneWithWhereWithoutJobInvitationsInput = {
+    where?: JobWhereInput
+    data: XOR<JobUpdateWithoutJobInvitationsInput, JobUncheckedUpdateWithoutJobInvitationsInput>
+  }
+
+  export type JobUpdateWithoutJobInvitationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    requirements?: JobUpdaterequirementsInput | string[]
+    budget?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
+    minBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    maxBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    duration?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: JobUpdateskillsInput | string[]
+    category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isRemote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversation?: ConversationUpdateManyWithoutJobNestedInput
+    client?: UserUpdateOneRequiredWithoutJobsPostedNestedInput
+    proposals?: ProposalUpdateManyWithoutJobNestedInput
+    reviews?: ReviewUpdateManyWithoutJobNestedInput
+  }
+
+  export type JobUncheckedUpdateWithoutJobInvitationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    requirements?: JobUpdaterequirementsInput | string[]
+    budget?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
+    minBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    maxBudget?: NullableFloatFieldUpdateOperationsInput | number | null
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    duration?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: JobUpdateskillsInput | string[]
+    category?: StringFieldUpdateOperationsInput | string
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    projectType?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreferences?: JobUpdatecommunicationPreferencesInput | string[]
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    isRemote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    isUrgent?: BoolFieldUpdateOperationsInput | boolean
+    visibility?: StringFieldUpdateOperationsInput | string
+    applicationDeadline?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    clientId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    conversation?: ConversationUncheckedUpdateManyWithoutJobNestedInput
+    proposals?: ProposalUncheckedUpdateManyWithoutJobNestedInput
+    reviews?: ReviewUncheckedUpdateManyWithoutJobNestedInput
+  }
+
+  export type UserUpsertWithoutJobInvitationsSentInput = {
+    update: XOR<UserUpdateWithoutJobInvitationsSentInput, UserUncheckedUpdateWithoutJobInvitationsSentInput>
+    create: XOR<UserCreateWithoutJobInvitationsSentInput, UserUncheckedCreateWithoutJobInvitationsSentInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutJobInvitationsSentInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutJobInvitationsSentInput, UserUncheckedUpdateWithoutJobInvitationsSentInput>
+  }
+
+  export type UserUpdateWithoutJobInvitationsSentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    userType?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    overview?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserUpdatetopSkillsInput | string[]
+    serviceOfferings?: UserUpdateserviceOfferingsInput | string[]
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    portfolio?: NullableStringFieldUpdateOperationsInput | string | null
+    experience?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserUpdatecertificationsInput | string[]
+    availability?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    companyWebsite?: NullableStringFieldUpdateOperationsInput | string | null
+    companyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    projectTypes?: UserUpdateprojectTypesInput | string[]
+    preferredSkills?: UserUpdatepreferredSkillsInput | string[]
+    budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
+    clientType?: NullableStringFieldUpdateOperationsInput | string | null
+    howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    jobsPosted?: JobUpdateManyWithoutClientNestedInput
+    proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
+    reviews?: ReviewUpdateManyWithoutAuthorNestedInput
+    receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsReceived?: JobInvitationUpdateManyWithoutFreelancerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutJobInvitationsSentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    userType?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    overview?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserUpdatetopSkillsInput | string[]
+    serviceOfferings?: UserUpdateserviceOfferingsInput | string[]
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    portfolio?: NullableStringFieldUpdateOperationsInput | string | null
+    experience?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserUpdatecertificationsInput | string[]
+    availability?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    companyWebsite?: NullableStringFieldUpdateOperationsInput | string | null
+    companyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    projectTypes?: UserUpdateprojectTypesInput | string[]
+    preferredSkills?: UserUpdatepreferredSkillsInput | string[]
+    budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
+    clientType?: NullableStringFieldUpdateOperationsInput | string | null
+    howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
+    proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
+    reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
+    receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsReceived?: JobInvitationUncheckedUpdateManyWithoutFreelancerNestedInput
+  }
+
+  export type UserUpsertWithoutJobInvitationsReceivedInput = {
+    update: XOR<UserUpdateWithoutJobInvitationsReceivedInput, UserUncheckedUpdateWithoutJobInvitationsReceivedInput>
+    create: XOR<UserCreateWithoutJobInvitationsReceivedInput, UserUncheckedCreateWithoutJobInvitationsReceivedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutJobInvitationsReceivedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutJobInvitationsReceivedInput, UserUncheckedUpdateWithoutJobInvitationsReceivedInput>
+  }
+
+  export type UserUpdateWithoutJobInvitationsReceivedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    userType?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    overview?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserUpdatetopSkillsInput | string[]
+    serviceOfferings?: UserUpdateserviceOfferingsInput | string[]
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    portfolio?: NullableStringFieldUpdateOperationsInput | string | null
+    experience?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserUpdatecertificationsInput | string[]
+    availability?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    companyWebsite?: NullableStringFieldUpdateOperationsInput | string | null
+    companyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    projectTypes?: UserUpdateprojectTypesInput | string[]
+    preferredSkills?: UserUpdatepreferredSkillsInput | string[]
+    budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
+    clientType?: NullableStringFieldUpdateOperationsInput | string | null
+    howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    jobsPosted?: JobUpdateManyWithoutClientNestedInput
+    proposals?: ProposalUpdateManyWithoutFreelancerNestedInput
+    reviews?: ReviewUpdateManyWithoutAuthorNestedInput
+    receivedReviews?: ReviewUpdateManyWithoutReceiverNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUpdateManyWithoutReceiverNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUpdateManyWithoutClientNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutJobInvitationsReceivedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    userType?: EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
+    isOnboarded?: BoolFieldUpdateOperationsInput | boolean
+    onboardingStep?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    timezone?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    overview?: NullableStringFieldUpdateOperationsInput | string | null
+    skills?: NullableJsonNullValueInput | InputJsonValue
+    topSkills?: UserUpdatetopSkillsInput | string[]
+    serviceOfferings?: UserUpdateserviceOfferingsInput | string[]
+    hourlyRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    portfolio?: NullableStringFieldUpdateOperationsInput | string | null
+    experience?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableJsonNullValueInput | InputJsonValue
+    workExperience?: NullableJsonNullValueInput | InputJsonValue
+    certifications?: UserUpdatecertificationsInput | string[]
+    availability?: NullableStringFieldUpdateOperationsInput | string | null
+    languages?: NullableJsonNullValueInput | InputJsonValue
+    socialLinks?: NullableJsonNullValueInput | InputJsonValue
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    subcategory?: NullableStringFieldUpdateOperationsInput | string | null
+    experienceLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    totalEarnings?: NullableStringFieldUpdateOperationsInput | string | null
+    successRate?: NullableIntFieldUpdateOperationsInput | number | null
+    completedJobs?: NullableIntFieldUpdateOperationsInput | number | null
+    onTime?: NullableIntFieldUpdateOperationsInput | number | null
+    onBudget?: NullableIntFieldUpdateOperationsInput | number | null
+    responseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    lastActive?: NullableStringFieldUpdateOperationsInput | string | null
+    topRatedPlus?: BoolFieldUpdateOperationsInput | boolean
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    risingTalent?: BoolFieldUpdateOperationsInput | boolean
+    portfolioItems?: NullableJsonNullValueInput | InputJsonValue
+    testScores?: NullableJsonNullValueInput | InputJsonValue
+    specializations?: UserUpdatespecializationsInput | string[]
+    memberSince?: NullableStringFieldUpdateOperationsInput | string | null
+    profileStrength?: NullableIntFieldUpdateOperationsInput | number | null
+    repeatHireRate?: NullableIntFieldUpdateOperationsInput | number | null
+    rating?: NullableFloatFieldUpdateOperationsInput | number | null
+    reviewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    portfolioProjects?: NullableJsonNullValueInput | InputJsonValue
+    workHistory?: NullableJsonNullValueInput | InputJsonValue
+    employmentHistory?: NullableJsonNullValueInput | InputJsonValue
+    coverImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnline?: BoolFieldUpdateOperationsInput | boolean
+    hourlyRateRange?: NullableStringFieldUpdateOperationsInput | string | null
+    availabilityStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    companySize?: NullableStringFieldUpdateOperationsInput | string | null
+    industry?: NullableStringFieldUpdateOperationsInput | string | null
+    companyWebsite?: NullableStringFieldUpdateOperationsInput | string | null
+    companyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    projectTypes?: UserUpdateprojectTypesInput | string[]
+    preferredSkills?: UserUpdatepreferredSkillsInput | string[]
+    budgetRange?: NullableStringFieldUpdateOperationsInput | string | null
+    clientType?: NullableStringFieldUpdateOperationsInput | string | null
+    howDidYouHear?: NullableStringFieldUpdateOperationsInput | string | null
+    interestedCategories?: UserUpdateinterestedCategoriesInput | string[]
+    urgencyLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    preferredWorkingStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    communicationPreference?: UserUpdatecommunicationPreferenceInput | string[]
+    projectDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentPreference?: NullableStringFieldUpdateOperationsInput | string | null
+    projectFrequency?: NullableStringFieldUpdateOperationsInput | string | null
+    averageProjectDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    maxHourlyRate?: NullableStringFieldUpdateOperationsInput | string | null
+    totalMonthlyBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    projectBasedRates?: NullableJsonNullValueInput | InputJsonValue
+    hoursPerWeek?: NullableStringFieldUpdateOperationsInput | string | null
+    workingHours?: NullableJsonNullValueInput | InputJsonValue
+    workingDays?: UserUpdateworkingDaysInput | string[]
+    minimumProjectBudget?: NullableStringFieldUpdateOperationsInput | string | null
+    specialRequirements?: NullableStringFieldUpdateOperationsInput | string | null
+    idDocument?: NullableStringFieldUpdateOperationsInput | string | null
+    addressProof?: NullableStringFieldUpdateOperationsInput | string | null
+    taxInformation?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    jobsPosted?: JobUncheckedUpdateManyWithoutClientNestedInput
+    proposals?: ProposalUncheckedUpdateManyWithoutFreelancerNestedInput
+    reviews?: ReviewUncheckedUpdateManyWithoutAuthorNestedInput
+    receivedReviews?: ReviewUncheckedUpdateManyWithoutReceiverNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    receivedMessages?: MessageUncheckedUpdateManyWithoutReceiverNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    savedFreelancers?: SavedFreelancerUncheckedUpdateManyWithoutUserNestedInput
+    savedByUsers?: SavedFreelancerUncheckedUpdateManyWithoutFreelancerNestedInput
+    jobInvitationsSent?: JobInvitationUncheckedUpdateManyWithoutClientNestedInput
   }
 
   export type JobCreateManyClientInput = {
@@ -23168,6 +26189,26 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type JobInvitationCreateManyClientInput = {
+    id?: string
+    jobId: string
+    freelancerEmail: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobInvitationCreateManyFreelancerInput = {
+    id?: string
+    jobId: string
+    clientId: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type JobUpdateWithoutClientInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
@@ -23197,6 +26238,7 @@ export namespace Prisma {
     conversation?: ConversationUpdateManyWithoutJobNestedInput
     proposals?: ProposalUpdateManyWithoutJobNestedInput
     reviews?: ReviewUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUpdateManyWithoutJobNestedInput
   }
 
   export type JobUncheckedUpdateWithoutClientInput = {
@@ -23228,6 +26270,7 @@ export namespace Prisma {
     conversation?: ConversationUncheckedUpdateManyWithoutJobNestedInput
     proposals?: ProposalUncheckedUpdateManyWithoutJobNestedInput
     reviews?: ReviewUncheckedUpdateManyWithoutJobNestedInput
+    jobInvitations?: JobInvitationUncheckedUpdateManyWithoutJobNestedInput
   }
 
   export type JobUncheckedUpdateManyWithoutClientInput = {
@@ -23508,6 +26551,66 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type JobInvitationUpdateWithoutClientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    job?: JobUpdateOneRequiredWithoutJobInvitationsNestedInput
+    freelancer?: UserUpdateOneRequiredWithoutJobInvitationsReceivedNestedInput
+  }
+
+  export type JobInvitationUncheckedUpdateWithoutClientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    jobId?: StringFieldUpdateOperationsInput | string
+    freelancerEmail?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobInvitationUncheckedUpdateManyWithoutClientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    jobId?: StringFieldUpdateOperationsInput | string
+    freelancerEmail?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobInvitationUpdateWithoutFreelancerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    job?: JobUpdateOneRequiredWithoutJobInvitationsNestedInput
+    client?: UserUpdateOneRequiredWithoutJobInvitationsSentNestedInput
+  }
+
+  export type JobInvitationUncheckedUpdateWithoutFreelancerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    jobId?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobInvitationUncheckedUpdateManyWithoutFreelancerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    jobId?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ConversationCreateManyJobInput = {
     id?: string
     participants?: ConversationCreateparticipantsInput | string[]
@@ -23544,6 +26647,16 @@ export namespace Prisma {
     comment: string
     authorId: string
     receiverId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobInvitationCreateManyJobInput = {
+    id?: string
+    clientId: string
+    freelancerEmail: string
+    message?: string | null
+    status?: $Enums.JobInvitationStatus
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -23666,6 +26779,36 @@ export namespace Prisma {
     comment?: StringFieldUpdateOperationsInput | string
     authorId?: StringFieldUpdateOperationsInput | string
     receiverId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobInvitationUpdateWithoutJobInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    client?: UserUpdateOneRequiredWithoutJobInvitationsSentNestedInput
+    freelancer?: UserUpdateOneRequiredWithoutJobInvitationsReceivedNestedInput
+  }
+
+  export type JobInvitationUncheckedUpdateWithoutJobInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    freelancerEmail?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobInvitationUncheckedUpdateManyWithoutJobInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    freelancerEmail?: StringFieldUpdateOperationsInput | string
+    message?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumJobInvitationStatusFieldUpdateOperationsInput | $Enums.JobInvitationStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

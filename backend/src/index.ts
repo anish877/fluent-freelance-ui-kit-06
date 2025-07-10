@@ -15,6 +15,7 @@ import notificationRoutes from './routes/notifications';
 import onboardingRoutes from './routes/onboarding';
 import uploadRoutes from './routes/upload';
 import talentRoutes from './routes/talent';
+import jobInvitationRoutes from './routes/job-invitations';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -79,6 +80,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/talent', talentRoutes);
+app.use('/api/job-invitations', jobInvitationRoutes);
 
 // Error handling middleware
 app.use(notFound);
