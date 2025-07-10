@@ -21,6 +21,7 @@ import notificationRoutes from './routes/notifications.js';
 import onboardingRoutes from './routes/onboarding.js';
 import uploadRoutes from './routes/upload.js';
 import talentRoutes from './routes/talent.js';
+import jobInvitationRoutes from './routes/job-invitations';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -110,6 +111,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/talent', talentRoutes);
+app.use('/api/job-invitations', jobInvitationRoutes);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../../dist')));

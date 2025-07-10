@@ -123,15 +123,17 @@ model User {
   phoneVerified  Boolean @default(false) // Phone verification status
 
   // Relations
-  jobsPosted       Job[]             @relation("JobPoster")
-  proposals        Proposal[]        @relation("ProposalAuthor")
-  reviews          Review[]          @relation("ReviewAuthor")
-  receivedReviews  Review[]          @relation("ReviewReceiver")
-  messages         Message[]         @relation("MessageSender")
-  receivedMessages Message[]         @relation("MessageReceiver")
-  notifications    Notification[]
-  savedFreelancers SavedFreelancer[] @relation("SavedByUser")
-  savedByUsers     SavedFreelancer[] @relation("SavedFreelancer")
+  jobsPosted             Job[]             @relation("JobPoster")
+  proposals              Proposal[]        @relation("ProposalAuthor")
+  reviews                Review[]          @relation("ReviewAuthor")
+  receivedReviews        Review[]          @relation("ReviewReceiver")
+  messages               Message[]         @relation("MessageSender")
+  receivedMessages       Message[]         @relation("MessageReceiver")
+  notifications          Notification[]
+  savedFreelancers       SavedFreelancer[] @relation("SavedByUser")
+  savedByUsers           SavedFreelancer[] @relation("SavedFreelancer")
+  jobInvitationsSent     JobInvitation[]   @relation("JobInvitationClient")
+  jobInvitationsReceived JobInvitation[]   @relation("JobInvitationFreelancer")
 
   @@map("users")
 }
@@ -166,9 +168,10 @@ model Job {
   conversation             Conversation[]
 
   // Relations
-  client    User       @relation("JobPoster", fields: [clientId], references: [id], onDelete: Cascade)
-  proposals Proposal[]
-  reviews   Review[]
+  client         User            @relation("JobPoster", fields: [clientId], references: [id], onDelete: Cascade)
+  proposals      Proposal[]
+  reviews        Review[]
+  jobInvitations JobInvitation[]
 
   @@map("jobs")
 }
@@ -287,6 +290,25 @@ model SavedFreelancer {
   @@map("saved_freelancers")
 }
 
+model JobInvitation {
+  id              String              @id @default(cuid())
+  jobId           String
+  clientId        String
+  freelancerEmail String
+  message         String?
+  status          JobInvitationStatus @default(PENDING)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  // Relations
+  job        Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  client     User @relation("JobInvitationClient", fields: [clientId], references: [id], onDelete: Cascade)
+  freelancer User @relation("JobInvitationFreelancer", fields: [freelancerEmail], references: [email], onDelete: Cascade)
+
+  @@unique([jobId, freelancerEmail])
+  @@map("job_invitations")
+}
+
 enum UserType {
   FREELANCER
   CLIENT
@@ -319,4 +341,11 @@ enum NotificationType {
   JOB_POSTED
   PAYMENT_RECEIVED
   SYSTEM_UPDATE
+  JOB_INVITATION
+}
+
+enum JobInvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }

@@ -351,6 +351,15 @@ wss.on("connection", (ws: WebSocket, req) => {
                 users: usersToSend
               }
             }));
+            broadcastGlobal(
+              {
+                type: "user_online",
+                payload: {
+                  userEmail: currentConnection.userEmail,
+                  userName: currentConnection.userName
+                },
+              }
+            );
             
 
             if(conversationId){
@@ -370,15 +379,7 @@ wss.on("connection", (ws: WebSocket, req) => {
                 
                 console.log(`✅ Conversation found, sending user online status: ${conversation.id}`);
 
-                broadcastGlobal(
-                  {
-                    type: "user_online",
-                    payload: {
-                      userEmail: currentConnection.userEmail,
-                      userName: currentConnection.userName
-                    },
-                  }
-                );
+                
 
               } catch (error){
                 console.log("Error while verifying conversationId: ", error)

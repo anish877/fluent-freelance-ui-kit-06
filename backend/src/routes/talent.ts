@@ -144,6 +144,7 @@ router.get('/', (async (req: Request, res: Response): Promise<void> => {
       select: {
         id: true,
         firstName: true,
+        email: true,
         lastName: true,
         title: true,
         location: true,
@@ -184,11 +185,13 @@ router.get('/', (async (req: Request, res: Response): Promise<void> => {
 
     const total = await prisma.user.count({ where });
 
+
     // Transform data to match frontend interface
     const transformedFreelancers = freelancers.map(freelancer => ({
       id: freelancer.id,
       name: `${freelancer.firstName} ${freelancer.lastName}`,
       title: freelancer.title || 'Freelancer',
+      email: freelancer.email || '',
       location: freelancer.location || `${freelancer.city || ''}, ${freelancer.country || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, ''),
       rating: freelancer.rating || 0,
       reviewCount: freelancer.reviewCount || 0,

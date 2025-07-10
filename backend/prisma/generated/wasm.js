@@ -314,6 +314,17 @@ exports.Prisma.SavedFreelancerScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.JobInvitationScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  clientId: 'clientId',
+  freelancerEmail: 'freelancerEmail',
+  message: 'message',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -370,7 +381,14 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   MESSAGE_RECEIVED: 'MESSAGE_RECEIVED',
   JOB_POSTED: 'JOB_POSTED',
   PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
-  SYSTEM_UPDATE: 'SYSTEM_UPDATE'
+  SYSTEM_UPDATE: 'SYSTEM_UPDATE',
+  JOB_INVITATION: 'JOB_INVITATION'
+};
+
+exports.JobInvitationStatus = exports.$Enums.JobInvitationStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED'
 };
 
 exports.Prisma.ModelName = {
@@ -381,7 +399,8 @@ exports.Prisma.ModelName = {
   Conversation: 'Conversation',
   Message: 'Message',
   Notification: 'Notification',
-  SavedFreelancer: 'SavedFreelancer'
+  SavedFreelancer: 'SavedFreelancer',
+  JobInvitation: 'JobInvitation'
 };
 
 /**
