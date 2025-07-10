@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Filter, MapPin, Star, Verified, Calendar, DollarSign, Eye, MessageCircle, Heart, Award, Shield, Clock, TrendingUp, Users, Globe, Briefcase, CheckCircle, Video, Phone, Mail } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -67,7 +66,6 @@ interface PlatformStats {
 
 const Talent = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const navigate = useNavigate();
   const { createConversation } = useWebSocket();
   const [searchTerm, setSearchTerm] = useState("");
