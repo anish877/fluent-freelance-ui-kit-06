@@ -14,6 +14,7 @@ import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import ClientJobView from "./pages/ClientJobView";
 import FreelancerProfile from "./pages/FreelancerProfile";
+import ClientProfile from "./pages/ClientProfile";
 import Dashboard from "./pages/Dashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import Login from "./pages/Login";
@@ -57,6 +58,7 @@ const App = () => {
                     <Route path="/jobs" element={<Jobs />} />
                     <Route path="/jobs/:id" element={<JobDetails />} />
                     <Route path="/freelancer/:id" element={<FreelancerProfile />} />
+                    <Route path="/client/:id" element={<ClientProfile />} />
                     <Route path="/talent" element={<Talent />} />
                     
                     {/* Public onboarding route - accessible to everyone */}

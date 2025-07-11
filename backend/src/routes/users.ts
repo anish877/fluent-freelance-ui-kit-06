@@ -960,6 +960,66 @@ router.get('/profile/:id', (async (req: Request, res: Response): Promise<void> =
   }
 }) as RequestHandler);
 
+// @desc    Get client's public profile by ID (for ClientProfile page)
+// @route   GET /api/users/client/:id
+// @access  Public
+router.get('/client/:id', (async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.params.id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        avatar: true,
+        location: true,
+        phone: true,
+        timezone: true,
+        rating: true,
+        reviewCount: true,
+        verified: true,
+        companyName: true,
+        companySize: true,
+        industry: true,
+        companyWebsite: true,
+        companyDescription: true,
+        projectTypes: true,
+        preferredSkills: true,
+        budgetRange: true,
+        clientType: true,
+        lastActive: true,
+        createdAt: true,
+        _count: {
+          select: {
+            jobsPosted: true,
+            reviews: true
+          }
+        }
+      }
+    });
+
+    if (!user) {
+      res.status(404).json({ message: 'Client not found' });
+      return;
+    }
+
+    // Only allow access to client profiles
+    if (user.userType !== 'CLIENT') {
+      res.status(404).json({ message: 'Client not found' });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
 // @desc    Test endpoint to verify data transformation
 // @route   GET /api/users/test-profile/:id
 // @access  Public (for testing only)
@@ -1044,4 +1104,4 @@ router.get('/test-profile/:id', (async (req: Request, res: Response): Promise<vo
   }
 }) as RequestHandler);
 
-export default router; 
+export default router;
