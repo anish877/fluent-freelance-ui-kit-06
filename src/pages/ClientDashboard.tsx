@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { 
   Plus, Eye, Edit, Trash2, Clock, Users, DollarSign, 
   TrendingUp, Star, MessageCircle, CheckCircle, AlertCircle,
-  Filter, Search, Calendar, BarChart3, PieChart, Loader2
+  Filter, Search, Calendar, BarChart3, PieChart, Loader2,
+  User, CalendarDays, FileText, Target
 } from "lucide-react";
 import axios from "axios";
 
@@ -47,6 +48,52 @@ interface Job {
   };
 }
 
+interface Offer {
+  id: string;
+  conversationId: string;
+  clientId: string;
+  freelancerId: string;
+  jobId: string;
+  budgetType: 'FIXED' | 'HOURLY';
+  amount: number;
+  duration: string;
+  milestones: Array<{
+    title: string;
+    description: string;
+    amount: number;
+    dueDate: string;
+    status?: 'pending' | 'in_progress' | 'completed';
+  }>;
+  terms?: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+  expiresAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  client: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+    companyName?: string;
+  };
+  freelancer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+    email: string;
+  };
+  job: {
+    id: string;
+    title: string;
+    description: string;
+  };
+  conversation: {
+    id: string;
+    projectName?: string;
+  };
+}
+
 const ClientDashboard = () => {
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState("all");
@@ -56,6 +103,11 @@ const ClientDashboard = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [jobsError, setJobsError] = useState<string | null>(null);
+
+  // Offers state
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [offersLoading, setOffersLoading] = useState(true);
+  const [offersError, setOffersError] = useState<string | null>(null);
 
   // Mock data for client dashboard
   const stats = {
@@ -90,6 +142,27 @@ const ClientDashboard = () => {
     }
   };
 
+  // Fetch accepted offers from backend
+  const fetchAcceptedOffers = async () => {
+    try {
+      setOffersLoading(true);
+      setOffersError(null);
+      
+      const response = await axios.get('/offers/me?status=ACCEPTED');
+      
+      if (response.data.success) {
+        setOffers(response.data.data);
+      } else {
+        setOffersError('Failed to fetch offers');
+      }
+    } catch (error) {
+      console.error('Error fetching offers:', error);
+      setOffersError(error.response?.data?.message || 'Failed to fetch offers');
+    } finally {
+      setOffersLoading(false);
+    }
+  };
+
   // Delete job
   const deleteJob = async (jobId: string) => {
     try {
@@ -104,6 +177,16 @@ const ClientDashboard = () => {
     } catch (error) {
       console.error('Error deleting job:', error);
     }
+  };
+
+  // Calculate progress for offers with milestones
+  const calculateProgress = (offer: Offer): number => {
+    if (!offer.milestones || offer.milestones.length === 0) {
+      return 0;
+    }
+    
+    const completedMilestones = offer.milestones.filter(m => m.status === 'completed').length;
+    return Math.round((completedMilestones / offer.milestones.length) * 100);
   };
 
   // Filter jobs based on search term and status
@@ -121,10 +204,11 @@ const ClientDashboard = () => {
     return matchesSearch && matchesFilter;
   });
 
-  // Load jobs on component mount
+  // Load data on component mount
   useEffect(() => {
     if (user?.userType === 'CLIENT') {
       fetchJobs();
+      fetchAcceptedOffers();
     }
   }, [user]);
 
@@ -265,37 +349,6 @@ const ClientDashboard = () => {
       },
       submittedDate: "2024-01-14",
       status: "shortlisted"
-    }
-  ];
-
-  const activeContracts = [
-    {
-      id: 1,
-      title: "Mobile App UI/UX Designer",
-      freelancer: "Sarah Chen",
-      startDate: "2024-01-20",
-      budget: "$3,500",
-      progress: 65,
-      milestones: [
-        { name: "Wireframes", status: "completed", dueDate: "2024-01-25" },
-        { name: "Design System", status: "in_progress", dueDate: "2024-02-05" },
-        { name: "Final Mockups", status: "pending", dueDate: "2024-02-15" }
-      ],
-      lastUpdate: "2024-01-22"
-    },
-    {
-      id: 2,
-      title: "Content Writer for Tech Blog",
-      freelancer: "James Wilson",
-      startDate: "2024-01-15",
-      budget: "$1,200",
-      progress: 40,
-      milestones: [
-        { name: "Article Outlines", status: "completed", dueDate: "2024-01-18" },
-        { name: "First Draft (5 articles)", status: "in_progress", dueDate: "2024-01-28" },
-        { name: "Final Articles", status: "pending", dueDate: "2024-02-10" }
-      ],
-      lastUpdate: "2024-01-21"
     }
   ];
 
@@ -612,78 +665,186 @@ const ClientDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Active Contracts</CardTitle>
-                <CardDescription>Monitor ongoing projects and milestones</CardDescription>
+                <CardDescription>Monitor ongoing projects and accepted offers</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  {activeContracts.map((contract) => (
-                    <div key={contract.id} className="border border-gray-200 rounded-lg p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">{contract.title}</h3>
-                          <p className="text-gray-600">with {contract.freelancer}</p>
-                          <p className="text-sm text-gray-500">
-                            Started: {new Date(contract.startDate).toLocaleDateString()} • 
-                            Budget: {contract.budget}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-teal-600">{contract.progress}%</p>
-                          <p className="text-sm text-gray-600">Complete</p>
-                        </div>
-                      </div>
-
-                      {/* Progress Bar */}
-                      <div className="mb-4">
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-teal-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${contract.progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      {/* Milestones */}
-                      <div className="space-y-2 mb-4">
-                        <h4 className="font-medium text-gray-900">Milestones</h4>
-                        {contract.milestones.map((milestone, index) => (
-                          <div key={index} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
-                            <div className="flex items-center space-x-2">
-                              {milestone.status === "completed" && (
-                                <CheckCircle className="h-4 w-4 text-green-600" />
-                              )}
-                              {milestone.status === "in_progress" && (
-                                <Clock className="h-4 w-4 text-blue-600" />
-                              )}
-                              {milestone.status === "pending" && (
-                                <AlertCircle className="h-4 w-4 text-gray-400" />
-                              )}
-                              <span className="text-sm font-medium">{milestone.name}</span>
+                {offersLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+                    <span className="ml-3 text-gray-600">Loading contracts...</span>
+                  </div>
+                ) : offersError ? (
+                  <div className="text-center py-12">
+                    <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+                    <p className="text-red-600 mb-4">{offersError}</p>
+                    <Button onClick={fetchAcceptedOffers} variant="outline">
+                      Try Again
+                    </Button>
+                  </div>
+                ) : offers.length === 0 ? (
+                  <div className="text-center py-12">
+                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Active Contracts</h3>
+                    <p className="text-gray-600 mb-6">You don't have any accepted offers yet. Start by posting a job and making offers to freelancers.</p>
+                    <Button onClick={() => navigate('/post-job')} className="bg-teal-600 hover:bg-teal-700">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Post a Job
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    {offers.map((offer) => {
+                      const progress = calculateProgress(offer);
+                      const hasMilestones = offer.milestones && offer.milestones.length > 0;
+                      
+                      return (
+                        <div key={offer.id} className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                          {/* Header */}
+                          <div className="flex justify-between items-start mb-6">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3 mb-3">
+                                <h3 className="text-xl font-semibold text-gray-900">{offer.job.title}</h3>
+                                <Badge className="bg-green-100 text-green-800 border-green-200">
+                                  Active Contract
+                                </Badge>
+                              </div>
+                              
+                              <div className="flex items-center space-x-6 text-sm text-gray-600 mb-4">
+                                <div className="flex items-center">
+                                  <User className="h-4 w-4 mr-2" />
+                                  <span className="font-medium">
+                                    {offer.freelancer.firstName} {offer.freelancer.lastName}
+                                  </span>
+                                </div>
+                                <div className="flex items-center">
+                                  <CalendarDays className="h-4 w-4 mr-2" />
+                                  <span>Started: {new Date(offer.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <DollarSign className="h-4 w-4 mr-2" />
+                                  <span className="font-medium">
+                                    ${offer.amount.toLocaleString()} 
+                                    {offer.budgetType === 'HOURLY' && '/hr'}
+                                  </span>
+                                </div>
+                                <div className="flex items-center">
+                                  <Clock className="h-4 w-4 mr-2" />
+                                  <span>{offer.duration}</span>
+                                </div>
+                              </div>
                             </div>
-                            <span className="text-xs text-gray-600">
-                              Due: {new Date(milestone.dueDate).toLocaleDateString()}
-                            </span>
+                            
+                            {hasMilestones && (
+                              <div className="text-right">
+                                <p className="text-3xl font-bold text-teal-600">{progress}%</p>
+                                <p className="text-sm text-gray-600">Complete</p>
+                              </div>
+                            )}
                           </div>
-                        ))}
-                      </div>
 
-                      <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                        <p className="text-sm text-gray-600">
-                          Last update: {new Date(contract.lastUpdate).toLocaleDateString()}
-                        </p>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            <MessageCircle className="h-4 w-4 mr-1" />
-                            Message
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
+                          {/* Progress Bar - Only show if milestones exist */}
+                          {hasMilestones && (
+                            <div className="mb-6">
+                              <div className="w-full bg-gray-100 rounded-full h-3">
+                                <div 
+                                  className="bg-teal-600 h-3 rounded-full transition-all duration-500 ease-out"
+                                  style={{ width: `${progress}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Milestones Section */}
+                          {hasMilestones ? (
+                            <div className="mb-6">
+                              <h4 className="font-semibold text-gray-900 mb-4 flex items-center">
+                                <Target className="h-5 w-5 mr-2 text-teal-600" />
+                                Project Milestones
+                              </h4>
+                              <div className="space-y-3">
+                                {offer.milestones.map((milestone, index) => (
+                                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100">
+                                    <div className="flex items-center space-x-3">
+                                      {milestone.status === "completed" && (
+                                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                                      )}
+                                      {milestone.status === "in_progress" && (
+                                        <Clock className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                                      )}
+                                      {(!milestone.status || milestone.status === "pending") && (
+                                        <AlertCircle className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                                      )}
+                                      <div>
+                                        <span className="font-medium text-gray-900">{milestone.title}</span>
+                                        {milestone.description && (
+                                          <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="text-sm font-semibold text-gray-700">
+                                        ${milestone.amount.toLocaleString()}
+                                      </span>
+                                      <p className="text-xs text-gray-500">
+                                        Due: {new Date(milestone.dueDate).toLocaleDateString()}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mb-6">
+                              <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                <div className="flex items-center">
+                                  <FileText className="h-5 w-5 text-blue-600 mr-3" />
+                                  <div>
+                                    <p className="font-medium text-blue-900">Fixed Price Contract</p>
+                                    <p className="text-sm text-blue-700">
+                                      This is a {offer.budgetType.toLowerCase()} contract with no defined milestones.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Terms Section */}
+                          {offer.terms && (
+                            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                              <h4 className="font-semibold text-gray-900 mb-2">Terms & Conditions</h4>
+                              <p className="text-sm text-gray-700 leading-relaxed">{offer.terms}</p>
+                            </div>
+                          )}
+
+                          {/* Actions */}
+                          <div className="flex justify-between items-center pt-6 border-t border-gray-100">
+                            <div className="text-sm text-gray-600">
+                              <p>Last updated: {new Date(offer.updatedAt).toLocaleDateString()}</p>
+                              {offer.expiresAt && (
+                                <p>Expires: {new Date(offer.expiresAt).toLocaleDateString()}</p>
+                              )}
+                            </div>
+                            <div className="flex space-x-3">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => navigate(`/messages/${offer.conversationId}`)}
+                              >
+                                <MessageCircle className="h-4 w-4 mr-2" />
+                                Message
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Details
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

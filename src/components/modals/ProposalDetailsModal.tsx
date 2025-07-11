@@ -1,5 +1,5 @@
 
-import { X, Calendar, Clock, DollarSign, Users, Star, MapPin, CheckCircle, AlertCircle } from "lucide-react";
+import { X, Calendar, Clock, DollarSign, Users, Star, MapPin, CheckCircle, AlertCircle, FileText, Briefcase, Eye } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -33,9 +33,11 @@ interface ProposalDetailsModalProps {
   proposal: Proposal;
   isOpen: boolean;
   onClose: () => void;
+  onViewJobPosting?: (jobId: string) => void;
+  jobId?: string;
 }
 
-const ProposalDetailsModal = ({ proposal, isOpen, onClose }: ProposalDetailsModalProps) => {
+const ProposalDetailsModal = ({ proposal, isOpen, onClose, onViewJobPosting, jobId }: ProposalDetailsModalProps) => {
   if (!isOpen) return null;
 
   const getStatusColor = (status: string) => {
@@ -83,212 +85,69 @@ const ProposalDetailsModal = ({ proposal, isOpen, onClose }: ProposalDetailsModa
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Client Information */}
+          {/* Proposal Details */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Client Information
+                <FileText className="h-5 w-5" />
+                Proposal Details
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-semibold text-lg">{proposal.client.name}</h3>
-                  <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                      {proposal.client.rating} rating
-                    </div>
-                    <span>•</span>
-                    <span>{proposal.client.jobsPosted} jobs posted</span>
-                  </div>
+                  <div className="text-sm text-gray-600">Your Bid Amount</div>
+                  <div className="font-semibold text-lg text-green-600">{proposal.bidAmount}</div>
                 </div>
-                <Button variant="outline">View Client Profile</Button>
+                <div>
+                  <div className="text-sm text-gray-600">Estimated Timeline</div>
+                  <div className="font-semibold">{proposal.timeline}</div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Proposal Details */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Proposal</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-sm text-gray-600">Your Bid</div>
-                    <div className="font-semibold text-lg">{proposal.bidAmount}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">Timeline</div>
-                    <div className="font-semibold">{proposal.timeline}</div>
-                  </div>
-                </div>
-                
-                <Separator />
-                
+              
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-gray-600 mb-2">Cover Letter</div>
-                  <div className="bg-gray-50 p-4 rounded-lg text-sm">
-                    {proposal.coverLetter}
-                  </div>
+                  <div className="text-sm text-gray-600">Proposal Status</div>
+                  <div className="font-semibold capitalize">{proposal.status}</div>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Job Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-sm text-gray-600">Job Budget</div>
-                    <div className="font-semibold">{proposal.jobBudget}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">Job Type</div>
-                    <div className="font-semibold capitalize">{proposal.jobType}</div>
-                  </div>
-                </div>
-                
                 <div>
-                  <div className="text-sm text-gray-600">Competition</div>
-                  <div className="font-semibold">{proposal.responses} proposals submitted</div>
+                  <div className="text-sm text-gray-600">Submitted Date</div>
+                  <div className="font-semibold">{formatDate(proposal.submittedDate)}</div>
                 </div>
-                
-                <Separator />
-                
-                <div>
-                  <div className="text-sm text-gray-600 mb-2">Required Skills</div>
-                  <div className="flex flex-wrap gap-2">
-                    {proposal.skills.map((skill, index) => (
-                      <Badge key={index} variant="secondary">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
+              </div>
+              
+              <Separator />
+              
+              <div>
+                <div className="text-sm text-gray-600 mb-2">Your Cover Letter</div>
+                <div className="bg-gray-50 p-4 rounded-lg text-sm leading-relaxed max-h-32 overflow-y-auto">
+                  {proposal.coverLetter}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Interview Information */}
-          {proposal.interviewScheduled && (
-            <Card className="border-blue-200 bg-blue-50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-800">
-                  <Calendar className="h-5 w-5" />
-                  Interview Scheduled
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-blue-900">
-                      {proposal.interviewScheduled.date} at {proposal.interviewScheduled.time}
-                    </div>
-                    <div className="text-sm text-blue-700 mt-1">
-                      You'll receive a meeting link 15 minutes before the interview
-                    </div>
-                  </div>
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    Join Interview
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Status-specific Information */}
-          {proposal.status === "accepted" && (
-            <Card className="border-green-200 bg-green-50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                  <div>
-                    <div className="font-semibold text-green-900">Congratulations! Your proposal was accepted</div>
-                    <div className="text-sm text-green-700">The client will contact you shortly to discuss project details</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {proposal.status === "rejected" && (
-            <Card className="border-red-200 bg-red-50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="h-6 w-6 text-red-600" />
-                  <div>
-                    <div className="font-semibold text-red-900">This proposal was not selected</div>
-                    <div className="text-sm text-red-700">Don't worry! Keep applying to similar projects to increase your chances</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Activity Timeline */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Activity Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <div className="font-medium">Proposal submitted</div>
-                    <div className="text-sm text-gray-600">{formatDate(proposal.submittedDate)}</div>
-                  </div>
-                </div>
-                {proposal.status === "interview" && (
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="font-medium">Interview scheduled</div>
-                      <div className="text-sm text-gray-600">Client wants to discuss your proposal</div>
-                    </div>
-                  </div>
-                )}
-                {proposal.status === "accepted" && (
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="font-medium">Proposal accepted</div>
-                      <div className="text-sm text-gray-600">You got the job! Time to get started</div>
-                    </div>
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center pt-4 border-t">
-            <div className="text-sm text-gray-500">
-              Last activity: {proposal.lastActivity}
-            </div>
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose}>
-                Close
-              </Button>
-              {proposal.status === "pending" && (
-                <>
-                  <Button variant="outline">Edit Proposal</Button>
-                  <Button variant="destructive">Withdraw Proposal</Button>
-                </>
-              )}
-              {proposal.status === "interview" && (
-                <Button>Join Interview</Button>
-              )}
-              {(proposal.status === "accepted" || proposal.status === "interview") && (
-                <Button variant="outline">Message Client</Button>
-              )}
-            </div>
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                console.log('Button clicked! Props:', { onViewJobPosting: !!onViewJobPosting, jobId });
+                if (onViewJobPosting && jobId) {
+                  console.log('Calling onViewJobPosting with jobId:', jobId);
+                  onViewJobPosting(jobId);
+                } else {
+                  console.log('Missing props:', { onViewJobPosting: !!onViewJobPosting, jobId });
+                }
+              }}
+              className="bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              View Job Posting
+            </Button>
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { createServer } from 'http';
+import { WebSocketServer } from 'ws';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,7 +23,8 @@ import notificationRoutes from './routes/notifications.js';
 import onboardingRoutes from './routes/onboarding.js';
 import uploadRoutes from './routes/upload.js';
 import talentRoutes from './routes/talent.js';
-import jobInvitationRoutes from './routes/job-invitations';
+import jobInvitationRoutes from './routes/job-invitations.js';
+import offersRoutes from './routes/offers.js';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -112,6 +115,7 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/talent', talentRoutes);
 app.use('/api/job-invitations', jobInvitationRoutes);
+app.use('/api/offers', offersRoutes);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../../dist')));
@@ -125,11 +129,28 @@ app.get('*', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
+// Create HTTP server
+const server = createServer(app);
+
+// Import and attach WebSocket server
+import { wss } from './websocket.js';
+
+// Attach WebSocket server to HTTP server
+server.on('upgrade', (request, socket, head) => {
+  console.log('🔄 WebSocket upgrade request received');
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    console.log('✅ WebSocket connection upgraded');
+    wss.emit('connection', ws, request);
+  });
+});
+
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`🌐 WebSocket endpoint: ws://localhost:${PORT}`);
+  console.log(`✅ WebSocket server attached and ready`);
 });
 
 export default app; 

@@ -1,6 +1,5 @@
-import WebSocket from "ws";
-import { createServer } from "http";
-import prisma from "./lib/prisma";
+import { WebSocketServer, WebSocket } from "ws";
+import prisma from "./lib/prisma.js";
 
 console.log("🚀 Starting WebSocket server initialization...");
 
@@ -36,7 +35,7 @@ interface WSMessage {
 }
 
 interface ClientConnection {
-  ws: WebSocket;
+  ws: any;
   userEmail: string;
   userName: string;
   conversationId?: string;
@@ -52,9 +51,8 @@ const conversationRooms = new Map<string, Set<string>>();
 
 console.log("📊 Initialized connection maps and room management");
 
-// WebSocket Server
-const server = createServer();
-const wss = new WebSocket.Server({ server });
+// WebSocket Server - will be attached to main server
+const wss = new WebSocketServer({ noServer: true });
 
 console.log("🌐 WebSocket server instance created");
 
@@ -129,7 +127,7 @@ const broadcast = (
   
   targetUserEmails.forEach((userEmail) => {
     const connection = connections.get(userEmail);
-    if (connection && connection.ws.readyState === WebSocket.OPEN) {
+    if (connection && connection.ws.readyState === 1) {
       try {
         connection.ws.send(JSON.stringify(message));
         successCount++;
@@ -235,10 +233,10 @@ const getConversationMessages = async (conversationId: string) => {
   }
 };
 
-const sendError = (ws: WebSocket, message: string, code = 4000) => {
+const sendError = (ws: any, message: string, code = 4000) => {
   console.log(`❌ Sending error to client: ${message} (code: ${code})`);
   
-  if (ws.readyState === WebSocket.OPEN) {
+  if (ws.readyState === 1) { // WebSocket.OPEN = 1
     ws.send(
       JSON.stringify({
         type: "error",
@@ -275,7 +273,7 @@ wss.on("connection", (ws: WebSocket, req) => {
 
   // Heartbeat to keep connection alive
   heartbeatInterval = setInterval(() => {
-    if (ws.readyState === WebSocket.OPEN) {
+    if (ws.readyState === 1) { // WebSocket.OPEN = 1
       console.log(`💓 Sending ping to ${currentConnection?.userEmail || ip}`);
       ws.ping();
     } else {
@@ -283,7 +281,7 @@ wss.on("connection", (ws: WebSocket, req) => {
     }
   }, 30000);
 
-  ws.on("message", (data: WebSocket.Data) => {
+  ws.on("message", (data: any) => {
     console.log(`📨 Received message from ${currentConnection?.userEmail || ip}`);
     console.log(`📨 Raw message data:`, data.toString());
     
@@ -440,6 +438,21 @@ wss.on("connection", (ws: WebSocket, req) => {
             // Fetch conversation from database
             const conversation = await prisma.conversation.findUnique({
               where: { id: conversationId },
+              include: {
+                job: {
+                  select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    budget: true,
+                    minBudget: true,
+                    maxBudget: true,
+                    hourlyRate: true,
+                    duration: true,
+                    status: true
+                  }
+                }
+              }
             });
             
             if (!conversation) {
@@ -558,6 +571,15 @@ wss.on("connection", (ws: WebSocket, req) => {
             // Verify conversation exists and user has access
             const msgConversation = await prisma.conversation.findUnique({
               where: { id: msgConvId },
+              include: {
+                job: {
+                  select: {
+                    id: true,
+                    title: true,
+                    description: true
+                  }
+                }
+              }
             });
 
             if (!msgConversation || !msgConversation.participants.includes(currentConnection.userEmail)) {
@@ -771,13 +793,7 @@ wss.on("connection", (ws: WebSocket, req) => {
   });
 });
 
-const PORT = 8080;
-console.log(`🚀 Starting server on port ${PORT}...`);
+// Export the WebSocket server for use in main server
+export { wss };
 
-server.listen(PORT, () => {
-  console.log(`✅ WebSocket server running on port ${PORT}`);
-  console.log(`🌐 WebSocket endpoint: ws://localhost:${PORT}`);
-  console.log(`📊 Server ready to accept connections`);
-});
-
-console.log(`🎯 WebSocket server setup complete`);
+console.log(`🎯 WebSocket server setup complete - will be attached to main server`);

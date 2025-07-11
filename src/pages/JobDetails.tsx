@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { 
   MapPin, Clock, DollarSign, Star, Users, Calendar, 
   Bookmark, Share2, Flag, CheckCircle, Award, 
-  MessageCircle, ThumbsUp, Eye, Send, Paperclip, Edit 
+  MessageCircle, ThumbsUp, Eye, Send, Paperclip, Edit, X 
 } from "lucide-react";
 
 import Footer from "../components/layout/Footer";
@@ -80,6 +80,7 @@ const JobDetails = () => {
   const [submittingProposal, setSubmittingProposal] = useState(false);
   const [existingProposal, setExistingProposal] = useState<ExistingProposal | null>(null);
   const [checkingProposal, setCheckingProposal] = useState(false);
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -273,6 +274,43 @@ const JobDetails = () => {
     } catch (err: unknown) {
       console.error('Error updating proposal:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to update proposal';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setSubmittingProposal(false);
+    }
+  };
+
+  const handleWithdrawProposal = async () => {
+    if (!existingProposal) return;
+
+    try {
+      setSubmittingProposal(true);
+      
+      const response = await axios.put(`/proposals/${existingProposal.id}/withdraw`, {}, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data.success) {
+        toast({
+          title: "Success",
+          description: "Proposal withdrawn successfully!",
+        });
+        // Update the existing proposal data
+        setExistingProposal(response.data.data);
+        // Clear the form
+        setProposal("");
+        setProposalBudget("");
+        setProposalDelivery("");
+      }
+    } catch (err: unknown) {
+      console.error('Error withdrawing proposal:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to withdraw proposal';
       toast({
         title: "Error",
         description: errorMessage,
@@ -694,6 +732,56 @@ const JobDetails = () => {
                         </p>
                         <p className="text-sm text-gray-500">
                           Submitted on {new Date(existingProposal.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+
+                    {existingProposal.status === 'PENDING' && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="destructive" 
+                              disabled={submittingProposal}
+                              className="w-full"
+                            >
+                              <X className="h-4 w-4 mr-2" />
+                              Withdraw Proposal
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Withdraw Proposal</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <p className="text-gray-600">
+                                Are you sure you want to withdraw your proposal? This action cannot be undone.
+                              </p>
+                              <div className="flex gap-3">
+                                <Button 
+                                  variant="outline" 
+                                  onClick={() => setShowWithdrawDialog(false)}
+                                  className="flex-1"
+                                >
+                                  Cancel
+                                </Button>
+                                <Button 
+                                  variant="destructive" 
+                                  onClick={() => {
+                                    setShowWithdrawDialog(false);
+                                    handleWithdrawProposal();
+                                  }}
+                                  disabled={submittingProposal}
+                                  className="flex-1"
+                                >
+                                  {submittingProposal ? "Withdrawing..." : "Withdraw"}
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        <p className="text-xs text-gray-500 mt-2 text-center">
+                          You can withdraw your proposal at any time before the client responds.
                         </p>
                       </div>
                     )}

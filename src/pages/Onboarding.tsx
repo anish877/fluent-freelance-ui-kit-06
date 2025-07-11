@@ -127,6 +127,7 @@ interface OnboardingCompleteProps {
   onComplete?: (password: string) => void;
   loading?: boolean;
   error?: string | null;
+  onRestart?: () => void;
 }
 
 type StepComponentProps = ComponentProps | UserTypeSelectionProps | OnboardingCompleteProps;
@@ -154,6 +155,7 @@ const Onboarding = () => {
     updateClientBudget,
     updateClientVerification,
     completeOnboarding,
+    clearOnboardingData,
   } = useOnboarding();
 
   const freelancerSteps = [
@@ -261,7 +263,12 @@ const Onboarding = () => {
         userType: userType,
         onComplete: handleComplete,
         loading: loading,
-        error: error
+        error: error,
+        onRestart: () => {
+          // Clear onboarding data and restart
+          clearOnboardingData();
+          window.location.reload();
+        }
       } as OnboardingCompleteProps;
     }
 
@@ -304,15 +311,6 @@ const Onboarding = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to FreelanceHub
-          </h1>
-          <p className="text-gray-600">
-            Let's set up your {userType || ""} profile to get you started
-          </p>
-        </div>
 
         {/* Progress Bar */}
         {userType && (
@@ -361,10 +359,11 @@ const Onboarding = () => {
         )}
 
         {/* Step Content */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-gray-50 border-none shadow-none">
           <CardContent className="p-8">
             {CurrentStepComponent && (
-              <CurrentStepComponent {...(getComponentProps() as StepComponentProps)} />
+              // @ts-expect-error - Component props are dynamically determined based on step
+              <CurrentStepComponent {...getComponentProps()} />
             )}
           </CardContent>
         </Card>

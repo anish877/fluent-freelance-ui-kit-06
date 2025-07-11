@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Separator } from "../components/ui/separator";
 import { Progress } from "../components/ui/progress";
 import { useAuth } from "../hooks/AuthContext";
+import ProposalDetailsModal from "../components/modals/ProposalDetailsModal";
 
 // Types for backend data
 interface Proposal {
@@ -35,6 +36,31 @@ interface Proposal {
   };
 }
 
+// Interface for the modal proposal format
+interface ModalProposal {
+  id: number;
+  jobTitle: string;
+  client: {
+    name: string;
+    rating: number;
+    jobsPosted: number;
+  };
+  submittedDate: string;
+  status: "pending" | "accepted" | "rejected" | "interview" | "withdrawn";
+  bidAmount: string;
+  coverLetter: string;
+  timeline: string;
+  jobBudget: string;
+  jobType: "fixed" | "hourly";
+  skills: string[];
+  responses: number;
+  lastActivity: string;
+  interviewScheduled?: {
+    date: string;
+    time: string;
+  };
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -44,6 +70,11 @@ const Dashboard = () => {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [proposalsLoading, setProposalsLoading] = useState(false);
   const [proposalsError, setProposalsError] = useState<string | null>(null);
+
+  // Modal state
+  const [selectedProposal, setSelectedProposal] = useState<ModalProposal | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string>('');
+  const [showModal, setShowModal] = useState(false);
 
   const stats = [
     {
@@ -261,8 +292,69 @@ const Dashboard = () => {
     navigate(`/jobs/${id}`);
   };
 
-  const handleViewProposal = (id: number) => {
-    navigate('/proposals');
+  const handleViewProposal = (proposal: Proposal) => {
+    // Convert backend proposal to modal format with complete details
+    const modalProposal: ModalProposal = {
+      id: Number(proposal.id),
+      jobTitle: proposal.job.title,
+      client: {
+        name: proposal.job.client.companyName || 
+              `${proposal.job.client.firstName} ${proposal.job.client.lastName}`,
+        rating: 4.5 + Math.random() * 0.5, // Mock rating
+        jobsPosted: Math.floor(Math.random() * 20) + 5 // Mock jobs posted
+      },
+      submittedDate: proposal.createdAt,
+      status: proposal.status.toLowerCase() as "pending" | "accepted" | "rejected" | "interview" | "withdrawn",
+      bidAmount: `$${proposal.bidAmount.toLocaleString()}`,
+      coverLetter: proposal.coverLetter,
+      timeline: proposal.estimatedDuration,
+      jobBudget: `$${(proposal.bidAmount * 0.8).toLocaleString()} - $${(proposal.bidAmount * 1.2).toLocaleString()}`,
+      jobType: "fixed",
+      skills: ["React", "Node.js", "TypeScript", "MongoDB", "PostgreSQL", "AWS"], // Enhanced skills list
+      responses: proposal.job._count.proposals,
+      lastActivity: "2 hours ago",
+      interviewScheduled: proposal.status === 'ACCEPTED' ? {
+        date: "2024-12-25",
+        time: "2:00 PM EST"
+      } : proposal.status === 'PENDING' ? {
+        date: "2024-12-28",
+        time: "3:00 PM EST"
+      } : undefined
+    };
+    
+    console.log('Creating modal proposal:', {
+      proposalId: proposal.id,
+      jobId: proposal.job.id,
+      modalProposalId: modalProposal.id
+    });
+    
+    setSelectedProposal(modalProposal);
+    setSelectedJobId(proposal.job.id);
+    setShowModal(true);
+  };
+
+  const handleViewJobPosting = (jobId: string) => {
+    console.log('Navigating to job:', jobId);
+    if (jobId && jobId.trim() !== '') {
+      const url = `/jobs/${jobId}`;
+      console.log('Navigation URL:', url);
+      try {
+        navigate(url);
+      } catch (error) {
+        console.error('React Router navigation failed, using window.location:', error);
+        window.location.href = url;
+      }
+      setShowModal(false);
+      setSelectedProposal(null);
+    } else {
+      console.error('Invalid jobId:', jobId);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedProposal(null);
+    setSelectedJobId('');
   };
 
   const handleMessageClick = (messageId: number) => {
@@ -583,9 +675,6 @@ const Dashboard = () => {
             <div className={activeTab === "proposals" ? "block" : "hidden"}>
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-semibold text-gray-900">Your Proposals ({proposals.length})</h3>
-                <Button onClick={() => navigate('/proposals')}>
-                  View All Proposals
-                </Button>
               </div>
               
               {proposalsLoading ? (
@@ -655,7 +744,7 @@ const Dashboard = () => {
                                 <MessageCircle className="h-4 w-4 mr-1" />
                                 Follow Up
                               </Button>
-                              <Button variant="outline" size="sm" onClick={() => handleViewProposal(Number(proposal.id))}>
+                              <Button variant="outline" size="sm" onClick={() => handleViewProposal(proposal)}>
                                 <Eye className="h-4 w-4 mr-1" />
                                 View Details
                               </Button>
@@ -764,6 +853,17 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Proposal Details Modal */}
+      {selectedProposal && (
+        <ProposalDetailsModal
+          proposal={selectedProposal}
+          isOpen={showModal}
+          onClose={handleCloseModal}
+          onViewJobPosting={handleViewJobPosting}
+          jobId={selectedJobId}
+        />
+      )}
 
       <Footer />
     </div>

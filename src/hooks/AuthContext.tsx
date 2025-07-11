@@ -180,7 +180,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Google OAuth login
   const login_google = () => {
     console.log('🔗 [Frontend] Initiating Google OAuth');
-    window.location.href = `${import.meta.env.VITE_API_URL || window.location.origin + '/api'}/auth/google`;
+    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}/auth/google`;
   };
 
   // Complete onboarding function
@@ -217,7 +217,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     console.log('⚙️ [Frontend] Setting up axios defaults');
     
-    const baseURL = import.meta.env.VITE_API_URL || window.location.origin + '/api';
+    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
     console.log('🔗 [Frontend] API Base URL:', baseURL);
     
     axios.defaults.baseURL = baseURL;

@@ -63,7 +63,7 @@ interface WebSocketContextType {
   
   // Actions
   joinConversation: (conversationId: string) => void;
-  createConversation: (otherUserEmail: string, projectName?: string) => Promise<string | null>;
+  createConversation: (otherUserEmail: string, projectName?: string, jobId?: string) => Promise<string | null>;
   sendMessage: (content: string, type?: 'text' | 'file' | 'image') => void;
   startTyping: () => void;
   stopTyping: () => void;
@@ -83,7 +83,7 @@ interface WebSocketProviderProps {
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ 
   children, 
-  wsUrl = import.meta.env.VITE_WS_URL || ((window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host),
+  wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5001',
   maxRetries = 5
 }) => {
   // Connection state
@@ -463,17 +463,25 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Action functions
   const joinConversation = useCallback((conversationId: string) => {
-    console.log(1)
+    console.log('🚪 joinConversation called');
+    console.log('🔌 WebSocket ready state:', socketRef.current?.readyState);
+    console.log('📧 Target conversation ID:', conversationId);
+    
     if (socketRef.current?.readyState === WebSocket.OPEN) {
-      console.log(1)
-      socketRef.current.send(JSON.stringify({
+      console.log('✅ Sending join_conversation request');
+      const joinPayload = {
         type: 'join_conversation',
         payload: { conversationId }
-      }));
+      };
+      console.log('📨 Join payload:', joinPayload);
+      
+      socketRef.current.send(JSON.stringify(joinPayload));
+    } else {
+      console.log('❌ Cannot join conversation - WebSocket not open');
     }
   }, []);
 
-  const createConversation = useCallback(async (otherUserEmail: string, projectName?: string): Promise<string | null> => {
+  const createConversation = useCallback(async (otherUserEmail: string, projectName?: string, jobId?: string): Promise<string | null> => {
     try {
       const response = await fetch('/api/messages/conversations', {
         method: 'POST',
@@ -483,7 +491,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         credentials: 'include',
         body: JSON.stringify({
           otherUserEmail,
-          projectName: projectName || `Project with ${otherUserEmail}`
+          projectName: projectName || `Project with ${otherUserEmail}`,
+          ...(jobId ? { jobId } : {})
         })
       });
 
@@ -502,21 +511,17 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
   }, []);
 
-  const sendMessage = useCallback((content: string, type: 'text' | 'file' | 'image' = 'text') => {
-    console.log(socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim())
-    if (socketRef.current?.readyState === WebSocket.OPEN && content.trim()) {
-      console.log("Sending message")
+  const stopTyping = useCallback(() => {
+    if (socketRef.current?.readyState === WebSocket.OPEN && currentConversationId) {
       socketRef.current.send(JSON.stringify({
-        type: 'send_message',
-        payload: { 
-          conversationId: currentConversationId, 
-          content: content.trim(), 
-          type 
-        }
+        type: 'stop_typing',
+        payload: { conversationId: currentConversationId }
       }));
-      
-      // Stop typing when message is sent
-      stopTyping();
+    }
+    
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
     }
   }, [currentConversationId]);
 
@@ -536,21 +541,37 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         stopTyping();
       }, 3000);
     }
-  }, [currentConversationId]);
+  }, [currentConversationId, stopTyping]);
 
-  const stopTyping = useCallback(() => {
-    if (socketRef.current?.readyState === WebSocket.OPEN && currentConversationId) {
-      socketRef.current.send(JSON.stringify({
-        type: 'stop_typing',
-        payload: { conversationId: currentConversationId }
-      }));
-    }
+  const sendMessage = useCallback((content: string, type: 'text' | 'file' | 'image' = 'text') => {
+    console.log('📤 sendMessage called');
+    console.log('🔌 WebSocket ready state:', socketRef.current?.readyState);
+    console.log('🔗 Current conversation ID:', currentConversationId);
+    console.log('💬 Content:', content);
     
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = null;
+    if (socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim()) {
+      console.log("✅ Sending message via WebSocket");
+      const messagePayload = {
+        type: 'send_message',
+        payload: { 
+          conversationId: currentConversationId, 
+          content: content.trim(), 
+          type 
+        }
+      };
+      console.log('📨 Message payload:', messagePayload);
+      
+      socketRef.current.send(JSON.stringify(messagePayload));
+      
+      // Stop typing when message is sent
+      stopTyping();
+    } else {
+      console.log('❌ Cannot send message:');
+      console.log('- WebSocket open:', socketRef.current?.readyState === WebSocket.OPEN);
+      console.log('- Has conversation ID:', !!currentConversationId);
+      console.log('- Has content:', !!content.trim());
     }
-  }, [currentConversationId]);
+  }, [currentConversationId, stopTyping]);
 
   // Auto-connect when provider mounts
   useEffect(() => {

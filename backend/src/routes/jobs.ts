@@ -2,6 +2,7 @@ import express, { Request, Response, RequestHandler } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma.js';
 import { protect, authorize, AuthRequest } from '../middleware/auth.js';
+import { Prisma } from '@prisma/client';
 const router = express.Router();
 
 // @desc    Get all jobs
@@ -170,7 +171,8 @@ router.get('/:id', (async (req: Request, res: Response): Promise<void> => {
                 avatar: true,
                 hourlyRate: true,
                 location: true,
-                skills: true
+                skills: true,
+                email: true
               }
             }
           },

@@ -11,7 +11,7 @@ const UserTypeSelection = ({ onNext }: UserTypeSelectionProps) => {
   const [selectedType, setSelectedType] = useState<"freelancer" | "client" | null>(null);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto ">
       <div className="text-center mb-10">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Join as a freelancer or hire talent

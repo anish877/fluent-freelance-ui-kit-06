@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   MapPin, Clock, Star, Users, Calendar, 
   Eye, MessageCircle, CheckCircle, XCircle, Award,
@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import axios from "axios";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/AuthContext";
+import { useWebSocket } from "../hooks/socketContext";
 
 interface Job {
   id: string;
@@ -127,6 +128,7 @@ interface Proposal {
       year: string;
     }>;
     certifications?: string[];
+    email?: string; // Added email to freelancer interface
   };
 }
 
@@ -143,6 +145,8 @@ const ClientJobView = () => {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { createConversation } = useWebSocket();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchJobAndProposals = async () => {
@@ -311,6 +315,29 @@ const ClientJobView = () => {
       return "Hourly rate not specified";
     }
     return "Budget not specified";
+  };
+
+  // Add a handler for messaging a freelancer
+  const handleMessageFreelancer = async (freelancerEmail: string, jobId: string, projectName: string) => {
+    try {
+      // Pass jobId for job-specific chat
+      const conversationId = await createConversation(freelancerEmail, projectName, jobId);
+      if (conversationId) {
+        navigate(`/messages/${conversationId}`);
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not start conversation.",
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Could not start conversation.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (loading) {
@@ -739,7 +766,11 @@ const ClientJobView = () => {
                                       View Profile
                                     </Button>
                                   </Link>
-                                  <Button variant="outline">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                  >
                                     <MessageCircle className="h-4 w-4 mr-2" />
                                     Message
                                   </Button>

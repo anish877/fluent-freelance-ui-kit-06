@@ -26,6 +26,20 @@ router.get('/conversations', protect, (async (req: AuthRequest, res: Response): 
         participants: true,
         updatedAt: true,
         createdAt: true,
+        jobId: true,
+        job: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            budget: true,
+            minBudget: true,
+            maxBudget: true,
+            hourlyRate: true,
+            duration: true,
+            status: true
+          }
+        },
         lastMessage: {
           select: {
             id: true,
@@ -43,13 +57,7 @@ router.get('/conversations', protect, (async (req: AuthRequest, res: Response): 
               }
             }
           }
-        },
-        // job: {
-        //   select: {
-        //     id: true,
-        //     title: true
-        //   }
-        // }
+        }
       },
       skip,
       take: Number(limit),
@@ -96,6 +104,8 @@ router.get('/conversations', protect, (async (req: AuthRequest, res: Response): 
           id: conv.id,
           name: otherParticipant?.firstName,
           projectName: conv.projectName,
+          jobId: conv.jobId,
+          job: conv.job,
           otherParticipant,
           lastMessage: conv.lastMessage ? {
             ...conv.lastMessage,
@@ -104,7 +114,6 @@ router.get('/conversations', protect, (async (req: AuthRequest, res: Response): 
               : conv.lastMessage.content
           } : null,
           unreadCount,
-          // job: conv.job,
           updatedAt: conv.updatedAt,
           createdAt: conv.createdAt
         };
@@ -140,7 +149,8 @@ router.get('/conversations', protect, (async (req: AuthRequest, res: Response): 
 // @route   POST /api/messages/conversations
 // @access  Private
 router.post('/conversations', protect, [
-  body('otherUserEmail').notEmpty().withMessage('Other user ID is required'),
+  body('otherUserEmail').notEmpty().withMessage('Other user email is required'),
+  body('jobId').notEmpty().withMessage('Job ID is required'),
   body('projectName').optional().isString().withMessage('Project name must be a string')
 ], (async (req: AuthRequest, res: Response): Promise<void> => {
   const errors = validationResult(req);
@@ -162,25 +172,29 @@ router.post('/conversations', protect, [
       return;
     }
 
-    // Check if conversation already exists between these users
-    const possibleConversations = await prisma.conversation.findMany({
+    // Check if job exists
+    const job = await prisma.job.findUnique({
+      where: { id: jobId }
+    });
+
+    if (!job) {
+      res.status(404).json({ message: 'Job not found' });
+      return;
+    }
+
+    // Check if conversation already exists between these users for this job
+    const existingConversation = await prisma.conversation.findFirst({
       where: {
         participants: {
           hasEvery: [req.user!.email, otherUserEmail]
         },
-        ...(jobId ? { jobId } : {})
+        jobId: jobId
       },
       include: {
         lastMessage: true
       }
     });
 
-    // Now filter manually to ensure it's only those 2 participants
-    const existingConversation = possibleConversations.find(conv => 
-      conv.participants.length === 2 &&
-      conv.participants.includes(req.user!.otherUserEmail) &&
-      conv.participants.includes(otherUserEmail)
-    );
     if (existingConversation) {
       res.json({
         success: true,
@@ -194,17 +208,9 @@ router.post('/conversations', protect, [
     const newConversation = await prisma.conversation.create({
       data: {
         participants: [req.user!.email, otherUserEmail],
-        jobId: jobId || null,
-        projectName: projectName || null
+        jobId: jobId,
+        projectName: projectName || job.title
       },
-      // include: {
-      //   job: {
-      //     select: {
-      //       id: true,
-      //       title: true
-      //     }
-      //   }
-      // }
     });
 
     res.status(201).json({

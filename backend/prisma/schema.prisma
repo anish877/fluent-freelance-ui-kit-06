@@ -134,6 +134,8 @@ model User {
   savedByUsers      SavedFreelancer[] @relation("SavedFreelancer")
   jobInvitationsSent JobInvitation[] @relation("JobInvitationClient")
   jobInvitationsReceived JobInvitation[] @relation("JobInvitationFreelancer")
+  offersSent Offer[] @relation("OfferClient")
+  offersReceived Offer[] @relation("OfferFreelancer")
 
   @@map("users")
 }
@@ -172,6 +174,7 @@ model Job {
   proposals     Proposal[]
   reviews       Review[]
   jobInvitations JobInvitation[]
+  offers Offer[]
 
   @@map("jobs")
 }
@@ -226,7 +229,7 @@ model Review {
 model Conversation {
   id            String   @id @default(cuid())
   participants  String[] // Array of user IDs
-  jobId         String?  // Optional: link to specific job
+  jobId         String   // Required: link to specific job
   projectName   String?  // Name of the project for this conversation
   isActive      Boolean  @default(true) // Whether the conversation is active
   lastMessageId String?  // ID of the last message in the conversation
@@ -234,9 +237,10 @@ model Conversation {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  job           Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  job           Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
   messages      Message[]
-  lastMessage   Message?  @relation("ConversationLastMessage", fields: [lastMessageId], references: [id])
+  lastMessage   Message? @relation("ConversationLastMessage", fields: [lastMessageId], references: [id])
+  offers        Offer[]
 
   @@map("conversations")
 }
@@ -348,4 +352,37 @@ enum JobInvitationStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+model Offer {
+  id              String   @id @default(cuid())
+  conversationId  String
+  clientId        String
+  freelancerId    String
+  jobId           String
+  budgetType      BudgetType
+  amount          Float
+  duration        String
+  milestones      Json? // Array of milestone objects
+  terms           String?
+  status          OfferStatus @default(PENDING)
+  expiresAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  client          User @relation("OfferClient", fields: [clientId], references: [id], onDelete: Cascade)
+  freelancer      User @relation("OfferFreelancer", fields: [freelancerId], references: [id], onDelete: Cascade)
+  job             Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("offers")
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  WITHDRAWN
 } 

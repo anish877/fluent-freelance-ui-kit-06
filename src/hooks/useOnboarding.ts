@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { toast } from 'sonner';
 
 interface OnboardingData {
   userType?: 'freelancer' | 'client';
@@ -88,6 +89,7 @@ interface UseOnboardingReturn {
   updateClientVerification: () => void;
   completeOnboarding: (password: string) => Promise<void>;
   loadOnboardingData: () => void;
+  clearOnboardingData: () => void;
 }
 
 const LOCAL_STORAGE_KEY = 'onboarding_data';
@@ -140,6 +142,38 @@ export const useOnboarding = (): UseOnboardingReturn => {
 
   const loadOnboardingData = () => {
     loadFromLocalStorage();
+  };
+
+  const clearOnboardingData = () => {
+    // Clear all onboarding data from localStorage
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    
+    // Clear any other onboarding-related localStorage items
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.includes('onboarding') || key.includes('Onboarding'))) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    // Also clear any form data that might be stored
+    const formKeys = [
+      'freelancer_onboarding',
+      'client_onboarding',
+      'onboarding_form_data',
+      'onboarding_step',
+      'onboarding_user_type'
+    ];
+    formKeys.forEach(key => localStorage.removeItem(key));
+    
+    // Reset state
+    setData({});
+    setCurrentStep(0);
+    setUserType(null);
+    setIsOnboarded(false);
+    setError(null);
   };
 
   const updateUserType = (type: 'freelancer' | 'client') => {
@@ -268,11 +302,23 @@ export const useOnboarding = (): UseOnboardingReturn => {
       const { success, message } = await authCompleteOnboarding(apiData);
 
       if (success) {
-        // Clear onboarding data from localStorage
-        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        // Clear all onboarding data using the utility function
+        clearOnboardingData();
         
         setIsOnboarded(true);
         setCurrentStep(userType === 'freelancer' ? 8 : 7);
+        
+        // Show success message
+        toast.success(
+          `Welcome to FreelanceHub! Your ${userType} profile has been created successfully.`
+        );
+        
+        // Redirect based on user type
+        if (userType === 'client') {
+          navigate('/client-dashboard', { replace: true });
+        } else if (userType === 'freelancer') {
+          navigate('/dashboard', { replace: true });
+        }
       } else {
         throw new Error(message || 'Failed to complete onboarding');
       }
@@ -310,5 +356,6 @@ export const useOnboarding = (): UseOnboardingReturn => {
     updateClientVerification,
     completeOnboarding,
     loadOnboardingData,
+    clearOnboardingData,
   };
 }; 

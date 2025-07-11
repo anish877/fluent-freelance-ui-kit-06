@@ -22,9 +22,10 @@ interface OnboardingCompleteProps {
   userType: "freelancer" | "client" | null;
   loading?: boolean;
   error?: string | null;
+  onRestart?: () => void;
 }
 
-const OnboardingComplete = ({ onComplete, data, userType, loading = false, error = null }: OnboardingCompleteProps) => {
+const OnboardingComplete = ({ onComplete, data, userType, loading = false, error = null, onRestart }: OnboardingCompleteProps) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -200,7 +201,7 @@ const OnboardingComplete = ({ onComplete, data, userType, loading = false, error
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 space-y-3">
           <Button 
             onClick={handleSubmit} 
             className="w-full" 
@@ -219,6 +220,17 @@ const OnboardingComplete = ({ onComplete, data, userType, loading = false, error
               </>
             )}
           </Button>
+          
+          {onRestart && (
+            <Button 
+              onClick={onRestart} 
+              variant="outline" 
+              className="w-full"
+              disabled={loading}
+            >
+              Start Over
+            </Button>
+          )}
         </div>
       </div>
 

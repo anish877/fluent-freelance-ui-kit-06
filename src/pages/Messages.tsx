@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Search, Plus, Send, Paperclip, Smile, MoreVertical, Phone, Video, Archive, Star, Circle, Briefcase, FileText } from "lucide-react";
+import { Search, Plus, Send, Paperclip, Smile, MoreVertical, Phone, Video, Archive, Star, Circle, Briefcase, FileText, DollarSign } from "lucide-react";
 
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -12,6 +12,8 @@ import { Conversation, useWebSocket } from "@/hooks/socketContext";
 import axios from "axios";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/AuthContext";
+import OfferModal from "@/components/modals/OfferModal";
+import OfferCard from "@/components/cards/OfferCard";
 
 const Messages = () => {
   const { conversationId } = useParams();
@@ -36,6 +38,8 @@ const Messages = () => {
   });
   const [clientJobs, setClientJobs] = useState([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
+  const [offers, setOffers] = useState([]);
+  const [showOfferModal, setShowOfferModal] = useState(false);
 
   // Debug clientJobs changes
   useEffect(() => {
@@ -45,7 +49,7 @@ const Messages = () => {
   const {
     isConnected,
     conversations: wsConversations,
-    messages: wsMessages,
+    messages,
     currentConversationId,
     joinConversation,
     sendMessage,
@@ -120,9 +124,17 @@ useEffect(() => {
   );
 
   // Messages for current conversation
-  const messages = useMemo(() => {
-    return (conversationId === currentConversationId) ? (wsMessages || []) : [];
-  }, [conversationId, currentConversationId, wsMessages]);
+  const conversationMessages = useMemo(() => {
+    console.log('🔄 Recalculating conversation messages');
+    console.log('📧 Current conversationId:', conversationId);
+    console.log('🔗 WebSocket currentConversationId:', currentConversationId);
+    console.log('💬 All messages:', messages);
+    
+    const filteredMessages = (conversationId === currentConversationId) ? (messages || []) : [];
+    console.log('📨 Filtered messages for conversation:', filteredMessages);
+    
+    return filteredMessages;
+  }, [conversationId, currentConversationId, messages]);
 
   // Fetch conversations on mount
   const fetchConversations = async () => {
@@ -140,7 +152,13 @@ useEffect(() => {
 
   // Join conversation when conversationId changes
   useEffect(() => {
+    console.log('🔄 Conversation ID changed effect');
+    console.log('📧 New conversationId:', conversationId);
+    console.log('🔗 Current WebSocket conversationId:', currentConversationId);
+    console.log('🔌 WebSocket connected:', isConnected);
+    
     if (conversationId && isConnected && conversationId !== currentConversationId) {
+      console.log('🚪 Joining conversation:', conversationId);
       joinConversation(conversationId);
     }
   }, [conversationId, isConnected, currentConversationId, joinConversation]);
@@ -151,7 +169,28 @@ useEffect(() => {
     if (messagesContainer) {
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-  }, [messages]);
+  }, [conversationMessages]);
+
+  // Get job details from conversation
+  const job = selectedConv?.job;
+
+  // Fetch offers for current conversation
+  const fetchOffers = async () => {
+    if (!conversationId) return;
+    
+    try {
+      const response = await axios.get(`/offers/conversation/${conversationId}`);
+      if (response.data.success) {
+        setOffers(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching offers:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchOffers();
+  }, [conversationId]);
 
   // Handlers
   const handleConversationSelect = (selectedConversationId) => {
@@ -162,9 +201,14 @@ useEffect(() => {
 
   const handleCreateConversation = async () => {
     try {
+      if (!newConversationData.jobId.trim()) {
+        toast.error("Job ID is required");
+        return;
+      }
+      
       const payload = {
         otherUserEmail: newConversationData.otherUserEmail,
-        jobId: newConversationData.jobId || null,
+        jobId: newConversationData.jobId,
         projectName: newConversationData.projectName || null
       };
       
@@ -199,10 +243,18 @@ useEffect(() => {
   };
 
   const handleSendMessage = () => {
+    console.log('📤 Sending message');
+    console.log('💬 Message text:', messageText);
+    console.log('📧 Conversation ID:', conversationId);
+    console.log('🔌 WebSocket connected:', isConnected);
+    
     if (messageText.trim() && conversationId) {
+      console.log('✅ Sending message via WebSocket');
       sendMessage(messageText.trim());
       setMessageText("");
       stopTyping();
+    } else {
+      console.log('❌ Cannot send message - missing text or conversation ID');
     }
   };
 
@@ -276,21 +328,115 @@ useEffect(() => {
     setShowJobInvitation(true);
   };
 
-  return (
-    <div className="h-screen bg-gray-50 flex flex-col">
+  // Open offer modal
+  const openOfferModal = () => {
+    if (user?.userType !== 'CLIENT') {
+      toast.error('Only clients can make offers');
+      return;
+    }
+    if (!selectedConv) {
+      toast.error('Please select a conversation first');
+      return;
+    }
+    if (!job) {
+      toast.error('Job details not available');
+      return;
+    }
+    setShowOfferModal(true);
+  };
 
-      
-      <div className="max-w-6xl mx-auto w-full flex-1 flex min-h-0 p-4">
-        <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">
+  // Timeline Sidebar component
+  function TimelineSidebar({ job, offers }) {
+    return (
+      <div className="p-6 w-full flex flex-col gap-6 h-full">
+        <h3 className="text-xl font-semibold text-gray-900">Timeline</h3>
+        
+        {/* Make Offer Button */}
+        {user?.userType === 'CLIENT' && selectedConv && (
+          <div className="mb-4">
+            <Button 
+              onClick={openOfferModal}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              size="sm"
+            >
+              <DollarSign className="h-4 w-4 mr-2" />
+              Make an Offer
+            </Button>
+          </div>
+        )}
+
+        {/* Offers Section */}
+        {offers.length > 0 && (
+          <div className="mb-6 flex-1 overflow-y-auto">
+            <h4 className="font-semibold mb-4 text-sm text-gray-700 uppercase tracking-wide">Offers</h4>
+            <div className="space-y-4">
+              {offers.map((offer) => (
+                <OfferCard 
+                  key={offer.id} 
+                  offer={offer} 
+                  onStatusChange={fetchOffers}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Job Details */}
+        {job && (
+          <div className="border-t border-gray-100 pt-6">
+            <h4 className="font-semibold mb-4 text-sm text-gray-700 uppercase tracking-wide">Job Details</h4>
+            <div className="mb-4">
+              <div className="font-semibold text-gray-900 text-lg mb-2">{job.title}</div>
+              <div className="text-sm text-gray-500 mb-3">Status: <span className="font-semibold text-gray-700">{job.status}</span></div>
+            </div>
+            {job.milestones && Array.isArray(job.milestones) && job.milestones.length > 0 && (
+              <div className="mb-4">
+                <div className="font-semibold mb-3 text-sm text-gray-700">Milestones</div>
+                <ul className="space-y-3">
+                  {job.milestones.map((m, i) => (
+                    <li key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <span className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-900 text-sm">{m.title}</div>
+                        <div className="text-xs text-gray-500">{m.duration}</div>
+                      </div>
+                      <span className="text-sm font-semibold text-gray-700">${m.amount}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="space-y-2">
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">Budget:</span> 
+                <span className="ml-2 font-semibold text-gray-900">
+                  {job.budget === 'FIXED' ? `$${job.minBudget || job.maxBudget}` : `$${job.hourlyRate}/hr`}
+                </span>
+              </div>
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">Duration:</span> 
+                <span className="ml-2 font-semibold text-gray-900">{job.duration || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen bg-white flex flex-col">
+      <div className="max-w-7xl mx-auto w-full flex-1 flex min-h-0">
+        <div className="grid grid-cols-12 gap-0 flex-1 min-h-0">
           
           {/* Conversations Sidebar */}
-          <div className="col-span-4 bg-white rounded-lg border flex flex-col min-h-0">
-            <div className="p-4 border-b flex-shrink-0">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Conversations</h2>
+          <div className="col-span-3 border-r border-gray-200 flex flex-col min-h-0">
+            <div className="p-6 border-b border-gray-100 flex-shrink-0">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Messages</h2>
                 <Button 
                   size="sm" 
-                  className="bg-teal-600 hover:bg-teal-700" 
+                  className="bg-green-600 hover:bg-green-700 text-white" 
                   onClick={() => setShowNewConversation(true)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -304,7 +450,7 @@ useEffect(() => {
                   placeholder="Search conversations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 border-gray-200 focus:border-green-500 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -313,8 +459,10 @@ useEffect(() => {
               {filteredConversations.map((conversation) => (
                 <div
                   key={conversation.id}
-                  className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors ${
-                    conversationId === conversation.id ? "bg-teal-50 border-r-4 border-r-teal-600" : ""
+                  className={`p-4 cursor-pointer transition-colors border-b border-gray-50 ${
+                    conversationId === conversation.id 
+                      ? "bg-green-50 border-r-2 border-r-green-600" 
+                      : "hover:bg-gray-50"
                   }`}
                   onClick={() => handleConversationSelect(conversation.id)}
                 >
@@ -322,7 +470,9 @@ useEffect(() => {
                     <div className="relative">
                       <Avatar className="h-12 w-12">
                         <AvatarImage src={conversation.avatar} alt={conversation.name} />
-                        <AvatarFallback>{conversation.name?.charAt(0) || '?'}</AvatarFallback>
+                        <AvatarFallback className="bg-gray-200 text-gray-700">
+                          {conversation.name?.charAt(0) || '?'}
+                        </AvatarFallback>
                       </Avatar>
                       {/* Online indicator */}
                       {conversation.isOnline && (
@@ -333,25 +483,21 @@ useEffect(() => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-medium text-gray-900 truncate">
+                          <h3 className="font-semibold text-gray-900 truncate text-sm">
                             {conversation.name || conversation.otherParticipantEmail}
                           </h3>
-                          {/* {conversation.isOnline && (
-                            <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0" />
-                          )} */}
-                          
                         </div>
-                        <span className="text-xs text-gray-500">{conversation.timestamp}</span>
+                        <span className="text-xs text-gray-400">{conversation.timestamp}</span>
                       </div>
                       
-                      <p className="text-sm text-gray-600 mb-1">{conversation.project}</p>
+                      <p className="text-sm text-gray-600 mb-2 font-medium">{conversation.project}</p>
                       
                       <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-500 truncate">
                           {conversation.lastMessage?.content}
                         </p>
                         {conversation.unread > 0 && (
-                          <Badge variant="default" className="bg-teal-600 text-xs px-2 py-1">
+                          <Badge variant="default" className="bg-green-600 text-xs px-2 py-1">
                             {conversation.unread}
                           </Badge>
                         )}
@@ -366,8 +512,8 @@ useEffect(() => {
           {/* New Conversation Modal */}
           {showNewConversation && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg w-96">
-                <h3 className="text-lg font-semibold mb-4">Start New Conversation</h3>
+              <div className="bg-white p-8 rounded-xl w-96 shadow-xl">
+                <h3 className="text-xl font-semibold mb-6 text-gray-900">Start New Conversation</h3>
                 <Input
                   placeholder="Other User Email"
                   value={newConversationData.otherUserEmail}
@@ -375,16 +521,17 @@ useEffect(() => {
                     ...newConversationData, 
                     otherUserEmail: e.target.value
                   })}
-                  className="mb-3"
+                  className="mb-4 border-gray-200 focus:border-green-500 focus:ring-green-500"
                 />
                 <Input
-                  placeholder="Job ID (optional)"
+                  placeholder="Job ID *"
                   value={newConversationData.jobId}
                   onChange={(e) => setNewConversationData({
                     ...newConversationData, 
                     jobId: e.target.value
                   })}
-                  className="mb-3"
+                  className="mb-4 border-gray-200 focus:border-green-500 focus:ring-green-500"
+                  required
                 />
                 <Input
                   placeholder="Project Name (optional)"
@@ -393,19 +540,20 @@ useEffect(() => {
                     ...newConversationData, 
                     projectName: e.target.value
                   })}
-                  className="mb-4"
+                  className="mb-6 border-gray-200 focus:border-green-500 focus:ring-green-500"
                 />
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-3">
                   <Button 
                     variant="outline" 
                     onClick={() => setShowNewConversation(false)}
+                    className="border-gray-200 text-gray-700 hover:bg-gray-50"
                   >
                     Cancel
                   </Button>
                   <Button 
                     onClick={handleCreateConversation}
-                    className="bg-teal-600 hover:bg-teal-700"
-                    disabled={!newConversationData.otherUserEmail.trim()}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    disabled={!newConversationData.otherUserEmail.trim() || !newConversationData.jobId.trim()}
                   >
                     Create
                   </Button>
@@ -417,14 +565,14 @@ useEffect(() => {
           {/* Job Invitation Modal */}
           {showJobInvitation && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg w-96 max-h-[80vh] overflow-y-auto">
-                <h3 className="text-lg font-semibold mb-4">Invite to Job</h3>
+              <div className="bg-white p-8 rounded-xl w-96 max-h-[80vh] overflow-y-auto shadow-xl">
+                <h3 className="text-xl font-semibold mb-6 text-gray-900">Invite to Job</h3>
                 
                 {/* Invitation Type Selection */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Invitation Type</label>
-                  <div className="space-y-2">
-                    <label className="flex items-center space-x-2 cursor-pointer">
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Invitation Type</label>
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-3 cursor-pointer">
                       <input
                         type="radio"
                         name="invitationType"
@@ -434,11 +582,11 @@ useEffect(() => {
                           ...jobInvitationData,
                           type: e.target.value
                         })}
-                        className="text-teal-600"
+                        className="text-green-600"
                       />
-                      <span className="text-sm">Create New Job</span>
+                      <span className="text-sm font-medium text-gray-700">Create New Job</span>
                     </label>
-                    <label className="flex items-center space-x-2 cursor-pointer">
+                    <label className="flex items-center space-x-3 cursor-pointer">
                       <input
                         type="radio"
                         name="invitationType"
@@ -448,17 +596,17 @@ useEffect(() => {
                           ...jobInvitationData,
                           type: e.target.value
                         })}
-                        className="text-teal-600"
+                        className="text-green-600"
                       />
-                      <span className="text-sm">Send Existing Job</span>
+                      <span className="text-sm font-medium text-gray-700">Send Existing Job</span>
                     </label>
                   </div>
                 </div>
 
                 {/* Existing Job Selection */}
                 {jobInvitationData.type === 'existing' && (
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Job</label>
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Select Job</label>
                     {loadingJobs ? (
                       <div className="text-sm text-gray-500">Loading jobs...</div>
                     ) : clientJobs.length > 0 ? (
@@ -468,7 +616,7 @@ useEffect(() => {
                           ...jobInvitationData,
                           jobId: e.target.value
                         })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       >
                         <option value="">Select a job...</option>
                         {clientJobs.map((job) => (
@@ -484,8 +632,8 @@ useEffect(() => {
                 )}
 
                 {/* Message */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
                     {jobInvitationData.type === 'new' ? 'Message (Optional)' : 'Message'}
                   </label>
                   <Textarea
@@ -499,20 +647,21 @@ useEffect(() => {
                       message: e.target.value
                     })}
                     rows={3}
-                    className="resize-none"
+                    className="resize-none border-gray-200 focus:border-green-500 focus:ring-green-500"
                   />
                 </div>
 
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-3">
                   <Button 
                     variant="outline" 
                     onClick={() => setShowJobInvitation(false)}
+                    className="border-gray-200 text-gray-700 hover:bg-gray-50"
                   >
                     Cancel
                   </Button>
                   <Button 
                     onClick={handleJobInvitation}
-                    className="bg-teal-600 hover:bg-teal-700"
+                    className="bg-green-600 hover:bg-green-700 text-white"
                     disabled={jobInvitationData.type === 'existing' && !jobInvitationData.jobId}
                   >
                     {jobInvitationData.type === 'new' ? 'Create Job' : 'Send Invitation'}
@@ -523,16 +672,18 @@ useEffect(() => {
           )}
 
           {/* Messages Area */}
-          <div className="col-span-8 bg-white rounded-lg border flex flex-col min-h-0">
+          <div className={`${selectedConv ? 'col-span-6' : 'col-span-9'} flex flex-col min-h-0`}>
             {selectedConv ? (
               <>
                 {/* Header */}
-                <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
-                  <div className="flex items-center space-x-3">
+                <div className="p-6 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+                  <div className="flex items-center space-x-4">
                     <div className="relative">
-                      <Avatar className="h-10 w-10">
+                      <Avatar className="h-12 w-12">
                         <AvatarImage src={selectedConv.avatar} alt={selectedConv.name} />
-                        <AvatarFallback>{selectedConv.name?.charAt(0) || '?'}</AvatarFallback>
+                        <AvatarFallback className="bg-gray-200 text-gray-700">
+                          {selectedConv.name?.charAt(0) || '?'}
+                        </AvatarFallback>
                       </Avatar>
                       {selectedConv.isOnline && (
                         <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
@@ -541,21 +692,21 @@ useEffect(() => {
                     
                     <div>
                       <div className="flex items-center space-x-2">
-                        <h3 className="font-medium text-gray-900">
+                        <h3 className="font-semibold text-gray-900 text-lg">
                           {selectedConv.name || selectedConv.otherParticipantEmail}
                         </h3>
                       </div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 font-medium">
                         {selectedConv.isOnline ? 'Online' : 'Offline'} • {selectedConv.project}
                       </p>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50">
                       <Phone className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50">
                       <Video className="h-4 w-4" />
                     </Button>
                     {user?.userType === 'CLIENT' && (
@@ -563,7 +714,7 @@ useEffect(() => {
                         variant="outline" 
                         size="sm"
                         onClick={openJobInvitation}
-                        className="bg-teal-50 border-teal-200 text-teal-700 hover:bg-teal-100"
+                        className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
                       >
                         <Briefcase className="h-4 w-4 mr-1" />
                         Invite to Job
@@ -571,7 +722,7 @@ useEffect(() => {
                     )}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -590,20 +741,20 @@ useEffect(() => {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 messages-scroll">
-                  {messages.map((message) => (
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0 messages-scroll">
+                  {conversationMessages.map((message) => (
                     <div 
                       key={message.id} 
                       className={`flex ${message.senderEmail === user?.email ? "justify-end" : "justify-start"}`}
                     >
-                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-xl ${
                         message.senderEmail === user?.email
-                          ? "bg-teal-600 text-white" 
+                          ? "bg-green-600 text-white" 
                           : "bg-gray-100 text-gray-900"
                       }`}>
-                        <p className="text-sm">{message.content}</p> 
-                        <p className={`text-xs mt-1 ${
-                          message.senderEmail === user?.email ? "text-teal-100" : "text-gray-500"
+                        <p className="text-sm leading-relaxed">{message.content}</p> 
+                        <p className={`text-xs mt-2 ${
+                          message.senderEmail === user?.email ? "text-green-100" : "text-gray-500"
                         }`}>
                           {new Date(message.timestamp).toLocaleTimeString([], {
                             hour: '2-digit',
@@ -617,7 +768,7 @@ useEffect(() => {
                   {/* Typing Indicator */}
                   {typingUsers.length > 0 && (
                     <div className="flex justify-start">
-                      <div className="bg-gray-100 text-gray-900 px-4 py-2 rounded-lg">
+                      <div className="bg-gray-100 text-gray-900 px-4 py-3 rounded-xl">
                         <p className="text-sm">
                           {typingUsers.map(user => user.userName).join(', ')} 
                           {typingUsers.length === 1 ? ' is' : ' are'} typing...
@@ -628,9 +779,9 @@ useEffect(() => {
                 </div>
 
                 {/* Message Input */}
-                <div className="p-4 border-t flex-shrink-0">
-                  <div className="flex items-end space-x-2">
-                    <Button variant="outline" size="sm">
+                <div className="p-6 border-t border-gray-100 flex-shrink-0">
+                  <div className="flex items-end space-x-3">
+                    <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50">
                       <Paperclip className="h-4 w-4" />
                     </Button>
                     
@@ -641,18 +792,18 @@ useEffect(() => {
                         onChange={handleInputChange}
                         onKeyPress={handleKeyPress}
                         rows={2}
-                        className="resize-none"
+                        className="resize-none border-gray-200 focus:border-green-500 focus:ring-green-500"
                       />
                     </div>
                     
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50">
                       <Smile className="h-4 w-4" />
                     </Button>
                     
                     <Button 
                       onClick={handleSendMessage}
                       disabled={!messageText.trim()}
-                      className="bg-teal-600 hover:bg-teal-700"
+                      className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       <Send className="h-4 w-4" />
                     </Button>
@@ -662,14 +813,36 @@ useEffect(() => {
             ) : (
               <div className="flex-1 flex items-center justify-center text-gray-500">
                 <div className="text-center">
-                  <h3 className="text-lg font-medium mb-2">Select a conversation</h3>
-                  <p>Choose a conversation from the sidebar to start messaging</p>
+                  <h3 className="text-xl font-semibold mb-3 text-gray-900">Select a conversation</h3>
+                  <p className="text-gray-600">Choose a conversation from the sidebar to start messaging</p>
                 </div>
               </div>
             )}
           </div>
+          
+          {/* Timeline Sidebar - Only show when conversation is selected */}
+          {selectedConv && (
+            <div className="col-span-3 border-l border-gray-200">
+              <TimelineSidebar job={job} offers={offers} />
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Offer Modal */}
+      {showOfferModal && selectedConv && job && (
+        <OfferModal
+          isOpen={showOfferModal}
+          onClose={() => setShowOfferModal(false)}
+          conversationId={conversationId}
+          freelancerId={selectedConv.otherParticipant?.id}
+          freelancerName={selectedConv.otherParticipantEmail}
+          jobId={selectedConv.jobId}
+          jobTitle={job.title}
+          jobDescription={job.description}
+          onOfferCreated={fetchOffers}
+        />
+      )}
     </div>
   );
 };

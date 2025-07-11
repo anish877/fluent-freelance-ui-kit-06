@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma.js';
 import { protect, AuthRequest } from '../middleware/auth.js';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 const router: Router = express.Router();
 
@@ -48,6 +49,7 @@ router.get('/progress', protect, (async (req: AuthRequest, res: Response): Promi
         category: true,
         subcategory: true,
         experienceLevel: true,
+        coverImage: true,
         // Client fields
         companyName: true,
         companySize: true,
@@ -748,6 +750,7 @@ router.post('/complete-with-data', [
       responseTime,
       minimumProjectBudget,
       specialRequirements,
+      coverImage,
       
       // Client specific fields
       clientType,
@@ -829,6 +832,7 @@ router.post('/complete-with-data', [
           responseTime,
           minimumProjectBudget,
           specialRequirements,
+          coverImage,
           
           // Client fields
           clientType,
@@ -875,7 +879,8 @@ router.post('/complete-with-data', [
           certifications: true,
           companyName: true,
           companySize: true,
-          industry: true
+          industry: true,
+          coverImage: true
         }
       });
     } else {
@@ -886,7 +891,7 @@ router.post('/complete-with-data', [
       const hashPassword = (password: string): Promise<string> => {
         return new Promise((resolve, reject) => {
           const salt = crypto.randomBytes(16).toString('hex');
-          crypto.scrypt(password, salt, 64, (err: any, derivedKey: any) => {
+          crypto.scrypt(password, salt, 64, (err: Error | null, derivedKey: Buffer) => {
             if (err) reject(err);
             resolve(salt + ':' + derivedKey.toString('hex'));
           });
@@ -941,6 +946,7 @@ router.post('/complete-with-data', [
           responseTime,
           minimumProjectBudget,
           specialRequirements,
+          coverImage,
           
           // Client fields
           clientType,
@@ -987,7 +993,8 @@ router.post('/complete-with-data', [
           certifications: true,
           companyName: true,
           companySize: true,
-          industry: true
+          industry: true,
+          coverImage: true
         }
       });
     }
@@ -995,7 +1002,6 @@ router.post('/complete-with-data', [
     console.log('User processed successfully:', user.id);
 
     // Generate JWT token
-    const jwt = require('jsonwebtoken');
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET!,
