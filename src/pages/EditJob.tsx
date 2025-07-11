@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -13,32 +14,7 @@ import JobDescriptionStep from "../components/forms/JobDescriptionStep";
 import JobRequirementsStep from "../components/forms/JobRequirementsStep";
 import JobBudgetStep from "../components/forms/JobBudgetStep";
 import JobReviewStep from "../components/forms/JobReviewStep";
-
-interface JobFormData {
-  title: string;
-  category: string;
-  subcategory: string;
-  projectType: string;
-  duration: string;
-  description: string;
-  objectives: string[];
-  deliverables: string[];
-  skills: string[];
-  experienceLevel: string;
-  preferredQualifications: string[];
-  workingHours: string;
-  timezone: string;
-  communicationPreferences: string[];
-  budgetType: 'fixed' | 'hourly' | 'milestone';
-  budgetAmount: number;
-  hourlyRateMin: number;
-  hourlyRateMax: number;
-  milestones: Array<{ name: string; amount: number; dueDate: string }>;
-  isUrgent: boolean;
-  visibility: 'public' | 'private' | 'invite-only';
-  applicationDeadline: string;
-  additionalNotes: string;
-}
+import { JobFormData } from "./PostJob";
 
 const EditJob = () => {
   const { id } = useParams();
@@ -65,7 +41,7 @@ const EditJob = () => {
     workingHours: "",
     timezone: "",
     communicationPreferences: [],
-    budgetType: "fixed",
+    budgetType: "",
     budgetAmount: 0,
     hourlyRateMin: 0,
     hourlyRateMax: 0,
@@ -166,9 +142,9 @@ const EditJob = () => {
       errors.push("Budget amount must be greater than 0");
     }
     if (formData.budgetType === "hourly") {
-      if (formData.hourlyRateMin <= 0) errors.push("Minimum hourly rate must be greater than 0");
-      if (formData.hourlyRateMax <= 0) errors.push("Maximum hourly rate must be greater than 0");
-      if (formData.hourlyRateMin > formData.hourlyRateMax) {
+      if ((formData.hourlyRateMin || 0) <= 0) errors.push("Minimum hourly rate must be greater than 0");
+      if ((formData.hourlyRateMax || 0) <= 0) errors.push("Maximum hourly rate must be greater than 0");
+      if ((formData.hourlyRateMin || 0) > (formData.hourlyRateMax || 0)) {
         errors.push("Minimum hourly rate cannot be greater than maximum hourly rate");
       }
     }
@@ -190,27 +166,27 @@ const EditJob = () => {
     setIsSubmitting(true);
     try {
       // Prepare data for API
-             const jobData = {
-         title: formData.title,
-         category: formData.category,
-         subcategory: formData.subcategory,
-         projectType: formData.projectType,
-         duration: formData.duration,
-         description: formData.description,
-         requirements: [...formData.objectives, ...formData.deliverables],
-         skills: formData.skills,
-         experienceLevel: formData.experienceLevel,
-         workingHours: formData.workingHours,
-         timezone: formData.timezone,
-         communicationPreferences: formData.communicationPreferences,
-         budget: formData.budgetType === 'fixed' ? 'FIXED' : 'HOURLY',
-         minBudget: formData.budgetType === 'fixed' ? formData.budgetAmount : formData.hourlyRateMin,
-         maxBudget: formData.budgetType === 'fixed' ? formData.budgetAmount : formData.hourlyRateMax,
-         hourlyRate: formData.budgetType === 'hourly' ? formData.hourlyRateMax : undefined,
-         isUrgent: formData.isUrgent,
-         visibility: formData.visibility,
-         applicationDeadline: formData.applicationDeadline ? new Date(formData.applicationDeadline + 'T00:00:00.000Z').toISOString() : null
-       };
+      const jobData = {
+        title: formData.title,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        projectType: formData.projectType,
+        duration: formData.duration,
+        description: formData.description,
+        requirements: [...formData.objectives, ...formData.deliverables],
+        skills: formData.skills,
+        experienceLevel: formData.experienceLevel,
+        workingHours: formData.workingHours,
+        timezone: formData.timezone,
+        communicationPreferences: formData.communicationPreferences,
+        budget: formData.budgetType === 'fixed' ? 'FIXED' : 'HOURLY',
+        minBudget: formData.budgetType === 'fixed' ? formData.budgetAmount : formData.hourlyRateMin,
+        maxBudget: formData.budgetType === 'fixed' ? formData.budgetAmount : formData.hourlyRateMax,
+        hourlyRate: formData.budgetType === 'hourly' ? formData.hourlyRateMax : undefined,
+        isUrgent: formData.isUrgent,
+        visibility: formData.visibility,
+        applicationDeadline: formData.applicationDeadline ? new Date(formData.applicationDeadline + 'T00:00:00.000Z').toISOString() : null
+      };
 
       const response = await axios.put(`/jobs/${id}`, jobData);
       
@@ -426,4 +402,4 @@ const EditJob = () => {
   );
 };
 
-export default EditJob; 
+export default EditJob;
