@@ -16,10 +16,10 @@ import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
-import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { offerService } from '../../services/offer.service';
 
 interface Milestone {
   title: string;
@@ -158,8 +158,8 @@ const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   const handleAccept = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.put(`/offers/${offer.id}/accept`);
-      if (response.data.success) {
+      const response = await offerService.acceptOffer(offer.id);
+      if (response.success) {
         toast.success('Offer accepted successfully!');
         onStatusChange?.();
         onClose();
@@ -176,8 +176,8 @@ const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   const handleReject = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.put(`/offers/${offer.id}/reject`);
-      if (response.data.success) {
+      const response = await offerService.rejectOffer(offer.id);
+      if (response.success) {
         toast.success('Offer rejected');
         onStatusChange?.();
         onClose();
@@ -194,8 +194,8 @@ const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   const handleWithdraw = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.put(`/offers/${offer.id}/withdraw`);
-      if (response.data.success) {
+      const response = await offerService.withdrawOffer(offer.id);
+      if (response.success) {
         toast.success('Offer withdrawn successfully');
         onStatusChange?.();
         onClose();
@@ -215,9 +215,9 @@ const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
     
     setLoadingPayments(true);
     try {
-      const response = await axios.get(`/offers/${offer.id}/payments`);
-      if (response.data.success) {
-        setPayments(response.data.data);
+      const response = await offerService.getOfferPayments(offer.id);
+      if (response.success) {
+        setPayments(response.data);
       }
     } catch (error: unknown) {
       console.error('Error fetching payments:', error);
@@ -230,13 +230,13 @@ const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   const handleMilestonePayment = async (milestoneIndex: number, amount: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.post(`/offers/${offer.id}/payments`, {
+      const response = await offerService.processMilestonePayment(offer.id, {
         milestoneIndex,
         amount,
         paymentMethod: 'Credit Card'
       });
       
-      if (response.data.success) {
+      if (response.success) {
         toast.success('Payment processed successfully!');
         fetchPayments(); // Refresh payments
         onStatusChange?.();
@@ -254,12 +254,12 @@ const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
   const handleTestMilestonePayment = async (milestoneIndex: number, amount: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.post(`/offers/${offer.id}/test-payment`, {
+      const response = await offerService.processMilestonePayment(offer.id, {
         milestoneIndex,
         amount
       });
       
-      if (response.data.success) {
+      if (response.success) {
         toast.success('Test payment processed successfully!');
         fetchPayments(); // Refresh payments
         onStatusChange?.();
@@ -288,14 +288,14 @@ const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
 
     setIsLoading(true);
     try {
-      const response = await axios.post(`/offers/${offer.id}/milestones`, {
+      const response = await offerService.addMilestone(offer.id, {
         title: newMilestone.title,
         description: newMilestone.description,
         amount: parseFloat(newMilestone.amount),
         dueDate: newMilestone.dueDate || null
       });
       
-      if (response.data.success) {
+      if (response.success) {
         toast.success('Milestone added successfully!');
         setShowAddMilestone(false);
         setNewMilestone({ title: '', description: '', amount: '', dueDate: '' });

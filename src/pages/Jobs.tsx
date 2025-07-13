@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Filter, MapPin, Clock, DollarSign, Bookmark, Eye, Users, Star, Award, AlertCircle, Calendar, Building, Globe, ChevronDown, Loader2 } from "lucide-react";
-import axios from "axios";
 
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -12,47 +11,8 @@ import { Separator } from "../components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import JobCard from "../components/cards/JobCard";
 import { useAuth } from "../hooks/AuthContext";
-
-// Types for backend data
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-
-  budget: 'FIXED' | 'HOURLY';
-  minBudget?: number;
-  maxBudget?: number;
-  duration?: string;
-  skills: string[];
-  category: string;
-  subcategory?: string;
-  projectType?: string;
-  experienceLevel?: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  visibility: string;
-  clientId: string;
-  createdAt: string;
-  updatedAt: string;
-  client: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    companyName?: string;
-    location?: string;
-    verified: boolean;
-    createdAt: string;
-  };
-  _count: {
-    proposals: number;
-  };
-}
-
-interface Category {
-  value: string;
-  label: string;
-  count: number;
-}
+import { jobService } from "../services";
+import { Job, Category } from "../types";
 
 const Jobs = () => {
   const { user } = useAuth();
@@ -126,33 +86,32 @@ const Jobs = () => {
         duration: selectedDuration !== 'all' ? selectedDuration : ''
       });
       
-      const response = await axios.get(`/jobs?${params}`);
+      const response = await jobService.getJobs({
+        search: searchTerm,
+        category: selectedCategory !== 'all' ? selectedCategory : undefined,
+        jobType: selectedJobType !== 'all' ? selectedJobType : undefined,
+        experience: selectedExperience !== 'all' ? selectedExperience : undefined,
+        budget: selectedBudget !== 'all' ? selectedBudget : undefined,
+        duration: selectedDuration !== 'all' ? selectedDuration : undefined
+      });
       
-      if (response.data.success) {
-        setJobs(response.data.data);
-        setTotalJobs(response.data.total || response.data.data.length);
-        setTotalPages(response.data.totalPages || Math.ceil((response.data.total || response.data.data.length) / jobsPerPage));
+      if (response.success && response.data) {
+        setJobs(response.data.data || []);
+        setTotalJobs(response.data.total || 0);
+        setTotalPages(response.data.totalPages || 1);
         setCurrentPage(page);
         
-        // Update category counts if available
-        if (response.data.categoryCounts) {
-          setCategories(prev => prev.map(cat => ({
-            ...cat,
-            count: cat.value === "all" ? response.data.total : (response.data.categoryCounts[cat.value] || 0)
-          })));
-        } else {
-          // Fallback to calculating from current data
-          const categoryCounts = response.data.data.reduce((acc: Record<string, number>, job: Job) => {
-            const category = job.category.toLowerCase().replace(/\s+/g, '-');
-            acc[category] = (acc[category] || 0) + 1;
-            return acc;
-          }, {});
-          
-          setCategories(prev => prev.map(cat => ({
-            ...cat,
-            count: cat.value === "all" ? response.data.total : (categoryCounts[cat.value] || 0)
-          })));
-        }
+        // Calculate category counts from current data
+        const categoryCounts = (response.data.data || []).reduce((acc: Record<string, number>, job: Job) => {
+          const category = job.category.toLowerCase().replace(/\s+/g, '-');
+          acc[category] = (acc[category] || 0) + 1;
+          return acc;
+        }, {});
+        
+        setCategories(prev => prev.map(cat => ({
+          ...cat,
+          count: cat.value === "all" ? response.data!.total : (categoryCounts[cat.value] || 0)
+        })));
       } else {
         setJobsError('Failed to fetch jobs');
       }

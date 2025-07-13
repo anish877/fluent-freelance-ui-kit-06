@@ -14,12 +14,12 @@ interface InterviewRescheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
   originalData: {
-    date: string;
-    time: string;
-    duration: number;
+    date?: string;
+    time?: string;
+    duration?: number;
     notes?: string;
-    jobTitle: string;
-    clientName: string;
+    jobTitle?: string;
+    clientName?: string;
   };
   onReschedule: (interviewData: any) => void;
 }
@@ -32,18 +32,29 @@ const InterviewRescheduleModal = ({
 }: InterviewRescheduleModalProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(originalData.date);
-  const [selectedTime, setSelectedTime] = useState(originalData.time);
-  const [duration, setDuration] = useState(originalData.duration.toString());
-  const [notes, setNotes] = useState(originalData.notes || "");
+  
+  // Provide default values and safe access to originalData
+  const safeOriginalData = {
+    date: originalData?.date || format(addDays(new Date(), 1), 'yyyy-MM-dd'),
+    time: originalData?.time || '09:00',
+    duration: originalData?.duration || 30,
+    notes: originalData?.notes || "",
+    jobTitle: originalData?.jobTitle || "Interview",
+    clientName: originalData?.clientName || "Client"
+  };
+  
+  const [selectedDate, setSelectedDate] = useState(safeOriginalData.date);
+  const [selectedTime, setSelectedTime] = useState(safeOriginalData.time);
+  const [duration, setDuration] = useState(safeOriginalData.duration.toString());
+  const [notes, setNotes] = useState(safeOriginalData.notes);
 
   // Update form when originalData changes
   useEffect(() => {
-    setSelectedDate(originalData.date);
-    setSelectedTime(originalData.time);
-    setDuration(originalData.duration.toString());
-    setNotes(originalData.notes || "");
-  }, [originalData]);
+    setSelectedDate(safeOriginalData.date);
+    setSelectedTime(safeOriginalData.time);
+    setDuration(safeOriginalData.duration.toString());
+    setNotes(safeOriginalData.notes);
+  }, [safeOriginalData]);
 
   // Generate time slots (9 AM to 6 PM)
   const timeSlots = [];
@@ -81,8 +92,8 @@ const InterviewRescheduleModal = ({
         time: selectedTime,
         duration: parseInt(duration),
         notes: notes,
-        jobTitle: originalData.jobTitle,
-        clientName: originalData.clientName
+        jobTitle: safeOriginalData.jobTitle,
+        clientName: safeOriginalData.clientName
       };
 
       onReschedule(interviewData);
@@ -120,13 +131,13 @@ const InterviewRescheduleModal = ({
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium text-gray-700">Job</Label>
-              <p className="text-sm text-gray-600 mt-1">{originalData.jobTitle}</p>
+              <p className="text-sm text-gray-600 mt-1">{safeOriginalData.jobTitle}</p>
             </div>
             
             <div>
               <Label className="text-sm font-medium text-gray-700">Original Schedule</Label>
               <p className="text-sm text-gray-600 mt-1">
-                {format(new Date(originalData.date), 'EEEE, MMMM d')} at {originalData.time} ({originalData.duration} minutes)
+                {originalData?.date ? format(new Date(originalData.date), 'EEEE, MMMM d') : 'Not specified'} at {originalData?.time || 'Not specified'} ({originalData?.duration || 30} minutes)
               </p>
             </div>
           </div>

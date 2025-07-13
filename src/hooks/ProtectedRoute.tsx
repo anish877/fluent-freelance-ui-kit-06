@@ -1,12 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/AuthContext';
 import { useEffect, useState } from 'react';
-
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-  allowedUserTypes?: ('FREELANCER' | 'CLIENT')[];
-  requireOnboarding?: boolean;
-}
+import { ProtectedRouteProps } from '../types';
 
 const ProtectedRoute = ({ 
   children, 

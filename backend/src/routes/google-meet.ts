@@ -14,6 +14,23 @@ router.post('/create-meet', protect, async (req: AuthRequest, res: Response) => 
     const { summary, description, startTime, duration } = req.body;
     const userId = req.user!.id;
 
+    // Validate required parameters
+    if (!startTime) {
+      res.status(400).json({ 
+        success: false,
+        message: 'Start time is required' 
+      });
+      return;
+    }
+
+    if (!duration || typeof duration !== 'number' || duration <= 0) {
+      res.status(400).json({ 
+        success: false,
+        message: 'Valid duration is required (must be a positive number)' 
+      });
+      return;
+    }
+
     // Get user with Google tokens
     const user = await prisma.user.findUnique({ 
       where: { id: userId },
@@ -70,16 +87,26 @@ router.post('/create-meet', protect, async (req: AuthRequest, res: Response) => 
         auth.setCredentials({ access_token: credentials.access_token });
       } catch (error) {
         console.error('Error refreshing token:', error);
-        res.status(401).json({ 
+        const redirectUrl = generateGoogleOAuthURL(userId);
+        
+        res.status(200).json({ 
           success: false,
+          error: 'Google token expired',
+          needsGoogleAuth: true,
+          redirectUrl,
           message: 'Google token expired. Please reconnect your Google account.' 
         });
         return;
       }
     } else if (user.expiresAt && new Date() > user.expiresAt && !user.refreshToken) {
       // Token expired but no refresh token available
-      res.status(401).json({ 
+      const redirectUrl = generateGoogleOAuthURL(userId);
+      
+      res.status(200).json({ 
         success: false,
+        error: 'Google token expired and no refresh token available',
+        needsGoogleAuth: true,
+        redirectUrl,
         message: 'Google token expired and no refresh token available. Please reconnect your Google account.' 
       });
       return;
@@ -88,7 +115,16 @@ router.post('/create-meet', protect, async (req: AuthRequest, res: Response) => 
     // Create calendar event with Google Meet
     const calendar = google.calendar({ version: 'v3', auth });
 
+    // Validate and parse the start time
     const startDateTime = new Date(startTime);
+    if (isNaN(startDateTime.getTime())) {
+      res.status(400).json({ 
+        success: false,
+        message: 'Invalid start time provided' 
+      });
+      return;
+    }
+
     const endDateTime = new Date(startDateTime.getTime() + (duration * 60 * 1000));
 
     const event = {

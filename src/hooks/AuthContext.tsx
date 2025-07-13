@@ -1,65 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
-// Types based on your backend user model
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  userType: 'FREELANCER' | 'CLIENT';
-  isOnboarded: boolean;
-  onboardingStep: number;
-  avatar?: string;
-  bio?: string;
-  location?: string;
-  phone?: string;
-  skills?: string[];
-  hourlyRate?: number;
-  portfolio?: string;
-  experience?: string;
-  education?: string;
-  certifications?: string[];
-  companyName?: string;
-  companySize?: string;
-  industry?: string;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  login_google: () => void;
-  connect_google_calendar: () => void;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; user?: User, status: number }>;
-  register: (userData: RegisterData) => Promise<{ success: boolean; message?: string; user?: User }>;
-  logout: () => Promise<void>;
-  checkAuth: () => Promise<{}>;
-  completeOnboarding: (userData: any) => Promise<{ success: boolean; message?: string; user?: User }>;
-}
-
-interface RegisterData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  userType: 'FREELANCER' | 'CLIENT';
-  [key: string]: any;
-}
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
+import { 
+  AuthUser,
+  AuthContextType,
+  AuthProviderProps,
+  RegisterData
+} from '../types';
 
 // Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Auth Provider Component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate()
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -94,7 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Login function
-  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; user?: User; status: number }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; user?: AuthUser; status: number }> => {
     try {
       const response = await axios.post('/auth/login', { email, password });
       
@@ -123,7 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Register function
-  const register = async (userData: RegisterData): Promise<{ success: boolean; message?: string; user?: User }> => {
+  const register = async (userData: RegisterData): Promise<{ success: boolean; message?: string; user?: AuthUser }> => {
     try {
       const response = await axios.post('/auth/register', userData);
       
@@ -172,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Complete onboarding function
-  const completeOnboarding = async (userData: any): Promise<{ success: boolean; message?: string; user?: User }> => {
+  const completeOnboarding = async (userData: any): Promise<{ success: boolean; message?: string; user?: AuthUser }> => {
     try {
       const response = await axios.post('/onboarding/complete-with-data', userData);
       

@@ -6,7 +6,6 @@ import {
   Filter, Search, Calendar, BarChart3, PieChart, Loader2,
   User, CalendarDays, FileText, Target
 } from "lucide-react";
-import axios from "axios";
 
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -14,155 +13,8 @@ import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { useAuth } from "../hooks/AuthContext";
-
-// Types for backend data
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-
-  budget: 'FIXED' | 'HOURLY';
-  minBudget?: number;
-  maxBudget?: number;
-  duration?: string;
-  skills: string[];
-  category: string;
-  subcategory?: string;
-  projectType?: string;
-  experienceLevel?: string;
-  workingHours?: string;
-  timezone?: string;
-  communicationPreferences: string[];
-  location?: string;
-  isRemote: boolean;
-  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  isUrgent: boolean;
-  visibility: string;
-  applicationDeadline?: string;
-  clientId: string;
-  createdAt: string;
-  updatedAt: string;
-  _count: {
-    proposals: number;
-  };
-}
-
-interface Proposal {
-  id: string;
-  jobId: string;
-  freelancerId: string;
-  coverLetter: string;
-  bidAmount: number;
-  bidType: 'FIXED' | 'HOURLY';
-  estimatedDuration: string;
-  attachments: string[];
-  questionResponses: Array<{
-    question: string;
-    answer: string;
-  }>;
-  milestones: Array<{
-    title: string;
-    description: string;
-    amount: number;
-    dueDate: string;
-  }>;
-  originalBudget?: number;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
-  clientNotes?: string;
-  rating?: number;
-  interview?: {
-    scheduled: boolean;
-    date?: string;
-    notes?: string;
-  };
-  isShortlisted?: boolean;
-  clientViewed?: boolean;
-  createdAt: string;
-  updatedAt: string;
-  freelancer: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    bio?: string;
-    location?: string;
-    skills: string[];
-    hourlyRate?: number;
-    portfolio?: string[];
-    experience?: string;
-    education?: string;
-    certifications?: string[];
-    languages?: string[];
-    topSkills?: string[];
-    experienceLevel?: string;
-    totalEarnings?: number;
-    successRate?: number;
-    completedJobs?: number;
-    onTime?: number;
-    responseTime?: number;
-    lastActive?: string;
-    topRatedPlus?: boolean;
-    verified?: boolean;
-    email: string;
-  };
-  job: {
-    id: string;
-    title: string;
-    description: string;
-    client: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      companyName?: string;
-    };
-  };
-}
-
-interface Offer {
-  id: string;
-  conversationId: string;
-  clientId: string;
-  freelancerId: string;
-  jobId: string;
-  budgetType: 'FIXED' | 'HOURLY';
-  amount: number;
-  duration: string;
-  milestones: Array<{
-    title: string;
-    description: string;
-    amount: number;
-    dueDate: string;
-    status?: 'pending' | 'in_progress' | 'completed';
-  }>;
-  terms?: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
-  expiresAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  client: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    companyName?: string;
-  };
-  freelancer: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    email: string;
-  };
-  job: {
-    id: string;
-    title: string;
-    description: string;
-  };
-  conversation: {
-    id: string;
-    projectName?: string;
-  };
-}
+import { jobService, proposalService, offerService } from "../services";
+import { Job, Proposal, Offer } from "../types";
 
 const ClientDashboard = () => {
   const { user } = useAuth();
@@ -204,16 +56,11 @@ const ClientDashboard = () => {
       setJobsLoading(true);
       setJobsError(null);
       
-      const response = await axios.get('/jobs/client/me');
-      
-      if (response.data.success) {
-        setJobs(response.data.data);
-      } else {
-        setJobsError('Failed to fetch jobs');
-      }
+      const response = await jobService.getClientJobs();
+      setJobs(response);
     } catch (error) {
       console.error('Error fetching jobs:', error);
-      setJobsError(error.response?.data?.message || 'Failed to fetch jobs');
+      setJobsError('Failed to fetch jobs');
     } finally {
       setJobsLoading(false);
     }
@@ -225,16 +72,11 @@ const ClientDashboard = () => {
       setOffersLoading(true);
       setOffersError(null);
       
-      const response = await axios.get('/offers/me?status=ACCEPTED');
-      
-      if (response.data.success) {
-        setOffers(response.data.data);
-      } else {
-        setOffersError('Failed to fetch offers');
-      }
+      const response = await offerService.getOffersByStatus('ACCEPTED');
+      setOffers(response);
     } catch (error) {
       console.error('Error fetching offers:', error);
-      setOffersError(error.response?.data?.message || 'Failed to fetch offers');
+      setOffersError('Failed to fetch offers');
     } finally {
       setOffersLoading(false);
     }
@@ -252,13 +94,9 @@ const ClientDashboard = () => {
       // Fetch proposals for each job
       for (const job of jobs) {
         try {
-          const response = await axios.get(`/proposals/job/${job.id}`);
-          
-          if (response.data.success) {
-            const jobProposals = response.data.data;
-            allProposals.push(...jobProposals);
-            proposalsByJobMap[job.id] = jobProposals;
-          }
+          const jobProposals = await proposalService.getJobProposalsArray(job.id);
+          allProposals.push(...jobProposals);
+          proposalsByJobMap[job.id] = jobProposals;
         } catch (error) {
           console.error(`Error fetching proposals for job ${job.id}:`, error);
         }
@@ -277,9 +115,9 @@ const ClientDashboard = () => {
   // Update proposal status (accept/reject)
   const updateProposalStatus = async (proposalId: string, status: 'ACCEPTED' | 'REJECTED') => {
     try {
-      const response = await axios.put(`/proposals/${proposalId}/status`, { status });
+      const response = await proposalService.updateProposalStatus(proposalId, status);
       
-      if (response.data.success) {
+      if (response.success) {
         // Update the proposal in state
         setProposals(prevProposals => 
           prevProposals.map(proposal => 
@@ -316,9 +154,9 @@ const ClientDashboard = () => {
     clientViewed?: boolean;
   }) => {
     try {
-      const response = await axios.put(`/proposals/${proposalId}`, updateData);
+      const response = await proposalService.updateProposal(proposalId, updateData);
       
-      if (response.data.success) {
+      if (response.success) {
         // Update the proposal in state
         setProposals(prevProposals => 
           prevProposals.map(proposal => 
@@ -349,9 +187,9 @@ const ClientDashboard = () => {
   // Delete job
   const deleteJob = async (jobId: string) => {
     try {
-      const response = await axios.delete(`/jobs/${jobId}`);
+      const response = await jobService.deleteJob(jobId);
       
-      if (response.data.success) {
+      if (response.success) {
         // Remove the job from state
         setJobs(jobs.filter(job => job.id !== jobId));
       } else {

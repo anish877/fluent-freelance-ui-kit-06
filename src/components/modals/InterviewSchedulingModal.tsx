@@ -10,8 +10,10 @@ import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Badge } from "../ui/badge";
 import { useToast } from "../../hooks/use-toast";
-import axios from "axios";
 import { useAuth } from "@/hooks/AuthContext";
+import { googleMeetService } from "../../services/google-meet.service";
+import { proposalService } from "../../services/proposal.service";
+import { messageService } from "../../services/message.service";
 
 interface InterviewSchedulingModalProps {
   isOpen: boolean;
@@ -83,7 +85,7 @@ const InterviewSchedulingModal = ({
     setLoading(true);
     try {
       // First, create the Google Meet link
-      const meetResponse = await axios.post('/google-meet/create-meet', {
+      const meetResponse = await googleMeetService.createMeet({
         summary: `Interview: ${jobTitle}`,
         description: `Interview for ${jobTitle} with ${freelancerName}`,
         startTime: `${selectedDate}T${selectedTime}:00`,
@@ -91,7 +93,7 @@ const InterviewSchedulingModal = ({
       });
 
       // Check if user needs to connect Google Calendar
-      if (meetResponse.status === 200 && meetResponse.data.needsGoogleAuth) {
+      if (meetResponse.needsGoogleAuth) {
         toast({
           title: "Google Calendar Required",
           description: "To schedule interviews, you need to connect your Google Calendar.",
@@ -106,11 +108,7 @@ const InterviewSchedulingModal = ({
         return;
       }
 
-      if (!meetResponse.data.success) {
-        throw new Error('Failed to create Google Meet link');
-      }
-
-      const meetUrl = meetResponse.data.meetLink;
+      const meetUrl = meetResponse.meetLink;
 
       const interviewData = {
         scheduled: true,
@@ -123,12 +121,12 @@ const InterviewSchedulingModal = ({
 
       if (isRescheduling && messageId) {
         // Reschedule existing interview
-        const rescheduleResponse = await axios.put(`/messages/interview/${messageId}/reschedule`, {
+        const rescheduleResponse = await messageService.rescheduleInterview(messageId, {
           interviewData,
           proposalId
         });
 
-        if (rescheduleResponse.data.success) {
+        if (rescheduleResponse.success) {
           toast({
             title: "Success",
             description: "Interview rescheduled successfully!",
@@ -146,11 +144,11 @@ const InterviewSchedulingModal = ({
         }
       } else {
         // Schedule new interview
-        const proposalResponse = await axios.put(`/proposals/${proposalId}`, {
+        const proposalResponse = await proposalService.updateProposal(proposalId, {
           interview: interviewData
         });
 
-        if (proposalResponse.data.success) {
+        if (proposalResponse.success) {
           toast({
             title: "Success",
             description: "Interview scheduled successfully!",

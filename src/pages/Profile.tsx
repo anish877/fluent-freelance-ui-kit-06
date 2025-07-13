@@ -10,181 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Separator } from "../components/ui/separator";
 import { useAuth } from "../hooks/AuthContext";
 import EditProfileModal from "../components/modals/EditProfileModal";
-
-interface UserProfile {
-  id: string;
-  firstName: string;
-  lastName: string;
-  title: string;
-  location: string;
-  country: string;
-  city: string;
-  timezone: string;
-  joinDate: string;
-  profilePicture: string;
-  rating: number;
-  reviewCount: number;
-  completedJobs: number;
-  totalEarnings: string;
-  successRate: number;
-  responseTime: string;
-  availability: string;
-  description: string;
-  skills: (string | { name: string })[];
-  languages: (string | { language: string; proficiency: string })[];
-  hourlyRate: string;
-  phone?: string;
-  coverImage?: string;
-  socialLinks?: {
-    linkedin?: string;
-    github?: string;
-    website?: string;
-    twitter?: string;
-  };
-  education: Array<{
-    degree: string;
-    school: string;
-    year: string;
-  }>;
-  certifications: Array<{
-    name: string;
-    issuer: string;
-    year: string;
-  }>;
-  portfolio: Array<{
-    title: string;
-    description: string;
-    image: string;
-    images?: string[];
-    technologies: string[];
-    link: string;
-    category?: string;
-    completionDate?: string;
-    clientFeedback?: string;
-    role?: string;
-    duration?: string;
-    client?: string;
-    budget?: string;
-    projectType?: string;
-    challenges?: string;
-    outcomes?: string;
-  }>;
-  workHistory: Array<{
-    title: string;
-    client: string;
-    duration: string;
-    description: string;
-    rating: number;
-    feedback: string;
-  }>;
-  workExperience: Array<{
-    title: string;
-    company: string;
-    startDate: string;
-    endDate: string;
-    current: boolean;
-    description: string;
-  }>;
-  reviews: Array<{
-    client: string;
-    rating: number;
-    date: string;
-    project: string;
-    comment: string;
-  }>;
-}
-
-// Add explicit types for all mapped fields
-interface Skill {
-  name: string;
-  category?: string;
-  level?: string;
-  yearsOfExperience?: number;
-}
-
-interface Language {
-  language: string;
-  proficiency: string;
-}
-
-interface Education {
-  degree: string;
-  institution?: string;
-  school?: string;
-  year: string;
-  endDate?: string;
-  startDate?: string;
-}
-
-interface Certification {
-  name: string;
-  issuer?: string;
-  year?: string;
-}
-
-interface PortfolioItem {
-  title: string;
-  description: string;
-  image: string;
-  images?: string[];
-  technologies: string[];
-  link: string;
-  category?: string;
-  completionDate?: string;
-  clientFeedback?: string;
-  role?: string;
-  duration?: string;
-  client?: string;
-  budget?: string;
-  projectType?: string;
-  challenges?: string;
-  outcomes?: string;
-}
-
-interface BackendPortfolioItem {
-  title: string;
-  description: string;
-  image: string;
-  images?: string[];
-  technologies: string[];
-  link?: string;
-  url?: string;
-  liveUrl?: string;
-  sourceUrl?: string;
-  category?: string;
-  completionDate?: string;
-  clientFeedback?: string;
-  role?: string;
-  duration?: string;
-  client?: string;
-  budget?: string;
-  projectType?: string;
-  challenges?: string;
-  outcomes?: string;
-}
-
-interface WorkExperience {
-  title: string;
-  company: string;
-  startDate: string;
-  endDate: string;
-  current: boolean;
-  description: string;
-}
-
-// Add Review type for fetchReviews
-interface Review {
-  author: {
-    firstName: string;
-    lastName: string;
-  };
-  rating: number;
-  createdAt: string;
-  job?: {
-    title?: string;
-  };
-  comment: string;
-}
+import { UserProfile, Skill, Language, Education, Certification, PortfolioItem, BackendPortfolioItem, WorkExperience, Review } from "../types";
 
 // Enhanced ExpandableText component
 const ExpandableText = ({ text, maxLength = 200, className = "" }: { 
@@ -663,15 +489,18 @@ const ProfileTabs = ({ userProfile, onEditClick }: { userProfile: UserProfile; o
           <CardContent>
             {userProfile.certifications.length > 0 ? (
               <div className="space-y-4">
-                {userProfile.certifications.map((cert, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
-                    <div>
-                      <div className="font-medium">{cert.name}</div>
-                      <div className="text-sm text-gray-600">{cert.issuer}</div>
+                {userProfile.certifications.map((cert, index) => {
+                  const certData = typeof cert === 'string' ? { name: cert, issuer: 'Unknown', year: '' } : cert;
+                  return (
+                    <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                      <div>
+                        <div className="font-medium">{certData.name}</div>
+                        <div className="text-sm text-gray-600">{certData.issuer}</div>
+                      </div>
+                      {certData.year && <Badge variant="outline">{certData.year}</Badge>}
                     </div>
-                    {cert.year && <Badge variant="outline">{cert.year}</Badge>}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <EmptyState

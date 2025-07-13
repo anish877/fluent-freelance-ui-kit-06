@@ -11,58 +11,7 @@ import { Separator } from "../components/ui/separator";
 import { Progress } from "../components/ui/progress";
 import { useAuth } from "../hooks/AuthContext";
 import { useWebSocket } from "../hooks/socketContext";
-
-interface Freelancer {
-  id: string;
-  name: string;
-  title: string;
-  location: string;
-  rating: number;
-  reviewCount: number;
-  hourlyRate: string;
-  availability: "available" | "busy" | "offline";
-  skills: string[];
-  description: string;
-  completedJobs: number;
-  totalEarnings: string;
-  responseTime: string;
-  languages: string[];
-  profilePicture: string;
-  verified: boolean;
-  topRated: boolean;
-  risingTalent: boolean;
-  email?: string;
-  portfolio: {
-    title: string;
-    image: string;
-    description: string;
-    category: string;
-  }[];
-  lastActive: string;
-  successRate: number;
-  onTime: number;
-  onBudget: number;
-  repeatHireRate: number;
-  certifications: string[];
-  education: string[];
-  specializations: string[];
-  testScores: { name: string; score: number }[];
-  memberSince: string;
-  profileStrength: number;
-}
-
-interface Category {
-  label: string;
-  value: string;
-  count: number;
-}
-
-interface PlatformStats {
-  totalFreelancers: string;
-  averageRating: string;
-  successRate: number;
-  countriesCount: number;
-}
+import { Freelancer, TalentCategory, PlatformStats } from "../types";
 
 const Talent = () => {
   const { user } = useAuth();
