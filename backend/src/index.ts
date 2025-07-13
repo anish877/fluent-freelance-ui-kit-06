@@ -25,6 +25,7 @@ import uploadRoutes from './routes/upload.js';
 import talentRoutes from './routes/talent.js';
 import jobInvitationRoutes from './routes/job-invitations.js';
 import offersRoutes from './routes/offers.js';
+import googleMeetRoutes from './routes/google-meet.js';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -116,6 +117,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/talent', talentRoutes);
 app.use('/api/job-invitations', jobInvitationRoutes);
 app.use('/api/offers', offersRoutes);
+app.use('/api/google-meet', googleMeetRoutes);
 
 // Serve static files from the React app only in production
 if (process.env.NODE_ENV === 'production') {

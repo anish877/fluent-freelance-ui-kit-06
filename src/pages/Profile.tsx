@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Edit, Camera, MapPin, Star, Calendar, DollarSign, Award, Users, Clock, CheckCircle, ExternalLink } from "lucide-react";
+import { Edit, Camera, MapPin, Star, Calendar, DollarSign, Award, Users, Clock, CheckCircle, ExternalLink, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import Footer from "../components/layout/Footer";
@@ -491,18 +491,109 @@ const ProfileHeader = ({ userProfile, onEditClick }: { userProfile: UserProfile;
 };
 
 // 5. Enhanced Tabs with Better Spacing and Animation
+const GoogleCalendarConnection = () => {
+  const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { connect_google_calendar } = useAuth();
+
+  useEffect(() => {
+    checkCalendarStatus();
+  }, []);
+
+  const checkCalendarStatus = async () => {
+    try {
+      const response = await fetch('/api/google-meet/status', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsConnected(data.isConnected && !data.isExpired);
+      }
+    } catch (error) {
+      console.error('Error checking calendar status:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleConnectCalendar = async () => {
+    try {
+      connect_google_calendar();
+    } catch (error) {
+      console.error('Error connecting calendar:', error);
+      alert('Failed to connect Google Calendar');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg p-6 border border-gray-200">
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg p-6 border border-gray-200">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <Calendar className="h-6 w-6 text-blue-600" />
+          <h3 className="text-lg font-semibold text-gray-900">Google Calendar</h3>
+        </div>
+        <Badge className={isConnected ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+          {isConnected ? "Connected" : "Not Connected"}
+        </Badge>
+      </div>
+      
+      <p className="text-gray-600 mb-4">
+        {isConnected 
+          ? "Your Google Calendar is connected. You can schedule interviews and they will be automatically added to your calendar."
+          : "Connect your Google Calendar to automatically schedule interviews and add them to your calendar."
+        }
+      </p>
+      
+      {!isConnected && (
+        <Button 
+          onClick={handleConnectCalendar}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <Calendar className="h-4 w-4 mr-2" />
+          Connect Google Calendar
+        </Button>
+      )}
+      
+      {isConnected && (
+        <Button 
+          variant="outline"
+          onClick={handleConnectCalendar}
+          className="border-blue-200 text-blue-600 hover:bg-blue-50"
+        >
+          <Settings className="h-4 w-4 mr-2" />
+          Reconnect Calendar
+        </Button>
+      )}
+    </div>
+  );
+};
+
 const ProfileTabs = ({ userProfile, onEditClick }: { userProfile: UserProfile; onEditClick: (tab?: string) => void }) => {
   const navigate = useNavigate();
   
   return (
     <Tabs defaultValue="overview" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-6">
+      <TabsList className="grid w-full grid-cols-7">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="portfolio">Portfolio ({userProfile.portfolio.length})</TabsTrigger>
         <TabsTrigger value="work-experience">Experience</TabsTrigger>
         <TabsTrigger value="work-history">Work History</TabsTrigger>
         <TabsTrigger value="reviews">Reviews ({userProfile.reviews.length})</TabsTrigger>
         <TabsTrigger value="education">Education</TabsTrigger>
+        <TabsTrigger value="settings">Settings</TabsTrigger>
       </TabsList>
 
       {/* Tab Contents with better empty states */}
@@ -800,6 +891,11 @@ const ProfileTabs = ({ userProfile, onEditClick }: { userProfile: UserProfile; o
             onAction={() => onEditClick('education')}
           />
         )}
+      </TabsContent>
+
+      {/* Settings Tab */}
+      <TabsContent value="settings" className="space-y-6">
+        <GoogleCalendarConnection />
       </TabsContent>
     </Tabs>
   );
