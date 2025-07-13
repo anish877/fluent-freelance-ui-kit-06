@@ -147,9 +147,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         break;
 
         case 'interview_scheduled':
-          console.log('📅 Received interview_scheduled message:', wsMessage.payload);
-          console.log('📅 Current conversation ID:', currentConversationId);
-          console.log('📅 Message conversation ID:', wsMessage.payload.conversationId);
           
           const interviewMessage = {
             id: wsMessage.payload.id,
@@ -160,16 +157,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
             type: 'interview' as const
           };
 
-          console.log('📅 Processed interview message:', interviewMessage);
 
           setMessages(prevMessages => {
-            console.log('📅 Current messages before adding interview:', prevMessages.length);
-            console.log('📅 Current conversation ID in setMessages:', currentConversationId);
-            console.log('📅 Message conversation ID:', interviewMessage.conversationId);
             
             const messageExists = prevMessages.some(msg => msg.id === interviewMessage.id);
             if (messageExists) {
-              console.log('📅 Interview message already exists, updating content');
               return prevMessages.map(msg =>
                 msg.id === interviewMessage.id ? interviewMessage : msg
               );
@@ -185,7 +177,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
             const updatedMessages = [...prevMessages];
             updatedMessages.splice(insertIndex, 0, interviewMessage);
-            console.log('📅 Added interview message, total messages:', updatedMessages.length);
             return updatedMessages;
           });
         break;
