@@ -31,23 +31,15 @@ interface Job {
   budget: 'FIXED' | 'HOURLY';
   minBudget?: number;
   maxBudget?: number;
-  hourlyRate?: number;
   duration?: string;
   skills: string[];
   category: string;
   subcategory?: string;
   projectType?: string;
   experienceLevel?: string;
-  workingHours?: string;
-  timezone?: string;
-  communicationPreferences: string[];
-  location?: string;
-  isRemote: boolean;
   status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  isUrgent: boolean;
   visibility: string;
-  applicationDeadline?: string;
-  requirements: string[];
+
   createdAt: string;
   updatedAt: string;
   client: {
@@ -70,6 +62,7 @@ interface Proposal {
   id: string;
   coverLetter: string;
   bidAmount: number;
+  bidType?: 'hourly' | 'fixed'; // Add bid type
   estimatedDuration: string;
   attachments: string[];
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
@@ -145,6 +138,7 @@ const ClientJobView = () => {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [acceptingProposalId, setAcceptingProposalId] = useState<string | null>(null);
   const { createConversation } = useWebSocket();
   const navigate = useNavigate();
 
@@ -296,8 +290,54 @@ const ClientJobView = () => {
     }
   };
 
+  const handleAcceptAndMessage = async (proposalId: string, freelancerEmail: string, jobId: string, projectName: string) => {
+    try {
+      setAcceptingProposalId(proposalId);
+      
+      // First, accept the proposal
+      const acceptResponse = await axios.put(`/proposals/${proposalId}/status`, {
+        status: 'ACCEPTED'
+      });
+      
+      if (acceptResponse.data.success) {
+        toast({
+          title: "Success",
+          description: "Proposal accepted successfully! Starting conversation...",
+        });
+        
+        // Refresh proposals
+        const proposalsResponse = await axios.get(`/proposals/job/${id}`);
+        if (proposalsResponse.data.success) {
+          setProposals(proposalsResponse.data.data);
+        }
+        
+        // Then start a conversation and redirect to messages
+        const conversationId = await createConversation(freelancerEmail, projectName, jobId);
+        if (conversationId) {
+          navigate(`/messages/${conversationId}`);
+        } else {
+          toast({
+            title: "Warning",
+            description: "Proposal accepted but could not start conversation. You can message the freelancer from the messages page.",
+            variant: "destructive"
+          });
+        }
+      }
+    } catch (err: unknown) {
+      console.error('Error accepting proposal and starting conversation:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to accept proposal and start conversation';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setAcceptingProposalId(null);
+    }
+  };
+
   const formatBudget = (job: Job) => {
-    if (job.budget === 'FIXED') {
+    if (job.projectType === 'fixed') {
       if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
         return `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`;
       } else if (job.minBudget) {
@@ -306,11 +346,11 @@ const ClientJobView = () => {
         return `$${job.maxBudget.toLocaleString()}`;
       }
       return "Budget not specified";
-    } else if (job.budget === 'HOURLY') {
+    } else if (job.projectType === 'hourly') {
       if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
         return `$${job.minBudget}/hr - $${job.maxBudget}/hr`;
-      } else if (job.hourlyRate) {
-        return `$${job.hourlyRate}/hr`;
+      } else if (job.minBudget) {
+        return `$${job.minBudget}/hr`;
       }
       return "Hourly rate not specified";
     }
@@ -400,10 +440,10 @@ const ClientJobView = () => {
                   <Calendar className="h-4 w-4 mr-1" />
                   Posted {formatDate(job.createdAt)}
                 </span>
-                <span className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {job.location || 'Remote'}
-                </span>
+                                    <span className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      Remote
+                    </span>
                 <span className="flex items-center">
                   <Eye className="h-4 w-4 mr-1" />
                   {job._count.proposals} proposals
@@ -597,7 +637,10 @@ const ClientJobView = () => {
                             <span className="capitalize">{proposal.status.toLowerCase()}</span>
                           </div>
                           <div className="text-right text-sm">
-                            <p className="font-semibold text-gray-900">${proposal.bidAmount.toLocaleString()}</p>
+                            <p className="font-semibold text-gray-900">
+                              ${proposal.bidAmount.toLocaleString()}
+                              {proposal.bidType === 'hourly' && '/hr'}
+                            </p>
                             <p className="text-gray-600">{proposal.estimatedDuration}</p>
                           </div>
                         </div>
@@ -624,6 +667,38 @@ const ClientJobView = () => {
                               Skills not specified
                             </Badge>
                           }
+                        </div>
+                      )}
+
+                      {/* Attachments */}
+                      {proposal.attachments && proposal.attachments.length > 0 && (
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <FileText className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm font-medium text-gray-700">Attachments ({proposal.attachments.length})</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {proposal.attachments.map((attachment, index) => (
+                              <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                <div className="w-6 h-6 bg-teal-100 rounded flex items-center justify-center">
+                                  <span className="text-xs font-medium text-teal-600">
+                                    {attachment.split('.').pop()?.toUpperCase() || 'FILE'}
+                                  </span>
+                                </div>
+                                <span className="text-xs text-gray-700 truncate max-w-24">
+                                  {attachment.split('/').pop() || 'attachment'}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => window.open(attachment, '_blank')}
+                                >
+                                  <Download className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
 
@@ -698,19 +773,25 @@ const ClientJobView = () => {
                                 {/* Proposal Details */}
                                 <div className="border rounded-lg p-4">
                                   <h3 className="font-semibold mb-3">Proposal Details</h3>
-                                  <div className="grid grid-cols-3 gap-4 mb-4">
+                                  <div className="grid grid-cols-2 gap-4 mb-4">
                                     <div>
                                       <span className="text-gray-600">Bid Amount: </span>
-                                      <span className="font-semibold text-lg">${proposal.bidAmount.toLocaleString()}</span>
+                                      <span className="font-semibold text-lg">
+                                        ${proposal.bidAmount.toLocaleString()}
+                                        {proposal.bidType === 'hourly' && '/hr'}
+                                      </span>
+                                      <p className="text-xs text-gray-500">
+                                        {proposal.bidType === 'hourly' ? 'Hourly Rate' : 'Fixed Price'}
+                                      </p>
                                     </div>
                                     <div>
                                       <span className="text-gray-600">Duration: </span>
                                       <span className="font-medium">{proposal.estimatedDuration}</span>
                                     </div>
-                                    <div>
-                                      <span className="text-gray-600">Status: </span>
-                                      <Badge className={getStatusColor(proposal.status)}>{proposal.status.toLowerCase()}</Badge>
-                                    </div>
+                                  </div>
+                                  <div className="mb-4">
+                                    <span className="text-gray-600">Status: </span>
+                                    <Badge className={getStatusColor(proposal.status)}>{proposal.status.toLowerCase()}</Badge>
                                   </div>
                                   
                                   {/* Milestones */}
@@ -739,6 +820,42 @@ const ClientJobView = () => {
                                       </p>
                                     </div>
                                   </div>
+
+                                  {/* Attachments */}
+                                  {proposal.attachments && proposal.attachments.length > 0 && (
+                                    <div>
+                                      <h4 className="font-medium mb-2">Attachments ({proposal.attachments.length})</h4>
+                                      <div className="space-y-2">
+                                        {proposal.attachments.map((attachment, index) => (
+                                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                            <div className="flex items-center space-x-3">
+                                              <div className="w-8 h-8 bg-teal-100 rounded flex items-center justify-center">
+                                                <span className="text-xs font-medium text-teal-600">
+                                                  {attachment.split('.').pop()?.toUpperCase() || 'FILE'}
+                                                </span>
+                                              </div>
+                                              <div>
+                                                <p className="text-sm font-medium text-gray-900">
+                                                  {attachment.split('/').pop() || 'attachment'}
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                  {attachment.includes('cloudinary') ? 'Cloudinary File' : 'Attachment'}
+                                                </p>
+                                              </div>
+                                            </div>
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              onClick={() => window.open(attachment, '_blank')}
+                                            >
+                                              <Download className="h-4 w-4 mr-1" />
+                                              View
+                                            </Button>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Question Responses */}
@@ -766,46 +883,70 @@ const ClientJobView = () => {
                                       View Profile
                                     </Button>
                                   </Link>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
-                                  >
-                                    <MessageCircle className="h-4 w-4 mr-2" />
-                                    Message
-                                  </Button>
-                                  <Button variant="outline">
-                                    <Calendar className="h-4 w-4 mr-2" />
-                                    Schedule Interview
-                                  </Button>
-                                  <Button 
-                                    variant="destructive"
-                                    onClick={() => handleProposalAction(proposal.id, "reject")}
-                                  >
-                                    <XCircle className="h-4 w-4 mr-2" />
-                                    Decline
-                                  </Button>
-                                  <Button 
-                                    onClick={() => handleProposalAction(proposal.id, "accept")}
-                                  >
-                                    <CheckCircle className="h-4 w-4 mr-2" />
-                                    Accept Proposal
-                                  </Button>
+                                  {proposal.status === "ACCEPTED" ? (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                    >
+                                      <MessageCircle className="h-4 w-4 mr-2" />
+                                      Message
+                                    </Button>
+                                  ) : proposal.status === "PENDING" ? (
+                                    <>
+                                      <Button variant="outline">
+                                        <Calendar className="h-4 w-4 mr-2" />
+                                        Schedule Interview
+                                      </Button>
+                                      <Button 
+                                        variant="destructive"
+                                        onClick={() => handleProposalAction(proposal.id, "reject")}
+                                      >
+                                        <XCircle className="h-4 w-4 mr-2" />
+                                        Decline
+                                      </Button>
+                                      <Button 
+                                        onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                        disabled={acceptingProposalId === proposal.id}
+                                      >
+                                        {acceptingProposalId === proposal.id ? (
+                                          <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                            Accepting...
+                                          </>
+                                        ) : (
+                                          <>
+                                            <MessageCircle className="h-4 w-4 mr-2" />
+                                            Accept & Message
+                                          </>
+                                        )}
+                                      </Button>
+                                    </>
+                                  ) : (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                    >
+                                      <MessageCircle className="h-4 w-4 mr-2" />
+                                      Message
+                                    </Button>
+                                  )}
                                 </div>
                               </div>
                             </DialogContent>
                           </Dialog>
 
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleProposalAction(proposal.id, "message")}
-                          >
-                            <MessageCircle className="h-4 w-4 mr-1" />
-                            Message
-                          </Button>
-
-                          {proposal.status === "PENDING" && (
+                          {proposal.status === "ACCEPTED" ? (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                            >
+                              <MessageCircle className="h-4 w-4 mr-1" />
+                              Message
+                            </Button>
+                          ) : proposal.status === "PENDING" ? (
                             <>
                               <Button 
                                 variant="outline" 
@@ -817,12 +958,31 @@ const ClientJobView = () => {
                               </Button>
                               <Button 
                                 size="sm"
-                                onClick={() => handleProposalAction(proposal.id, "accept")}
+                                onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                disabled={acceptingProposalId === proposal.id}
                               >
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                Accept
+                                {acceptingProposalId === proposal.id ? (
+                                  <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-1"></div>
+                                    Accepting...
+                                  </>
+                                ) : (
+                                  <>
+                                    <MessageCircle className="h-4 w-4 mr-1" />
+                                    Accept & Message
+                                  </>
+                                )}
                               </Button>
                             </>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                            >
+                              <MessageCircle className="h-4 w-4 mr-1" />
+                              Message
+                            </Button>
                           )}
 
                           <DropdownMenu>
@@ -840,6 +1000,30 @@ const ClientJobView = () => {
                                 <FileText className="h-4 w-4 mr-2" />
                                 Archive
                               </DropdownMenuItem>
+                              {proposal.status === "ACCEPTED" ? (
+                                <DropdownMenuItem onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}>
+                                  <MessageCircle className="h-4 w-4 mr-2" />
+                                  Message
+                                </DropdownMenuItem>
+                              ) : proposal.status === "PENDING" && (
+                                <DropdownMenuItem 
+                                  onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                  disabled={acceptingProposalId === proposal.id}
+                                  className={acceptingProposalId === proposal.id ? "opacity-50 cursor-not-allowed" : ""}
+                                >
+                                  {acceptingProposalId === proposal.id ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+                                      Accepting...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <MessageCircle className="h-4 w-4 mr-2" />
+                                      Accept & Message
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem className="text-red-600" onClick={() => handleProposalAction(proposal.id, "reject")}>
                                 <XCircle className="h-4 w-4 mr-2" />
                                 Reject
@@ -877,21 +1061,15 @@ const ClientJobView = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Requirements</CardTitle>
+                    <CardTitle>Skills Required</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium mb-2">Required Skills & Experience</h4>
-                        <ul className="space-y-2">
-                          {job.requirements.map((req, index) => (
-                            <li key={index} className="flex items-start">
-                              <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 mr-2 flex-shrink-0" />
-                              <span className="text-gray-700">{req}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    <div className="flex flex-wrap gap-2">
+                      {job.skills.map((skill, index) => (
+                        <Badge key={index} variant="secondary">
+                          {skill}
+                        </Badge>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -922,7 +1100,7 @@ const ClientJobView = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Location</p>
-                      <p className="font-semibold text-gray-900">{job.location || 'Remote'}</p>
+                      <p className="font-semibold text-gray-900">Remote</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -1148,7 +1326,7 @@ const ClientJobView = () => {
                   <h3 className="font-medium mb-2">Application Deadline</h3>
                   <input
                     type="date"
-                    defaultValue={job.applicationDeadline ? new Date(job.applicationDeadline).toISOString().split('T')[0] : ''}
+                    defaultValue=""
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   />
                 </div>

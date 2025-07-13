@@ -13,7 +13,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/AuthContext";
 import OfferModal from "@/components/modals/OfferModal";
-import OfferCard from "@/components/cards/OfferCard";
+import OfferDetailsModal from "@/components/modals/OfferDetailsModal";
 
 const Messages = () => {
   const { conversationId } = useParams();
@@ -40,6 +40,9 @@ const Messages = () => {
   const [loadingJobs, setLoadingJobs] = useState(false);
   const [offers, setOffers] = useState([]);
   const [showOfferModal, setShowOfferModal] = useState(false);
+  const [showOfferDetailsModal, setShowOfferDetailsModal] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [offerPayments, setOfferPayments] = useState({});
 
   // Debug clientJobs changes
   useEffect(() => {
@@ -182,6 +185,27 @@ useEffect(() => {
       const response = await axios.get(`/offers/conversation/${conversationId}`);
       if (response.data.success) {
         setOffers(response.data.data);
+        
+        // Fetch payments for accepted offers
+        const acceptedOffers = response.data.data.filter(offer => offer.status === 'ACCEPTED');
+        const paymentsPromises = acceptedOffers.map(async (offer) => {
+          try {
+            const paymentsResponse = await axios.get(`/offers/${offer.id}/payments`);
+            if (paymentsResponse.data.success) {
+              return { offerId: offer.id, payments: paymentsResponse.data.data };
+            }
+          } catch (error) {
+            console.error('Error fetching payments for offer:', offer.id, error);
+          }
+          return { offerId: offer.id, payments: [] };
+        });
+        
+        const paymentsResults = await Promise.all(paymentsPromises);
+        const paymentsMap = {};
+        paymentsResults.forEach(result => {
+          paymentsMap[result.offerId] = result.payments;
+        });
+        setOfferPayments(paymentsMap);
       }
     } catch (error) {
       console.error('Error fetching offers:', error);
@@ -348,12 +372,16 @@ useEffect(() => {
   // Timeline Sidebar component
   function TimelineSidebar({ job, offers }) {
     return (
-      <div className="p-6 w-full flex flex-col gap-6 h-full">
-        <h3 className="text-xl font-semibold text-gray-900">Timeline</h3>
+      <div className="h-full flex flex-col overflow-hidden">
+        <div className="p-6 border-b border-gray-100 flex-shrink-0">
+          <h3 className="text-xl font-semibold text-gray-900">Timeline</h3>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-6 space-y-6" style={{ height: 'calc(100vh - 200px)' }}>
         
         {/* Make Offer Button */}
         {user?.userType === 'CLIENT' && selectedConv && (
-          <div className="mb-4">
+          <div className="flex-shrink-0">
             <Button 
               onClick={openOfferModal}
               className="w-full bg-green-600 hover:bg-green-700 text-white"
@@ -367,23 +395,72 @@ useEffect(() => {
 
         {/* Offers Section */}
         {offers.length > 0 && (
-          <div className="mb-6 flex-1 overflow-y-auto">
+          <div className="flex-shrink-0">
             <h4 className="font-semibold mb-4 text-sm text-gray-700 uppercase tracking-wide">Offers</h4>
-            <div className="space-y-4">
-              {offers.map((offer) => (
-                <OfferCard 
-                  key={offer.id} 
-                  offer={offer} 
-                  onStatusChange={fetchOffers}
-                />
-              ))}
+            <div className="space-y-3">
+              {offers.map((offer) => {
+                const offerPaymentsList = offerPayments[offer.id] || [];
+                const milestones = offer.milestones || [];
+                const totalMilestones = milestones.length;
+                const paidMilestones = offerPaymentsList.filter(p => p.status === 'COMPLETED').length;
+                
+                return (
+                  <div key={offer.id} className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <DollarSign className="h-4 w-4 text-green-600" />
+                        <span className="font-semibold text-sm">
+                          ${offer.amount} {offer.budgetType === 'HOURLY' && '/hr'}
+                        </span>
+                      </div>
+                      <Badge className={`text-xs ${
+                        offer.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                        offer.status === 'ACCEPTED' ? 'bg-green-100 text-green-800' :
+                        offer.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {offer.status}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-gray-600 mb-2">{offer.duration}</p>
+                    
+                    {/* Payment Progress for Accepted Offers */}
+                    {offer.status === 'ACCEPTED' && totalMilestones > 0 && (
+                      <div className="mb-3">
+                        <div className="flex justify-between text-xs text-gray-600 mb-1">
+                          <span>Payment Progress</span>
+                          <span>{paidMilestones}/{totalMilestones} milestones funded</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${(paidMilestones / totalMilestones) * 100}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedOffer(offer);
+                        setShowOfferDetailsModal(true);
+                      }}
+                      className="w-full text-xs"
+                    >
+                      View Offer Details
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
 
         {/* Job Details */}
         {job && (
-          <div className="border-t border-gray-100 pt-6">
+          <div className="border-t border-gray-100 pt-6 flex-shrink-0">
             <h4 className="font-semibold mb-4 text-sm text-gray-700 uppercase tracking-wide">Job Details</h4>
             <div className="mb-4">
               <div className="font-semibold text-gray-900 text-lg mb-2">{job.title}</div>
@@ -410,7 +487,14 @@ useEffect(() => {
               <div className="text-sm text-gray-600">
                 <span className="font-medium">Budget:</span> 
                 <span className="ml-2 font-semibold text-gray-900">
-                  {job.budget === 'FIXED' ? `$${job.minBudget || job.maxBudget}` : `$${job.hourlyRate}/hr`}
+                  {job.budget === 'FIXED' 
+                    ? (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget 
+                        ? `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`
+                        : `$${(job.minBudget || job.maxBudget || 0).toLocaleString()}`)
+                    : (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget 
+                        ? `$${job.minBudget}/hr - $${job.maxBudget}/hr`
+                        : `$${job.minBudget || job.maxBudget || 0}/hr`)
+                  }
                 </span>
               </div>
               <div className="text-sm text-gray-600">
@@ -420,17 +504,18 @@ useEffect(() => {
             </div>
           </div>
         )}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-white flex flex-col">
-      <div className="max-w-7xl mx-auto w-full flex-1 flex min-h-0">
-        <div className="grid grid-cols-12 gap-0 flex-1 min-h-0">
+    <div className="h-[calc(100vh-64px)] bg-white flex flex-col overflow-hidden">
+      <div className="max-w-7xl mx-auto w-full h-full flex">
+        <div className="grid grid-cols-12 gap-0 w-full h-full">
           
           {/* Conversations Sidebar */}
-          <div className="col-span-3 border-r border-gray-200 flex flex-col min-h-0">
+          <div className="col-span-3 border-r border-gray-200 flex flex-col h-full">
             <div className="p-6 border-b border-gray-100 flex-shrink-0">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Messages</h2>
@@ -455,7 +540,7 @@ useEffect(() => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="flex-1 overflow-y-auto h-0">
               {filteredConversations.map((conversation) => (
                 <div
                   key={conversation.id}
@@ -621,7 +706,15 @@ useEffect(() => {
                         <option value="">Select a job...</option>
                         {clientJobs.map((job) => (
                           <option key={job.id} value={job.id}>
-                            {job.title} - ${job.minBudget || job.maxBudget || job.hourlyRate || 'TBD'}
+                            {job.title} - {
+                              job.budget === 'FIXED' 
+                                ? (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget 
+                                    ? `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`
+                                    : `$${(job.minBudget || job.maxBudget || 0).toLocaleString()}`)
+                                : (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget 
+                                    ? `$${job.minBudget}/hr - $${job.maxBudget}/hr`
+                                    : `$${job.minBudget || job.maxBudget || 0}/hr`)
+                            }
                           </option>
                         ))}
                       </select>
@@ -672,7 +765,7 @@ useEffect(() => {
           )}
 
           {/* Messages Area */}
-          <div className={`${selectedConv ? 'col-span-6' : 'col-span-9'} flex flex-col min-h-0`}>
+          <div className={`${selectedConv ? 'col-span-6' : 'col-span-9'} flex flex-col h-full`}>
             {selectedConv ? (
               <>
                 {/* Header */}
@@ -741,7 +834,7 @@ useEffect(() => {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0 messages-scroll">
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 h-0 messages-scroll scrollbar-hide">
                   {conversationMessages.map((message) => (
                     <div 
                       key={message.id} 
@@ -822,7 +915,7 @@ useEffect(() => {
           
           {/* Timeline Sidebar - Only show when conversation is selected */}
           {selectedConv && (
-            <div className="col-span-3 border-l border-gray-200">
+            <div className="col-span-3 border-l border-gray-200 h-full overflow-hidden">
               <TimelineSidebar job={job} offers={offers} />
             </div>
           )}
@@ -840,7 +933,32 @@ useEffect(() => {
           jobId={selectedConv.jobId}
           jobTitle={job.title}
           jobDescription={job.description}
+          jobBudget={job.budget}
+          jobMinBudget={job.minBudget}
+          jobMaxBudget={job.maxBudget}
           onOfferCreated={fetchOffers}
+        />
+      )}
+
+      {/* Offer Details Modal */}
+      {showOfferDetailsModal && selectedOffer && (
+        <OfferDetailsModal
+          isOpen={showOfferDetailsModal}
+          onClose={() => {
+            setShowOfferDetailsModal(false);
+            setSelectedOffer(null);
+          }}
+          offer={selectedOffer}
+          onStatusChange={() => {
+            fetchOffers();
+            // Update the selected offer with new data
+            if (selectedOffer) {
+              const updatedOffer = offers.find(o => o.id === selectedOffer.id);
+              if (updatedOffer) {
+                setSelectedOffer(updatedOffer);
+              }
+            }
+          }}
         />
       )}
     </div>

@@ -6,53 +6,35 @@ import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Progress } from "../components/ui/progress";
-import JobBasicsStep from "../components/forms/JobBasicsStep";
-import JobDescriptionStep from "../components/forms/JobDescriptionStep";
-import JobRequirementsStep from "../components/forms/JobRequirementsStep";
-import JobBudgetStep from "../components/forms/JobBudgetStep";
+import JobDetailsStep from "../components/forms/JobDetailsStep";
+import ProjectScopeStep from "../components/forms/ProjectScopeStep";
+import BudgetVisibilityStep from "../components/forms/BudgetVisibilityStep";
 import JobReviewStep from "../components/forms/JobReviewStep";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/AuthContext";
 import axios from "axios";
+import { uploadService } from "../lib/uploadService";
 
 export interface JobFormData {
   // Basic Info
   title: string;
-  category: string;
-  subcategory: string;
-  projectType: string;
-  duration: string;
-  
-  // Description
   description: string;
-  objectives: string[];
-  deliverables: string[];
-  
-  // Requirements
+  category: string;
   skills: string[];
-  experienceLevel: string;
-  preferredQualifications: string[];
-  workingHours: string;
-  timezone: string;
-  communicationPreferences: string[];
+  experienceLevel: string; // entry-level, intermediate, expert
+  projectType: string; // hourly, fixed-price
+  duration: string; // ongoing, short-term, one-time
   
   // Budget
-  budgetType: string;
-  budgetAmount: number;
-  hourlyRateMin?: number;
-  hourlyRateMax?: number;
-  milestones?: Array<{
-    title: string;
-    amount: number;
-    description: string;
-  }>;
+  budgetType: 'hourly' | 'fixed';
+  minBudget?: number;
+  maxBudget?: number;
+  hideBudget: boolean;
   
-  // Additional
+  // Visibility & Files
+  visibility: 'public' | 'invite-only' | 'private';
   attachments?: File[];
-  isUrgent: boolean;
-  visibility: string;
-  applicationDeadline?: string;
-  additionalNotes: string;
+  attachmentUrls?: string[]; // Store uploaded URLs
 }
 
 const PostJob = () => {
@@ -63,32 +45,25 @@ const PostJob = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<JobFormData>({
     title: "",
-    category: "",
-    subcategory: "",
-    projectType: "",
-    duration: "",
     description: "",
-    objectives: [],
-    deliverables: [],
+    category: "",
     skills: [],
     experienceLevel: "",
-    preferredQualifications: [],
-    workingHours: "",
-    timezone: "",
-    communicationPreferences: [],
-    budgetType: "",
-    budgetAmount: 0,
-    isUrgent: false,
+    projectType: "",
+    duration: "",
+    budgetType: "hourly",
+    minBudget: 0,
+    maxBudget: 0,
+    hideBudget: false,
     visibility: "public",
-    additionalNotes: ""
+    attachments: []
   });
 
   const steps = [
-    { id: 1, title: "Basic Information", description: "Job title, category, and type" },
-    { id: 2, title: "Job Description", description: "Detailed description and objectives" },
-    { id: 3, title: "Requirements", description: "Skills and qualifications needed" },
-    { id: 4, title: "Budget & Timeline", description: "Payment and project timeline" },
-    { id: 5, title: "Review & Post", description: "Review and publish your job" }
+    { id: 1, title: "Job Details", description: "Title, description, category, and skills" },
+    { id: 2, title: "Project Scope", description: "Experience level, project type, and duration" },
+    { id: 3, title: "Budget & Visibility", description: "Payment structure and job visibility" },
+    { id: 4, title: "Review & Post", description: "Review and publish your job" }
   ];
 
   const updateFormData = (data: Partial<JobFormData>) => {
@@ -112,30 +87,24 @@ const PostJob = () => {
 
     // Basic validation
     if (!formData.title.trim()) errors.push("Job title is required");
+    if (!formData.description.trim()) errors.push("Job description is required");
     if (!formData.category) errors.push("Category is required");
-    if (!formData.subcategory) errors.push("Subcategory is required");
+    if (formData.skills.length === 0) errors.push("At least one skill is required");
+    if (!formData.experienceLevel) errors.push("Experience level is required");
     if (!formData.projectType) errors.push("Project type is required");
     if (!formData.duration) errors.push("Duration is required");
 
-    // Description validation
-    if (!formData.description.trim()) errors.push("Job description is required");
-    if (formData.description.length < 50) errors.push("Description must be at least 50 characters");
-    if (formData.deliverables.length === 0) errors.push("At least one deliverable is required");
-
-    // Requirements validation
-    if (formData.skills.length === 0) errors.push("At least one skill is required");
-    if (!formData.experienceLevel) errors.push("Experience level is required");
-
-    // Budget validation
-    if (!formData.budgetType) errors.push("Budget type is required");
-    if (formData.budgetType === "fixed" && (!formData.budgetAmount || formData.budgetAmount <= 0)) {
-      errors.push("Fixed budget amount is required and must be greater than 0");
-    }
-    if (formData.budgetType === "hourly" && (!formData.hourlyRateMin || !formData.hourlyRateMax)) {
-      errors.push("Hourly rate range is required");
-    }
-    if (formData.budgetType === "hourly" && formData.hourlyRateMin && formData.hourlyRateMax && formData.hourlyRateMin >= formData.hourlyRateMax) {
-      errors.push("Minimum hourly rate must be less than maximum hourly rate");
+    // Budget validation - only check hourly rates for hourly projects
+    if (formData.projectType === "hourly") {
+      if (!formData.minBudget || !formData.maxBudget) {
+        errors.push("Hourly rate range is required");
+      } else if (formData.minBudget >= formData.maxBudget) {
+        errors.push("Minimum hourly rate must be less than maximum hourly rate");
+      }
+    } else if (formData.projectType === "fixed") {
+      if (!formData.minBudget || formData.minBudget <= 0) {
+        errors.push("Fixed budget amount is required and must be greater than 0");
+      }
     }
 
     return { isValid: errors.length === 0, errors };
@@ -154,31 +123,38 @@ const PostJob = () => {
 
     setIsSubmitting(true);
     try {
+      // Upload files first if any
+      let attachmentUrls: string[] = [];
+      if (formData.attachments && formData.attachments.length > 0) {
+        try {
+          const uploadResponse = await uploadService.uploadMultiple(formData.attachments);
+          attachmentUrls = uploadResponse.data.map(file => file.url);
+        } catch (uploadError) {
+          console.error('File upload error:', uploadError);
+          toast({
+            title: "Upload Error",
+            description: "Failed to upload some files. Please try again.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
       // Prepare data for API
       const jobData = {
         title: formData.title,
-        category: formData.category,
-        subcategory: formData.subcategory,
-        projectType: formData.projectType,
-        duration: formData.duration,
         description: formData.description,
-        objectives: formData.objectives,
-        deliverables: formData.deliverables,
+        category: formData.category,
         skills: formData.skills,
         experienceLevel: formData.experienceLevel,
-        preferredQualifications: formData.preferredQualifications,
-        workingHours: formData.workingHours,
-        timezone: formData.timezone,
-        communicationPreferences: formData.communicationPreferences,
+        projectType: formData.projectType,
+        duration: formData.duration,
         budgetType: formData.budgetType,
-        budgetAmount: formData.budgetAmount,
-        hourlyRateMin: formData.hourlyRateMin,
-        hourlyRateMax: formData.hourlyRateMax,
-        milestones: formData.milestones,
-        isUrgent: formData.isUrgent,
+        minBudget: formData.minBudget,
+        maxBudget: formData.maxBudget,
+        hideBudget: formData.hideBudget,
         visibility: formData.visibility,
-        applicationDeadline: formData.applicationDeadline,
-        additionalNotes: formData.additionalNotes
+        attachments: attachmentUrls // Send URLs instead of File objects
       };
 
       const response = await axios.post('/jobs', jobData);
@@ -193,9 +169,9 @@ const PostJob = () => {
       } else {
         throw new Error(response.data.message || 'Failed to post job');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error posting job:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to post job. Please try again.';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to post job. Please try again.';
       toast({
         title: "Error",
         description: errorMessage,
@@ -209,14 +185,12 @@ const PostJob = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <JobBasicsStep formData={formData} updateFormData={updateFormData} />;
+        return <JobDetailsStep formData={formData} updateFormData={updateFormData} />;
       case 2:
-        return <JobDescriptionStep formData={formData} updateFormData={updateFormData} />;
+        return <ProjectScopeStep formData={formData} updateFormData={updateFormData} />;
       case 3:
-        return <JobRequirementsStep formData={formData} updateFormData={updateFormData} />;
+        return <BudgetVisibilityStep formData={formData} updateFormData={updateFormData} />;
       case 4:
-        return <JobBudgetStep formData={formData} updateFormData={updateFormData} />;
-      case 5:
         return <JobReviewStep formData={formData} updateFormData={updateFormData} />;
       default:
         return null;

@@ -144,27 +144,19 @@ model Job {
   id            String   @id @default(cuid())
   title         String
   description   String
-  requirements  String[]
+  category      String
+  skills        String[]
+  experienceLevel String // entry-level, intermediate, expert
+  projectType   String   // hourly, fixed-price
+  duration      String   // ongoing, short-term, one-time
   budget        BudgetType
   minBudget     Float?
   maxBudget     Float?
-  hourlyRate    Float?
-  duration      String?
-  skills        String[]
-  category      String
-  subcategory   String?
-  projectType   String?
-  experienceLevel String?
-  workingHours  String?
-  timezone      String?
-  communicationPreferences String[]
-  location      String?
-  isRemote      Boolean   @default(false)
-  status        JobStatus @default(OPEN)
-  isUrgent      Boolean   @default(false)
-  visibility    String    @default("public")
-  applicationDeadline DateTime?
+  hideBudget    Boolean  @default(false)
+  visibility    String   @default("public") // public, invite-only, private
+  attachments   String[] // URLs to attached files
   clientId      String
+  status        JobStatus @default(OPEN)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   conversation  Conversation[]
@@ -183,6 +175,7 @@ model Proposal {
   id          String   @id @default(cuid())
   coverLetter String
   bidAmount   Float
+  bidType     BudgetType @default(FIXED) // Add bid type (hourly/fixed)
   estimatedDuration String
   attachments String[]
   status      ProposalStatus @default(PENDING)
@@ -346,6 +339,11 @@ enum NotificationType {
   PAYMENT_RECEIVED
   SYSTEM_UPDATE
   JOB_INVITATION
+  OFFER_RECEIVED
+  OFFER_ACCEPTED
+  OFFER_REJECTED
+  OFFER_WITHDRAWN
+  MILESTONE_PAID
 }
 
 enum JobInvitationStatus {
@@ -375,8 +373,34 @@ model Offer {
   client          User @relation("OfferClient", fields: [clientId], references: [id], onDelete: Cascade)
   freelancer      User @relation("OfferFreelancer", fields: [freelancerId], references: [id], onDelete: Cascade)
   job             Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  payments        Payment[]
 
   @@map("offers")
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  offerId         String
+  milestoneIndex  Int      // Index of the milestone being paid
+  amount          Float
+  status          PaymentStatus @default(PENDING)
+  paymentMethod   String?  // Payment method used
+  transactionId   String?  // External transaction ID
+  paidAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  offer           Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
 }
 
 enum OfferStatus {

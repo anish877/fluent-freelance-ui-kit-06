@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { 
   MapPin, Clock, DollarSign, Star, Users, Calendar, 
   Bookmark, Share2, Flag, CheckCircle, Award, 
-  MessageCircle, ThumbsUp, Eye, Send, Paperclip, Edit, X 
+  MessageCircle, ThumbsUp, Eye, Send, Paperclip, Edit, X, Download 
 } from "lucide-react";
 
 import Footer from "../components/layout/Footer";
@@ -21,23 +21,16 @@ interface Job {
   budget: 'FIXED' | 'HOURLY';
   minBudget?: number;
   maxBudget?: number;
-  hourlyRate?: number;
   duration?: string;
   skills: string[];
   category: string;
   subcategory?: string;
   projectType?: string;
   experienceLevel?: string;
-  workingHours?: string;
-  timezone?: string;
-  communicationPreferences: string[];
   location?: string;
-  isRemote: boolean;
   status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  isUrgent: boolean;
   visibility: string;
-  applicationDeadline?: string;
-  requirements: string[];
+  attachments?: string[]; // URLs to attached files
   createdAt: string;
   updatedAt: string;
   client: {
@@ -73,7 +66,9 @@ const JobDetails = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [proposal, setProposal] = useState("");
   const [proposalBudget, setProposalBudget] = useState("");
+  const [proposalBudgetType, setProposalBudgetType] = useState<'hourly' | 'fixed'>('fixed');
   const [proposalDelivery, setProposalDelivery] = useState("");
+  const [proposalAttachments, setProposalAttachments] = useState<File[]>([]);
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,7 +129,7 @@ const JobDetails = () => {
   }, [id, toast, user]);
 
   const formatBudget = (job: Job) => {
-    if (job.budget === 'FIXED') {
+    if (job.projectType === 'fixed') {
       if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
         return `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`;
       } else if (job.minBudget) {
@@ -143,11 +138,11 @@ const JobDetails = () => {
         return `$${job.maxBudget.toLocaleString()}`;
       }
       return "Budget not specified";
-    } else if (job.budget === 'HOURLY') {
+    } else if (job.projectType === 'hourly') {
       if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
         return `$${job.minBudget}/hr - $${job.maxBudget}/hr`;
-      } else if (job.hourlyRate) {
-        return `$${job.hourlyRate}/hr`;
+      } else if (job.minBudget) {
+        return `$${job.minBudget}/hr`;
       }
       return "Hourly rate not specified";
     }
@@ -172,6 +167,17 @@ const JobDetails = () => {
     return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
   };
 
+  // Get file extension from URL
+  const getFileExtension = (url: string): string => {
+    const filename = url.split('/').pop() || '';
+    return filename.split('.').pop()?.toUpperCase() || 'FILE';
+  };
+
+  // Get filename from URL
+  const getFilename = (url: string): string => {
+    return url.split('/').pop() || 'attachment';
+  };
+
   const handleProposalSubmit = async () => {
     if (!user || user.userType !== 'FREELANCER') {
       toast({
@@ -194,12 +200,41 @@ const JobDetails = () => {
     try {
       setSubmittingProposal(true);
       
+      // Handle file uploads first
+      const uploadedAttachments: string[] = [];
+      if (proposalAttachments.length > 0) {
+        for (const file of proposalAttachments) {
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          try {
+            const uploadResponse = await axios.post('/upload/single', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+            
+            if (uploadResponse.data.success) {
+              uploadedAttachments.push(uploadResponse.data.data.url);
+            }
+          } catch (uploadErr) {
+            console.error('Error uploading file:', uploadErr);
+            toast({
+              title: "Warning",
+              description: `Failed to upload ${file.name}`,
+              variant: "destructive"
+            });
+          }
+        }
+      }
+      
       const proposalData = {
         jobId: id,
         coverLetter: proposal,
-        bidAmount: parseFloat(proposalBudget.replace(/[^0-9.]/g, '')),
+        bidAmount: parseFloat(proposalBudget),
+        bidType: job.projectType === 'hourly' ? 'HOURLY' : 'FIXED', // Match job project type
         estimatedDuration: proposalDelivery,
-        attachments: []
+        attachments: uploadedAttachments
       };
 
       const response = await axios.post('/proposals', proposalData, {
@@ -215,7 +250,9 @@ const JobDetails = () => {
         });
         setProposal("");
         setProposalBudget("");
+        setProposalBudgetType('fixed');
         setProposalDelivery("");
+        setProposalAttachments([]);
         // Refresh the existing proposal data
         const checkResponse = await axios.get(`/proposals/check/${id}`);
         if (checkResponse.data.success && checkResponse.data.data) {
@@ -250,11 +287,40 @@ const JobDetails = () => {
     try {
       setSubmittingProposal(true);
       
+      // Handle file uploads first
+      const uploadedAttachments: string[] = [];
+      if (proposalAttachments.length > 0) {
+        for (const file of proposalAttachments) {
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          try {
+            const uploadResponse = await axios.post('/upload/single', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+            
+            if (uploadResponse.data.success) {
+              uploadedAttachments.push(uploadResponse.data.data.url);
+            }
+          } catch (uploadErr) {
+            console.error('Error uploading file:', uploadErr);
+            toast({
+              title: "Warning",
+              description: `Failed to upload ${file.name}`,
+              variant: "destructive"
+            });
+          }
+        }
+      }
+      
       const proposalData = {
         coverLetter: proposal,
-        bidAmount: parseFloat(proposalBudget.replace(/[^0-9.]/g, '')),
+        bidAmount: parseFloat(proposalBudget),
+        bidType: proposalBudgetType === 'hourly' ? 'HOURLY' : 'FIXED', // Add bid type (hourly/fixed)
         estimatedDuration: proposalDelivery,
-        attachments: []
+        attachments: uploadedAttachments
       };
 
       const response = await axios.put(`/proposals/${existingProposal.id}/update`, proposalData, {
@@ -270,6 +336,7 @@ const JobDetails = () => {
         });
         // Update the existing proposal data
         setExistingProposal(response.data.data);
+        setProposalAttachments([]);
       }
     } catch (err: unknown) {
       console.error('Error updating proposal:', err);
@@ -456,7 +523,7 @@ const JobDetails = () => {
                 <div>
                   <p className="text-sm text-gray-600">Budget</p>
                   <p className="font-semibold text-gray-900">{formatBudget(job)}</p>
-                  <p className="text-xs text-gray-500">{job.budget === 'FIXED' ? 'Fixed Price' : 'Hourly Rate'}</p>
+                  <p className="text-xs text-gray-500">{job.projectType === 'fixed' ? 'Fixed Price' : 'Hourly Rate'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Duration</p>
@@ -498,55 +565,47 @@ const JobDetails = () => {
                 </div>
               </div>
 
-              {/* Requirements */}
-              {job.requirements && job.requirements.length > 0 && (
+              {/* Attachments */}
+              {job.attachments && job.attachments.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3">Requirements</h3>
-                  <div className="space-y-2">
-                    {job.requirements.map((requirement, index) => (
-                      <div key={index} className="flex items-start">
-                        <span className="text-teal-500 mr-2 mt-1">•</span>
-                        <span className="text-gray-700">{requirement}</span>
+                  <h3 className="font-semibold text-gray-900 mb-3">Attached Files</h3>
+                  <div className="space-y-3">
+                    {job.attachments.map((attachment, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-teal-100 rounded flex items-center justify-center">
+                            <span className="text-xs font-medium text-teal-600">
+                              {getFileExtension(attachment)}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {getFilename(attachment)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {attachment.includes('cloudinary') ? 'Cloudinary File' : 'Attachment'}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(attachment, '_blank')}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Communication Preferences */}
-              {job.communicationPreferences && job.communicationPreferences.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3">Communication Preferences</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {job.communicationPreferences.map((pref, index) => (
-                      <Badge key={index} variant="outline">
-                        {pref}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
 
-              {/* Working Details */}
-              {(job.workingHours || job.timezone) && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-3">Working Details</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {job.workingHours && (
-                      <div>
-                        <p className="text-sm text-gray-600">Working Hours</p>
-                        <p className="font-medium text-gray-900">{job.workingHours}</p>
-                      </div>
-                    )}
-                    {job.timezone && (
-                      <div>
-                        <p className="text-sm text-gray-600">Timezone</p>
-                        <p className="font-medium text-gray-900">{job.timezone}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+
+
+
+
             </div>
 
             {/* About the Client */}
@@ -641,8 +700,34 @@ const JobDetails = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Submit/Edit Proposal */}
-            {user && user.userType === 'FREELANCER' && (
+            {/* Show Edit Job button for the job owner */}
+            {user && user.id === job.client.id && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Manage Your Job</h3>
+                <p className="text-gray-600 mb-4">
+                  You can edit your job posting or view proposals from freelancers.
+                </p>
+                <div>
+                  <Link to={`/edit-job/${job.id}`}>
+                    <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit Job
+                    </Button>
+                  </Link>
+                  <div className="mt-3">
+                    <Link to={`/client-jobs/${job.id}`}>
+                      <Button variant="outline" className="w-full">
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Proposals
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Submit/Edit Proposal - only show for freelancers who are not the job owner */}
+            {user && user.userType === 'FREELANCER' && user.id !== job.client.id && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 {checkingProposal ? (
                   <div className="flex items-center justify-center py-4">
@@ -656,63 +741,141 @@ const JobDetails = () => {
                     {existingProposal.status === 'PENDING' && (
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                          <Button className="w-full bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
                             <Edit className="h-4 w-4 mr-2" />
                             Edit Proposal
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                          <DialogHeader>
-                            <DialogTitle>Edit Your Proposal</DialogTitle>
+                        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border-0">
+                          <DialogHeader className="pb-8 border-b border-gray-100">
+                            <DialogTitle className="text-3xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                              Edit Your Proposal
+                            </DialogTitle>
+                            <p className="text-gray-600 mt-3 text-lg">
+                              Refine your approach for <span className="font-semibold text-gray-800">"{job.title}"</span>
+                            </p>
                           </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Your Proposal
-                              </label>
+                          
+                          <div className="py-8 space-y-10">
+                            {/* Cover Letter Section */}
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <label className="text-lg font-semibold text-gray-900 flex items-center">
+                                  <MessageCircle className="h-5 w-5 mr-2 text-teal-600" />
+                                  Cover Letter
+                                </label>
+                                <span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full font-medium">Required</span>
+                              </div>
                               <textarea
                                 value={proposal}
                                 onChange={(e) => setProposal(e.target.value)}
-                                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                placeholder="Describe your approach to this project..."
+                                className="w-full h-48 px-6 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-300 resize-none transition-all duration-300 text-gray-700 placeholder-gray-400"
+                                placeholder="Share your unique approach, relevant experience, and why you're the perfect fit for this project..."
+                                required
+                              />
+                              <p className="text-sm text-gray-500 flex items-center">
+                                <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                                Be specific about your methodology and past successes
+                              </p>
+                            </div>
+                            
+                            {/* Rate Section */}
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <label className="text-lg font-semibold text-gray-900 flex items-center">
+                                  <DollarSign className="h-5 w-5 mr-2 text-teal-600" />
+                                  Your Rate
+                                </label>
+                                <span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full font-medium">Required</span>
+                              </div>
+                              <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
+                                <div className="space-y-4">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-gray-700">
+                                      {job.projectType === 'hourly' ? 'Hourly Rate' : 'Fixed Price'}
+                                    </span>
+                                    <Badge variant="secondary" className="bg-teal-100 text-teal-700">
+                                      {job.projectType === 'hourly' ? 'Per Hour' : 'Total Project'}
+                                    </Badge>
+                                  </div>
+                                  <div className="relative">
+                                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-lg">
+                                      $
+                                    </span>
+                                    <input
+                                      type="number"
+                                      value={proposalBudget}
+                                      onChange={(e) => setProposalBudget(e.target.value)}
+                                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-300 transition-all duration-300 text-lg font-medium"
+                                      placeholder={job.projectType === 'hourly' ? "25" : "3500"}
+                                      min="0"
+                                      step="0.01"
+                                      required
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <input
+                                type="hidden"
+                                value={job.projectType === 'hourly' ? 'hourly' : 'fixed'}
+                                onChange={(e) => setProposalBudgetType(e.target.value as 'hourly' | 'fixed')}
                               />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Your Budget
+
+                            {/* Duration Section */}
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <label className="text-lg font-semibold text-gray-900 flex items-center">
+                                  <Clock className="h-5 w-5 mr-2 text-teal-600" />
+                                  Estimated Duration
                                 </label>
-                                <input
-                                  type="text"
-                                  value={proposalBudget}
-                                  onChange={(e) => setProposalBudget(e.target.value)}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                  placeholder="$3,500"
-                                />
+                                <span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full font-medium">Required</span>
                               </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Delivery Time
-                                </label>
-                                <select 
-                                  value={proposalDelivery}
-                                  onChange={(e) => setProposalDelivery(e.target.value)}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                >
-                                  <option value="">Select duration</option>
-                                  <option value="1 week">1 week</option>
-                                  <option value="2 weeks">2 weeks</option>
-                                  <option value="1 month">1 month</option>
-                                  <option value="2-3 months">2-3 months</option>
-                                </select>
-                              </div>
+                              <select 
+                                value={proposalDelivery}
+                                onChange={(e) => setProposalDelivery(e.target.value)}
+                                className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-300 transition-all duration-300 text-lg font-medium bg-white"
+                                required
+                              >
+                                <option value="">Select estimated duration</option>
+                                <option value="1 week">1 week</option>
+                                <option value="2 weeks">2 weeks</option>
+                                <option value="1 month">1 month</option>
+                                <option value="2-3 months">2-3 months</option>
+                                <option value="3+ months">3+ months</option>
+                              </select>
+                              <p className="text-sm text-gray-500 flex items-center">
+                                <Clock className="h-4 w-4 mr-2 text-blue-500" />
+                                Realistic timelines build client trust and confidence
+                              </p>
                             </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-4 pt-8 border-t border-gray-100">
+                            <Button 
+                              variant="outline"
+                              className="flex-1 py-4 px-8 border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 rounded-xl font-medium text-gray-700"
+                              onClick={() => {
+                                const closeButton = document.querySelector('[data-radix-dialog-close]') as HTMLButtonElement;
+                                closeButton?.click();
+                              }}
+                            >
+                              Cancel
+                            </Button>
                             <Button 
                               onClick={handleProposalUpdate} 
-                              className="w-full"
+                              className="flex-1 py-4 px-8 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                               disabled={submittingProposal}
                             >
-                              {submittingProposal ? "Updating..." : "Update Proposal"}
+                              {submittingProposal ? (
+                                <div className="flex items-center">
+                                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                                  Updating...
+                                </div>
+                              ) : (
+                                "Update Proposal"
+                              )}
                             </Button>
                           </div>
                         </DialogContent>
@@ -792,63 +955,200 @@ const JobDetails = () => {
                     
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                        <Button className="w-full bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
                           <Send className="h-4 w-4 mr-2" />
                           Send Proposal
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Submit Your Proposal</DialogTitle>
+                      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border-0">
+                        <DialogHeader className="pb-8 border-b border-gray-100">
+                          <DialogTitle className="text-3xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                            Submit Your Proposal
+                          </DialogTitle>
+                          <p className="text-gray-600 mt-3 text-lg">
+                            Present your qualifications for <span className="font-semibold text-gray-800">"{job.title}"</span>
+                          </p>
                         </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Your Proposal
-                            </label>
+                        
+                        <div className="py-8 space-y-10">
+                          {/* Cover Letter Section */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <label className="text-lg font-semibold text-gray-900 flex items-center">
+                                <MessageCircle className="h-5 w-5 mr-2 text-teal-600" />
+                                Cover Letter
+                              </label>
+                              <span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full font-medium">Required</span>
+                            </div>
                             <textarea
                               value={proposal}
                               onChange={(e) => setProposal(e.target.value)}
-                              className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                              placeholder="Describe your approach to this project..."
+                              className="w-full h-48 px-6 py-4 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-300 resize-none transition-all duration-300 text-gray-700 placeholder-gray-400"
+                              placeholder="Share your unique approach, relevant experience, and why you're the perfect fit for this project..."
+                              required
+                            />
+                            <p className="text-sm text-gray-500 flex items-center">
+                              <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                              Be specific about your methodology and past successes
+                            </p>
+                          </div>
+                          
+                          {/* Rate Section */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <label className="text-lg font-semibold text-gray-900 flex items-center">
+                                <DollarSign className="h-5 w-5 mr-2 text-teal-600" />
+                                Your Rate
+                              </label>
+                              <span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full font-medium">Required</span>
+                            </div>
+                            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200">
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm font-medium text-gray-700">
+                                    {job.projectType === 'hourly' ? 'Hourly Rate' : 'Fixed Price'}
+                                  </span>
+                                  <Badge variant="secondary" className="bg-teal-100 text-teal-700">
+                                    {job.projectType === 'hourly' ? 'Per Hour' : 'Total Project'}
+                                  </Badge>
+                                </div>
+                                <div className="relative">
+                                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-lg">
+                                    $
+                                  </span>
+                                  <input
+                                    type="number"
+                                    value={proposalBudget}
+                                    onChange={(e) => setProposalBudget(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-300 transition-all duration-300 text-lg font-medium"
+                                    placeholder={job.projectType === 'hourly' ? "25" : "3500"}
+                                    min="0"
+                                    step="0.01"
+                                    required
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            <input
+                              type="hidden"
+                              value={job.projectType === 'hourly' ? 'hourly' : 'fixed'}
+                              onChange={(e) => setProposalBudgetType(e.target.value as 'hourly' | 'fixed')}
                             />
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Your Budget
+
+                          {/* Duration Section */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <label className="text-lg font-semibold text-gray-900 flex items-center">
+                                <Clock className="h-5 w-5 mr-2 text-teal-600" />
+                                Estimated Duration
                               </label>
-                              <input
-                                type="text"
-                                value={proposalBudget}
-                                onChange={(e) => setProposalBudget(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                placeholder="$3,500"
-                              />
+                              <span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full font-medium">Required</span>
                             </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Delivery Time
-                              </label>
-                              <select 
-                                value={proposalDelivery}
-                                onChange={(e) => setProposalDelivery(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                              >
-                                <option value="">Select duration</option>
-                                <option value="1 week">1 week</option>
-                                <option value="2 weeks">2 weeks</option>
-                                <option value="1 month">1 month</option>
-                                <option value="2-3 months">2-3 months</option>
-                              </select>
-                            </div>
+                            <select 
+                              value={proposalDelivery}
+                              onChange={(e) => setProposalDelivery(e.target.value)}
+                              className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-300 transition-all duration-300 text-lg font-medium bg-white"
+                              required
+                            >
+                              <option value="">Select estimated duration</option>
+                              <option value="1 week">1 week</option>
+                              <option value="2 weeks">2 weeks</option>
+                              <option value="1 month">1 month</option>
+                              <option value="2-3 months">2-3 months</option>
+                              <option value="3+ months">3+ months</option>
+                            </select>
+                            <p className="text-sm text-gray-500 flex items-center">
+                              <Clock className="h-4 w-4 mr-2 text-blue-500" />
+                              Realistic timelines build client trust and confidence
+                            </p>
                           </div>
+
+                          {/* Attachments Section */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <label className="text-lg font-semibold text-gray-900 flex items-center">
+                                <Paperclip className="h-5 w-5 mr-2 text-teal-600" />
+                                Attachments
+                              </label>
+                              <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium">Optional</span>
+                            </div>
+                            <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 hover:border-teal-300 transition-all duration-300 bg-gradient-to-br from-gray-50 to-gray-100">
+                              <input
+                                type="file"
+                                multiple
+                                onChange={(e) => {
+                                  const files = Array.from(e.target.files || []);
+                                  setProposalAttachments(files);
+                                }}
+                                className="hidden"
+                                id="file-upload"
+                                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
+                              />
+                              <label htmlFor="file-upload" className="cursor-pointer">
+                                <div className="text-center">
+                                  <Paperclip className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                                  <p className="text-lg font-medium text-gray-900 mb-2">
+                                    Upload files
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    PDF, DOC, images up to 10MB each
+                                  </p>
+                                </div>
+                              </label>
+                            </div>
+                            
+                            {proposalAttachments.length > 0 && (
+                              <div className="space-y-3">
+                                <p className="text-sm font-medium text-gray-700 flex items-center">
+                                  <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                                  Selected files:
+                                </p>
+                                {proposalAttachments.map((file, index) => (
+                                  <div key={index} className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-gray-200 shadow-sm">
+                                    <div className="flex items-center space-x-3">
+                                      <Paperclip className="h-5 w-5 text-teal-600" />
+                                      <span className="text-sm font-medium text-gray-900 truncate">{file.name}</span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => setProposalAttachments(proposalAttachments.filter((_, i) => i !== index))}
+                                      className="text-gray-400 hover:text-red-500 transition-colors duration-200 p-1 rounded-full hover:bg-red-50"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-4 pt-8 border-t border-gray-100">
+                          <Button 
+                            variant="outline"
+                            className="flex-1 py-4 px-8 border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 rounded-xl font-medium text-gray-700"
+                            onClick={() => {
+                              const closeButton = document.querySelector('[data-radix-dialog-close]') as HTMLButtonElement;
+                              closeButton?.click();
+                            }}
+                          >
+                            Cancel
+                          </Button>
                           <Button 
                             onClick={handleProposalSubmit} 
-                            className="w-full"
+                            className="flex-1 py-4 px-8 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
                             disabled={submittingProposal}
                           >
-                            {submittingProposal ? "Submitting..." : "Submit Proposal"}
+                            {submittingProposal ? (
+                              <div className="flex items-center">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                                Submitting...
+                              </div>
+                            ) : (
+                              "Submit Proposal"
+                            )}
                           </Button>
                         </div>
                       </DialogContent>
@@ -868,8 +1168,8 @@ const JobDetails = () => {
               </div>
             )}
 
-            {/* Show different message for non-freelancers */}
-            {user && user.userType !== 'FREELANCER' && (
+            {/* Show different message for non-freelancers (excluding job owner) */}
+            {user && user.userType !== 'FREELANCER' && user.id !== job.client.id && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Submit a Proposal</h3>
                 <p className="text-gray-600 mb-4">

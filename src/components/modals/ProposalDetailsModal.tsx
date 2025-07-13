@@ -23,6 +23,7 @@ interface Proposal {
   skills: string[];
   responses: number;
   lastActivity: string;
+  attachments?: string[];
   interviewScheduled?: {
     date: string;
     time: string;
@@ -62,88 +63,127 @@ const ProposalDetailsModal = ({ proposal, isOpen, onClose, onViewJobPosting, job
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100 relative">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+        <div className="flex items-center justify-between px-8 pt-8 pb-4 border-b border-gray-100">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{proposal.jobTitle}</h2>
-            <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-1">{proposal.jobTitle}</h2>
+            <div className="flex items-center gap-3 text-sm text-gray-500 font-medium">
               <span>Proposal ID: #{proposal.id}</span>
-              <span>•</span>
+              <span className="mx-1">•</span>
               <span>Submitted: {formatDate(proposal.submittedDate)}</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(proposal.status)}`}>
-              <span className="capitalize">{proposal.status}</span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Badge className={`px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(proposal.status)}`}>{proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}</Badge>
+            <Button variant="ghost" size="icon" onClick={onClose} className="ml-2 text-gray-400 hover:text-gray-700 focus:ring-2 focus:ring-teal-500">
               <X className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Proposal Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Proposal Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-gray-600">Your Bid Amount</div>
-                  <div className="font-semibold text-lg text-green-600">{proposal.bidAmount}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Estimated Timeline</div>
-                  <div className="font-semibold">{proposal.timeline}</div>
-                </div>
+        {/* Main Content */}
+        <div className="px-8 py-8 space-y-8">
+          {/* Bid & Timeline */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500 font-medium">Your Bid</div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-teal-600" />
+                <span className="text-xl font-bold text-gray-900">{proposal.bidAmount}</span>
+                <span className="text-xs text-gray-500 font-medium">{proposal.jobType === 'hourly' ? '/hr' : 'total'}</span>
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-gray-600">Proposal Status</div>
-                  <div className="font-semibold capitalize">{proposal.status}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Submitted Date</div>
-                  <div className="font-semibold">{formatDate(proposal.submittedDate)}</div>
-                </div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500 font-medium">Timeline</div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-teal-600" />
+                <span className="text-lg font-semibold text-gray-900">{proposal.timeline}</span>
               </div>
-              
-              <Separator />
-              
-              <div>
-                <div className="text-sm text-gray-600 mb-2">Your Cover Letter</div>
-                <div className="bg-gray-50 p-4 rounded-lg text-sm leading-relaxed max-h-32 overflow-y-auto">
-                  {proposal.coverLetter}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" onClick={onClose}>
+          <Separator className="my-2" />
+
+          {/* Status & Activity */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500 font-medium">Status</div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span className="text-base font-semibold text-gray-900 capitalize">{proposal.status}</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500 font-medium">Last Activity</div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-teal-600" />
+                <span className="text-base font-semibold text-gray-900">{formatDate(proposal.lastActivity)}</span>
+              </div>
+            </div>
+          </div>
+
+          <Separator className="my-2" />
+
+          {/* Cover Letter */}
+          <div>
+            <div className="text-xs text-gray-500 font-medium mb-2">Cover Letter</div>
+
+            <div className="bg-gray-50 border border-gray-100 rounded-lg p-5 text-gray-800 text-base leading-relaxed max-h-48 overflow-y-auto shadow-inner">
+              {proposal.coverLetter}
+            </div>
+          </div>
+
+          {/* Attachments */}
+          {proposal.attachments && proposal.attachments.length > 0 && (
+            <div>
+              <div className="text-xs text-gray-500 font-medium mb-2">Attachments ({proposal.attachments.length})</div>
+              <div className="space-y-2">
+                {proposal.attachments.map((attachment, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-teal-100 rounded flex items-center justify-center">
+                        <span className="text-xs font-medium text-teal-600">
+                          {attachment.split('.').pop()?.toUpperCase() || 'FILE'}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {attachment.split('/').pop() || 'attachment'}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {attachment.includes('cloudinary') ? 'Cloudinary File' : 'Attachment'}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(attachment, '_blank')}
+                    >
+                      <FileText className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex flex-col md:flex-row justify-end gap-3 pt-4 border-t border-gray-100">
+            <Button variant="outline" onClick={onClose} className="min-w-[120px]">
               Close
             </Button>
             <Button 
               variant="outline" 
               onClick={() => {
-                console.log('Button clicked! Props:', { onViewJobPosting: !!onViewJobPosting, jobId });
                 if (onViewJobPosting && jobId) {
-                  console.log('Calling onViewJobPosting with jobId:', jobId);
                   onViewJobPosting(jobId);
-                } else {
-                  console.log('Missing props:', { onViewJobPosting: !!onViewJobPosting, jobId });
                 }
               }}
-              className="bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100"
+              className="bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100 min-w-[160px]"
             >
               <Eye className="h-4 w-4 mr-2" />
               View Job Posting

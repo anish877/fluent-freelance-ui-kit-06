@@ -49,7 +49,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.use(cookieParser())
 // Rate limiting
 const limiter = rateLimit({
@@ -104,7 +104,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes
+// API Routes - these must come before any static file serving
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
@@ -117,13 +117,24 @@ app.use('/api/talent', talentRoutes);
 app.use('/api/job-invitations', jobInvitationRoutes);
 app.use('/api/offers', offersRoutes);
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../../dist')));
+// Serve static files from the React app only in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../../dist')));
 
-// Handle React routing, return all requests to React app
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../dist/index.html'));
-});
+  // Handle React routing, return all requests to React app only in production
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../dist/index.html'));
+  });
+} else {
+  // In development, only serve API routes and return 404 for non-API routes
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api/')) {
+      res.status(404).json({ message: 'API endpoint not found' });
+    } else {
+      res.status(404).json({ message: 'Route not found' });
+    }
+  });
+}
 
 // Error handling middleware
 app.use(notFound);

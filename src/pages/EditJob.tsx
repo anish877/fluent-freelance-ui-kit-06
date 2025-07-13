@@ -8,36 +8,27 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/AuthContext";
-import JobBasicsStep from "../components/forms/JobBasicsStep";
-import JobDescriptionStep from "../components/forms/JobDescriptionStep";
-import JobRequirementsStep from "../components/forms/JobRequirementsStep";
-import JobBudgetStep from "../components/forms/JobBudgetStep";
+import { uploadService } from "../lib/uploadService";
+import JobDetailsStep from "../components/forms/JobDetailsStep";
+import ProjectScopeStep from "../components/forms/ProjectScopeStep";
+import BudgetVisibilityStep from "../components/forms/BudgetVisibilityStep";
 import JobReviewStep from "../components/forms/JobReviewStep";
 
 interface JobFormData {
   title: string;
-  category: string;
-  subcategory: string;
-  projectType: string;
-  duration: string;
   description: string;
-  objectives: string[];
-  deliverables: string[];
+  category: string;
   skills: string[];
-  experienceLevel: string;
-  preferredQualifications: string[];
-  workingHours: string;
-  timezone: string;
-  communicationPreferences: string[];
-  budgetType: 'fixed' | 'hourly' | 'milestone';
-  budgetAmount: number;
-  hourlyRateMin: number;
-  hourlyRateMax: number;
-  milestones: Array<{ name: string; amount: number; dueDate: string }>;
-  isUrgent: boolean;
-  visibility: 'public' | 'private' | 'invite-only';
-  applicationDeadline: string;
-  additionalNotes: string;
+  experienceLevel: string; // entry-level, intermediate, expert
+  projectType: string; // hourly, fixed
+  duration: string; // one-time, short-term, ongoing
+  budgetType: 'hourly' | 'fixed';
+  minBudget?: number;
+  maxBudget?: number;
+  hideBudget: boolean;
+  visibility: 'public' | 'invite-only' | 'private';
+  attachments?: File[];
+  attachmentUrls?: string[]; // Store uploaded URLs
 }
 
 const EditJob = () => {
@@ -52,36 +43,25 @@ const EditJob = () => {
 
   const [formData, setFormData] = useState<JobFormData>({
     title: "",
-    category: "",
-    subcategory: "",
-    projectType: "",
-    duration: "",
     description: "",
-    objectives: [],
-    deliverables: [],
+    category: "",
     skills: [],
     experienceLevel: "",
-    preferredQualifications: [],
-    workingHours: "",
-    timezone: "",
-    communicationPreferences: [],
+    projectType: "",
+    duration: "",
     budgetType: "fixed",
-    budgetAmount: 0,
-    hourlyRateMin: 0,
-    hourlyRateMax: 0,
-    milestones: [],
-    isUrgent: false,
+    minBudget: 0,
+    maxBudget: 0,
+    hideBudget: false,
     visibility: "public",
-    applicationDeadline: "",
-    additionalNotes: ""
+    attachments: []
   });
 
   const steps = [
-    { id: 1, title: "Job Basics" },
-    { id: 2, title: "Description" },
-    { id: 3, title: "Requirements" },
-    { id: 4, title: "Budget & Timeline" },
-    { id: 5, title: "Review & Post" }
+    { id: 1, title: "Job Details" },
+    { id: 2, title: "Project Scope" },
+    { id: 3, title: "Budget & Visibility" },
+    { id: 4, title: "Review & Update" }
   ];
 
   // Fetch job data on component mount
@@ -99,28 +79,19 @@ const EditJob = () => {
           // Transform backend data to frontend format
           const transformedData: JobFormData = {
             title: job.title || "",
-            category: job.category || "",
-            subcategory: job.subcategory || "",
-            projectType: job.projectType || "",
-            duration: job.duration || "",
             description: job.description || "",
-            objectives: job.requirements?.filter((req: string) => req.includes("objective") || req.includes("goal")) || [],
-            deliverables: job.requirements?.filter((req: string) => req.includes("deliverable") || req.includes("output")) || [],
+            category: job.category || "",
             skills: Array.isArray(job.skills) ? job.skills : [],
             experienceLevel: job.experienceLevel || "",
-            preferredQualifications: [],
-            workingHours: job.workingHours || "",
-            timezone: job.timezone || "",
-            communicationPreferences: Array.isArray(job.communicationPreferences) ? job.communicationPreferences : [],
-            budgetType: job.budget === 'FIXED' ? 'fixed' : job.budget === 'HOURLY' ? 'hourly' : 'milestone',
-            budgetAmount: job.minBudget || job.maxBudget || 0,
-            hourlyRateMin: job.minBudget || 0,
-            hourlyRateMax: job.maxBudget || job.hourlyRate || 0,
-            milestones: [],
-            isUrgent: job.isUrgent || false,
+            projectType: job.projectType || "",
+            duration: job.duration || "",
+            budgetType: job.projectType === 'fixed' ? 'fixed' : 'hourly',
+            minBudget: job.minBudget || 0,
+            maxBudget: job.maxBudget || 0,
+            hideBudget: job.hideBudget || false,
             visibility: job.visibility || "public",
-            applicationDeadline: job.applicationDeadline ? new Date(job.applicationDeadline).toISOString().split('T')[0] : "",
-            additionalNotes: ""
+            attachments: [], // New files to upload
+            attachmentUrls: job.attachments || [] // Existing uploaded URLs
           };
           
           setFormData(transformedData);
@@ -153,23 +124,25 @@ const EditJob = () => {
     const errors: string[] = [];
 
     if (!formData.title.trim()) errors.push("Job title is required");
-    if (!formData.category) errors.push("Category is required");
     if (!formData.description.trim()) errors.push("Job description is required");
+    if (!formData.category) errors.push("Category is required");
     if (formData.skills.length === 0) errors.push("At least one skill is required");
     if (!formData.experienceLevel) errors.push("Experience level is required");
-    if (!formData.workingHours) errors.push("Working hours are required");
-    if (!formData.timezone) errors.push("Timezone is required");
-    if (formData.communicationPreferences.length === 0) errors.push("At least one communication preference is required");
-
-    // Budget validation
-    if (formData.budgetType === "fixed" && formData.budgetAmount <= 0) {
-      errors.push("Budget amount must be greater than 0");
-    }
-    if (formData.budgetType === "hourly") {
-      if (formData.hourlyRateMin <= 0) errors.push("Minimum hourly rate must be greater than 0");
-      if (formData.hourlyRateMax <= 0) errors.push("Maximum hourly rate must be greater than 0");
-      if (formData.hourlyRateMin > formData.hourlyRateMax) {
+    if (!formData.projectType) errors.push("Project type is required");
+    if (!formData.duration) errors.push("Duration is required");
+    if (formData.projectType === "hourly") {
+      if (!formData.minBudget || formData.minBudget <= 0) {
+        errors.push("Minimum hourly rate must be greater than 0");
+      }
+      if (!formData.maxBudget || formData.maxBudget <= 0) {
+        errors.push("Maximum hourly rate must be greater than 0");
+      }
+      if (formData.minBudget && formData.maxBudget && formData.minBudget > formData.maxBudget) {
         errors.push("Minimum hourly rate cannot be greater than maximum hourly rate");
+      }
+    } else if (formData.projectType === "fixed") {
+      if (!formData.minBudget || formData.minBudget <= 0) {
+        errors.push("Fixed budget amount must be greater than 0");
       }
     }
 
@@ -189,28 +162,42 @@ const EditJob = () => {
 
     setIsSubmitting(true);
     try {
+      // Upload new files first if any
+      let newAttachmentUrls: string[] = [];
+      if (formData.attachments && formData.attachments.length > 0) {
+        try {
+          const uploadResponse = await uploadService.uploadMultiple(formData.attachments);
+          newAttachmentUrls = uploadResponse.data.map(file => file.url);
+        } catch (uploadError) {
+          console.error('File upload error:', uploadError);
+          toast({
+            title: "Upload Error",
+            description: "Failed to upload some files. Please try again.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      // Combine existing and new attachment URLs
+      const allAttachmentUrls = [...(formData.attachmentUrls || []), ...newAttachmentUrls];
+
       // Prepare data for API
-             const jobData = {
-         title: formData.title,
-         category: formData.category,
-         subcategory: formData.subcategory,
-         projectType: formData.projectType,
-         duration: formData.duration,
-         description: formData.description,
-         requirements: [...formData.objectives, ...formData.deliverables],
-         skills: formData.skills,
-         experienceLevel: formData.experienceLevel,
-         workingHours: formData.workingHours,
-         timezone: formData.timezone,
-         communicationPreferences: formData.communicationPreferences,
-         budget: formData.budgetType === 'fixed' ? 'FIXED' : 'HOURLY',
-         minBudget: formData.budgetType === 'fixed' ? formData.budgetAmount : formData.hourlyRateMin,
-         maxBudget: formData.budgetType === 'fixed' ? formData.budgetAmount : formData.hourlyRateMax,
-         hourlyRate: formData.budgetType === 'hourly' ? formData.hourlyRateMax : undefined,
-         isUrgent: formData.isUrgent,
-         visibility: formData.visibility,
-         applicationDeadline: formData.applicationDeadline ? new Date(formData.applicationDeadline + 'T00:00:00.000Z').toISOString() : null
-       };
+      const jobData = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        skills: formData.skills,
+        experienceLevel: formData.experienceLevel,
+        projectType: formData.projectType,
+        duration: formData.duration,
+        budget: formData.projectType === 'fixed' ? 'FIXED' : 'HOURLY',
+        minBudget: formData.minBudget,
+        maxBudget: formData.maxBudget,
+        hideBudget: formData.hideBudget,
+        visibility: formData.visibility,
+        attachments: allAttachmentUrls
+      };
 
       const response = await axios.put(`/jobs/${id}`, jobData);
       
@@ -240,14 +227,12 @@ const EditJob = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <JobBasicsStep formData={formData} updateFormData={updateFormData} />;
+        return <JobDetailsStep formData={formData} updateFormData={updateFormData} />;
       case 2:
-        return <JobDescriptionStep formData={formData} updateFormData={updateFormData} />;
+        return <ProjectScopeStep formData={formData} updateFormData={updateFormData} />;
       case 3:
-        return <JobRequirementsStep formData={formData} updateFormData={updateFormData} />;
+        return <BudgetVisibilityStep formData={formData} updateFormData={updateFormData} />;
       case 4:
-        return <JobBudgetStep formData={formData} updateFormData={updateFormData} />;
-      case 5:
         return <JobReviewStep formData={formData} updateFormData={updateFormData} />;
       default:
         return null;

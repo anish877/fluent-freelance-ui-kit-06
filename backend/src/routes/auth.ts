@@ -109,7 +109,7 @@ router.post('/register', [
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     }).json({
       success: true,
@@ -207,7 +207,7 @@ router.post('/login', [
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     }).status(200).json({
       success: true,
@@ -295,7 +295,7 @@ router.get('/google/callback',
       res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     })
     res.redirect(`${process.env.CLIENT_URL}/dashboard?from=oauth`);

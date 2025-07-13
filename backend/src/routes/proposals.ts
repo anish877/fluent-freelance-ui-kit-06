@@ -132,10 +132,7 @@ router.get('/freelancer/me', protect, authorize('FREELANCER'), (async (req: Auth
             budget: true,
             minBudget: true,
             maxBudget: true,
-            hourlyRate: true,
             category: true,
-            location: true,
-            isRemote: true,
             status: true,
             _count: {
               select: {
@@ -184,6 +181,7 @@ router.post('/', protect, authorize('FREELANCER'), [
   body('jobId').notEmpty().withMessage('Job ID is required'),
   body('coverLetter').notEmpty().withMessage('Cover letter is required'),
   body('bidAmount').isFloat({ min: 0 }).withMessage('Bid amount must be a positive number'),
+  body('bidType').isIn(['FIXED', 'HOURLY']).withMessage('Bid type must be FIXED or HOURLY'),
   body('estimatedDuration').notEmpty().withMessage('Estimated duration is required'),
   body('attachments').optional().isArray().withMessage('Attachments must be an array'),
   body('questionResponses').optional().isArray().withMessage('Question responses must be an array'),
@@ -212,6 +210,13 @@ router.post('/', protect, authorize('FREELANCER'), [
       return;
     }
 
+    // Enforce bidType matches job.projectType
+    if ((job.projectType === 'hourly' && req.body.bidType !== 'HOURLY') ||
+        (job.projectType === 'fixed' && req.body.bidType !== 'FIXED')) {
+      res.status(400).json({ message: 'Bid type must match job type.' });
+      return;
+    }
+
     // Check if user already submitted a proposal for this job
     const existingProposal = await prisma.proposal.findFirst({
       where: {
@@ -230,6 +235,7 @@ router.post('/', protect, authorize('FREELANCER'), [
         jobId: req.body.jobId,
         coverLetter: req.body.coverLetter,
         bidAmount: req.body.bidAmount,
+        bidType: req.body.bidType || 'FIXED',
         estimatedDuration: req.body.estimatedDuration,
         attachments: req.body.attachments || [],
         questionResponses: req.body.questionResponses || [],

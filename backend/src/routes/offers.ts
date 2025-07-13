@@ -5,6 +5,16 @@ import { protect, AuthRequest } from '../middleware/auth.js';
 
 const router: Router = express.Router();
 
+// Helper function to format currency
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+};
+
 // @desc    Create offer
 // @route   POST /api/offers
 // @access  Private (Clients only)
@@ -92,6 +102,17 @@ router.post('/', protect, [
       return;
     }
 
+    // Process milestones - if no milestones provided, create one with full amount
+    let processedMilestones = milestones || [];
+    if (!processedMilestones || processedMilestones.length === 0) {
+      processedMilestones = [{
+        title: 'Project Completion',
+        description: 'Full project payment',
+        amount: amount,
+        dueDate: null
+      }];
+    }
+
     // Create offer
     const offer = await prisma.offer.create({
       data: {
@@ -102,7 +123,7 @@ router.post('/', protect, [
         budgetType,
         amount,
         duration,
-        milestones: milestones || [],
+        milestones: processedMilestones,
         terms: terms || null,
         expiresAt: expiresAt ? new Date(expiresAt) : null
       },
@@ -140,7 +161,7 @@ router.post('/', protect, [
       data: {
         title: 'New Offer Received',
         message: `You've received a new offer: "${job.title}"`,
-        type: 'JOB_INVITATION', // Reusing this type for offers
+        type: 'OFFER_RECEIVED',
         userId: freelancerId
       }
     });
@@ -376,8 +397,8 @@ router.put('/:id/accept', protect, (async (req: AuthRequest, res: Response): Pro
     await prisma.notification.create({
       data: {
         title: 'Offer Accepted',
-        message: `${req.user!.firstName} has accepted your offer: "${offer.title}"`,
-        type: 'PROPOSAL_ACCEPTED',
+        message: `${req.user!.firstName} has accepted your offer`,
+        type: 'OFFER_ACCEPTED',
         userId: offer.clientId
       }
     });
@@ -451,8 +472,8 @@ router.put('/:id/reject', protect, (async (req: AuthRequest, res: Response): Pro
     await prisma.notification.create({
       data: {
         title: 'Offer Declined',
-        message: `${req.user!.firstName} has declined your offer: "${offer.title}"`,
-        type: 'PROPOSAL_REJECTED',
+        message: `${req.user!.firstName} has declined your offer`,
+        type: 'OFFER_REJECTED',
         userId: offer.clientId
       }
     });
@@ -526,8 +547,8 @@ router.put('/:id/withdraw', protect, (async (req: AuthRequest, res: Response): P
     await prisma.notification.create({
       data: {
         title: 'Offer Withdrawn',
-        message: `The offer "${offer.title}" has been withdrawn`,
-        type: 'PROPOSAL_REJECTED',
+        message: `The offer has been withdrawn`,
+        type: 'OFFER_WITHDRAWN',
         userId: offer.freelancerId
       }
     });
@@ -539,6 +560,342 @@ router.put('/:id/withdraw', protect, (async (req: AuthRequest, res: Response): P
     });
   } catch (error) {
     console.error('Error withdrawing offer:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
+// @desc    Create payment for milestone
+// @route   POST /api/offers/:id/payments
+// @access  Private (Client only)
+router.post('/:id/payments', protect, [
+  body('milestoneIndex').isInt({ min: 0 }).withMessage('Valid milestone index is required'),
+  body('amount').isFloat({ min: 0 }).withMessage('Valid amount is required'),
+  body('paymentMethod').optional().isString().withMessage('Payment method must be a string')
+], (async (req: AuthRequest, res: Response): Promise<void> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  try {
+    const offerId = req.params.id;
+    const { milestoneIndex, amount, paymentMethod } = req.body;
+
+    if (req.user!.userType !== 'CLIENT') {
+      res.status(403).json({ message: 'Only clients can make payments' });
+      return;
+    }
+
+    const offer = await prisma.offer.findFirst({
+      where: {
+        id: offerId,
+        clientId: req.user!.id,
+        status: 'ACCEPTED'
+      },
+      include: {
+        payments: true
+      }
+    });
+
+    if (!offer) {
+      res.status(404).json({ message: 'Offer not found or not accepted' });
+      return;
+    }
+
+    // Check if milestone exists
+    const milestones = offer.milestones as any[];
+    if (!milestones || milestoneIndex >= milestones.length) {
+      res.status(400).json({ message: 'Invalid milestone index' });
+      return;
+    }
+
+    const milestone = milestones[milestoneIndex];
+    if (Math.abs(milestone.amount - amount) > 0.01) {
+      res.status(400).json({ message: 'Payment amount must match milestone amount' });
+      return;
+    }
+
+    // Check if payment already exists for this milestone
+    const existingPayment = offer.payments.find(p => p.milestoneIndex === milestoneIndex);
+    if (existingPayment) {
+      res.status(400).json({ message: 'Payment already exists for this milestone' });
+      return;
+    }
+
+    // Simulate payment processing delay for testing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Create payment record with dummy transaction ID
+    const payment = await prisma.payment.create({
+      data: {
+        offerId,
+        milestoneIndex,
+        amount,
+        paymentMethod: paymentMethod || 'Credit Card',
+        status: 'COMPLETED',
+        transactionId: `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        paidAt: new Date()
+      }
+    });
+
+    // Create notification for freelancer
+    await prisma.notification.create({
+      data: {
+        title: 'Milestone Payment Received',
+        message: `Payment of ${formatCurrency(amount)} has been received for milestone ${milestoneIndex + 1}`,
+        type: 'MILESTONE_PAID',
+        userId: offer.freelancerId
+      }
+    });
+
+    res.status(201).json({
+      success: true,
+      data: payment,
+      message: 'Payment processed successfully'
+    });
+  } catch (error) {
+    console.error('Error creating payment:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
+// @desc    Get payments for offer
+// @route   GET /api/offers/:id/payments
+// @access  Private
+router.get('/:id/payments', protect, (async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const offerId = req.params.id;
+
+    const offer = await prisma.offer.findFirst({
+      where: {
+        id: offerId,
+        OR: [
+          { clientId: req.user!.id },
+          { freelancerId: req.user!.id }
+        ]
+      },
+      include: {
+        payments: {
+          orderBy: { createdAt: 'asc' }
+        }
+      }
+    });
+
+    if (!offer) {
+      res.status(404).json({ message: 'Offer not found or access denied' });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: offer.payments
+    });
+  } catch (error) {
+    console.error('Error fetching payments:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
+// @desc    Add milestone to accepted offer
+// @route   POST /api/offers/:id/milestones
+// @access  Private (Client only)
+router.post('/:id/milestones', protect, [
+  body('title').notEmpty().withMessage('Milestone title is required'),
+  body('description').notEmpty().withMessage('Milestone description is required'),
+  body('amount').isFloat({ min: 0 }).withMessage('Valid amount is required'),
+  body('dueDate').optional().isISO8601().withMessage('Due date must be a valid date')
+], (async (req: AuthRequest, res: Response): Promise<void> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  try {
+    const offerId = req.params.id;
+    const { title, description, amount, dueDate } = req.body;
+
+    if (req.user!.userType !== 'CLIENT') {
+      res.status(403).json({ message: 'Only clients can add milestones' });
+      return;
+    }
+
+    const offer = await prisma.offer.findFirst({
+      where: {
+        id: offerId,
+        clientId: req.user!.id,
+        status: 'ACCEPTED'
+      }
+    });
+
+    if (!offer) {
+      res.status(404).json({ message: 'Offer not found or not accepted' });
+      return;
+    }
+
+    // Get current milestones
+    const currentMilestones = (offer.milestones as any[]) || [];
+    
+    // Create new milestone
+    const newMilestone = {
+      title,
+      description,
+      amount: parseFloat(amount),
+      dueDate: dueDate ? new Date(dueDate).toISOString() : null
+    };
+
+    // Add new milestone to the list
+    const updatedMilestones = [...currentMilestones, newMilestone];
+
+    // Update offer with new milestones
+    const updatedOffer = await prisma.offer.update({
+      where: { id: offerId },
+      data: {
+        milestones: updatedMilestones,
+        amount: currentMilestones.reduce((sum, m) => sum + m.amount, 0) + newMilestone.amount
+      },
+      include: {
+        client: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+            companyName: true
+          }
+        },
+        freelancer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+            email: true
+          }
+        },
+        job: {
+          select: {
+            id: true,
+            title: true,
+            description: true
+          }
+        }
+      }
+    });
+
+    // Create notification for freelancer
+    await prisma.notification.create({
+      data: {
+        title: 'New Milestone Added',
+        message: `A new milestone "${title}" has been added to your accepted offer`,
+        type: 'OFFER_RECEIVED',
+        userId: offer.freelancerId
+      }
+    });
+
+    res.status(201).json({
+      success: true,
+      data: updatedOffer,
+      message: 'Milestone added successfully'
+    });
+  } catch (error) {
+    console.error('Error adding milestone:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
+// @desc    Test payment for milestone (for testing purposes)
+// @route   POST /api/offers/:id/test-payment
+// @access  Private (Client only)
+router.post('/:id/test-payment', protect, [
+  body('milestoneIndex').isInt({ min: 0 }).withMessage('Valid milestone index is required'),
+  body('amount').isFloat({ min: 0 }).withMessage('Valid amount is required')
+], (async (req: AuthRequest, res: Response): Promise<void> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  try {
+    const offerId = req.params.id;
+    const { milestoneIndex, amount } = req.body;
+
+    if (req.user!.userType !== 'CLIENT') {
+      res.status(403).json({ message: 'Only clients can make test payments' });
+      return;
+    }
+
+    const offer = await prisma.offer.findFirst({
+      where: {
+        id: offerId,
+        clientId: req.user!.id,
+        status: 'ACCEPTED'
+      },
+      include: {
+        payments: true
+      }
+    });
+
+    if (!offer) {
+      res.status(404).json({ message: 'Offer not found or not accepted' });
+      return;
+    }
+
+    // Check if milestone exists
+    const milestones = offer.milestones as any[];
+    if (!milestones || milestoneIndex >= milestones.length) {
+      res.status(400).json({ message: 'Invalid milestone index' });
+      return;
+    }
+
+    const milestone = milestones[milestoneIndex];
+    if (Math.abs(milestone.amount - amount) > 0.01) {
+      res.status(400).json({ message: 'Payment amount must match milestone amount' });
+      return;
+    }
+
+    // Check if payment already exists for this milestone
+    const existingPayment = offer.payments.find(p => p.milestoneIndex === milestoneIndex);
+    if (existingPayment) {
+      res.status(400).json({ message: 'Payment already exists for this milestone' });
+      return;
+    }
+
+    // Simulate payment processing delay for testing
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Create test payment record
+    const payment = await prisma.payment.create({
+      data: {
+        offerId,
+        milestoneIndex,
+        amount,
+        paymentMethod: 'Test Payment',
+        status: 'COMPLETED',
+        transactionId: `TEST_TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        paidAt: new Date()
+      }
+    });
+
+    // Create notification for freelancer
+    await prisma.notification.create({
+      data: {
+        title: 'Test Payment Received',
+        message: `Test payment of ${formatCurrency(amount)} has been received for milestone ${milestoneIndex + 1}`,
+        type: 'MILESTONE_PAID',
+        userId: offer.freelancerId
+      }
+    });
+
+    res.status(201).json({
+      success: true,
+      data: payment,
+      message: 'Test payment processed successfully'
+    });
+  } catch (error) {
+    console.error('Error processing test payment:', error);
     res.status(500).json({ message: 'Server error' });
   }
 }) as RequestHandler);

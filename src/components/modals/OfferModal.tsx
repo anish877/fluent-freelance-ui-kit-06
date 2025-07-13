@@ -18,6 +18,9 @@ interface OfferModalProps {
   jobId: string;
   jobTitle: string;
   jobDescription: string;
+  jobBudget?: 'FIXED' | 'HOURLY';
+  jobMinBudget?: number;
+  jobMaxBudget?: number;
   onOfferCreated?: () => void;
 }
 
@@ -37,10 +40,13 @@ const OfferModal: React.FC<OfferModalProps> = ({
   jobId,
   jobTitle,
   jobDescription,
+  jobBudget,
+  jobMinBudget,
+  jobMaxBudget,
   onOfferCreated
 }) => {
   const [formData, setFormData] = useState({
-    budgetType: 'FIXED' as 'FIXED' | 'HOURLY',
+    budgetType: (jobBudget || 'FIXED') as 'FIXED' | 'HOURLY',
     amount: '',
     duration: '',
     terms: '',
@@ -53,7 +59,7 @@ const OfferModal: React.FC<OfferModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        budgetType: 'FIXED' as 'FIXED' | 'HOURLY',
+        budgetType: (jobBudget || 'FIXED') as 'FIXED' | 'HOURLY',
         amount: '',
         duration: '',
         terms: '',
@@ -61,7 +67,7 @@ const OfferModal: React.FC<OfferModalProps> = ({
       });
       setMilestones([]);
     }
-  }, [isOpen]);
+  }, [isOpen, jobBudget]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -173,23 +179,38 @@ const OfferModal: React.FC<OfferModalProps> = ({
             </div>
           </div>
 
-          {/* Budget and Duration */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Budget Type Heading */}
+          {jobBudget && (
             <div>
-              <Label htmlFor="budgetType" className="text-base font-semibold text-gray-700">Budget Type *</Label>
-              <Select
-                value={formData.budgetType}
-                onValueChange={(value: 'FIXED' | 'HOURLY') => handleInputChange('budgetType', value)}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="FIXED">Fixed Price</SelectItem>
-                  <SelectItem value="HOURLY">Hourly Rate</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label className="text-base font-semibold text-gray-700">Project Type</Label>
+              <div className="mt-2 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <p className="text-base font-medium text-gray-900">
+                  {formData.budgetType === 'FIXED' ? 'Fixed Price' : 'Hourly Rate'} Project
+                </p>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Based on job requirements</p>
             </div>
+          )}
+
+          {/* Budget and Duration */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {!jobBudget && (
+              <div>
+                <Label htmlFor="budgetType" className="text-base font-semibold text-gray-700">Budget Type *</Label>
+                <Select
+                  value={formData.budgetType}
+                  onValueChange={(value: 'FIXED' | 'HOURLY') => handleInputChange('budgetType', value)}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FIXED">Fixed Price</SelectItem>
+                    <SelectItem value="HOURLY">Hourly Rate</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div>
               <Label htmlFor="amount" className="text-base font-semibold text-gray-700">
@@ -202,9 +223,23 @@ const OfferModal: React.FC<OfferModalProps> = ({
                 step="0.01"
                 value={formData.amount}
                 onChange={(e) => handleInputChange('amount', e.target.value)}
-                placeholder={formData.budgetType === 'FIXED' ? '500' : '25'}
+                placeholder={
+                  formData.budgetType === 'FIXED' 
+                    ? (jobMinBudget && jobMaxBudget 
+                        ? `${jobMinBudget} - ${jobMaxBudget}` 
+                        : String(jobMinBudget || jobMaxBudget || '500'))
+                    : (jobMinBudget && jobMaxBudget 
+                        ? `${jobMinBudget} - ${jobMaxBudget}` 
+                        : String(jobMinBudget || jobMaxBudget || '25'))
+                }
                 className="mt-2"
               />
+              {jobMinBudget && jobMaxBudget && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Job budget: ${jobMinBudget.toLocaleString()} - ${jobMaxBudget.toLocaleString()}
+                  {formData.budgetType === 'HOURLY' ? '/hr' : ''}
+                </p>
+              )}
             </div>
 
             <div>
@@ -219,83 +254,85 @@ const OfferModal: React.FC<OfferModalProps> = ({
             </div>
           </div>
 
-          {/* Milestones */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <Label className="text-base font-semibold text-gray-700">Milestones (Optional)</Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addMilestone}
-                className="border-gray-200 text-green-700 hover:bg-green-50 hover:border-green-600"
-              >
-                Add Milestone
-              </Button>
-            </div>
-
-            {milestones.map((milestone, index) => (
-              <div key={index} className="border border-gray-100 rounded-xl p-5 mb-4 space-y-4 bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-gray-800">Milestone {index + 1}</h4>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeMilestone(index)}
-                    className="rounded-full hover:bg-gray-200"
-                  >
-                    <X className="h-4 w-4 text-gray-400" />
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Title</Label>
-                    <Input
-                      value={milestone.title}
-                      onChange={(e) => updateMilestone(index, 'title', e.target.value)}
-                      placeholder="Milestone title"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Amount ($)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={milestone.amount}
-                      onChange={(e) => updateMilestone(index, 'amount', parseFloat(e.target.value) || 0)}
-                      placeholder="0"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Description</Label>
-                  <Textarea
-                    value={milestone.description}
-                    onChange={(e) => updateMilestone(index, 'description', e.target.value)}
-                    placeholder="Describe what will be delivered"
-                    rows={2}
-                    className="resize-none mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Due Date</Label>
-                  <Input
-                    type="date"
-                    value={milestone.dueDate}
-                    onChange={(e) => updateMilestone(index, 'dueDate', e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
+          {/* Milestones - Only for Fixed Price */}
+          {formData.budgetType === 'FIXED' && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <Label className="text-base font-semibold text-gray-700">Milestones (Optional)</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addMilestone}
+                  className="border-gray-200 text-green-700 hover:bg-green-50 hover:border-green-600"
+                >
+                  Add Milestone
+                </Button>
               </div>
-            ))}
-          </div>
+
+              {milestones.map((milestone, index) => (
+                <div key={index} className="border border-gray-100 rounded-xl p-5 mb-4 space-y-4 bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-gray-800">Milestone {index + 1}</h4>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeMilestone(index)}
+                      className="rounded-full hover:bg-gray-200"
+                    >
+                      <X className="h-4 w-4 text-gray-400" />
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">Title</Label>
+                      <Input
+                        value={milestone.title}
+                        onChange={(e) => updateMilestone(index, 'title', e.target.value)}
+                        placeholder="Milestone title"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">Amount ($)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={milestone.amount}
+                        onChange={(e) => updateMilestone(index, 'amount', parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Description</Label>
+                    <Textarea
+                      value={milestone.description}
+                      onChange={(e) => updateMilestone(index, 'description', e.target.value)}
+                      placeholder="Describe what will be delivered"
+                      rows={2}
+                      className="resize-none mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Due Date</Label>
+                    <Input
+                      type="date"
+                      value={milestone.dueDate}
+                      onChange={(e) => updateMilestone(index, 'dueDate', e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Terms and Expiration */}
           <div className="space-y-6">

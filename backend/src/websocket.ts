@@ -447,7 +447,6 @@ wss.on("connection", (ws: WebSocket, req) => {
                     budget: true,
                     minBudget: true,
                     maxBudget: true,
-                    hourlyRate: true,
                     duration: true,
                     status: true
                   }

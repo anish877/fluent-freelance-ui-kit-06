@@ -35,7 +35,6 @@ router.get('/conversations', protect, (async (req: AuthRequest, res: Response): 
             budget: true,
             minBudget: true,
             maxBudget: true,
-            hourlyRate: true,
             duration: true,
             status: true
           }

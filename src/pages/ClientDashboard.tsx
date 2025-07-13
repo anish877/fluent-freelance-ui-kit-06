@@ -20,11 +20,10 @@ interface Job {
   id: string;
   title: string;
   description: string;
-  requirements: string[];
+
   budget: 'FIXED' | 'HOURLY';
   minBudget?: number;
   maxBudget?: number;
-  hourlyRate?: number;
   duration?: string;
   skills: string[];
   category: string;
@@ -214,14 +213,18 @@ const ClientDashboard = () => {
 
   // Format budget display
   const formatBudget = (job: Job) => {
-    if (job.budget === 'FIXED') {
-      if (job.minBudget && job.maxBudget) {
+    if (job.projectType === 'fixed') {
+      if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
         return `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`;
       } else if (job.minBudget) {
         return `$${job.minBudget.toLocaleString()}`;
       }
-    } else if (job.budget === 'HOURLY' && job.hourlyRate) {
-      return `$${job.hourlyRate}/hour`;
+    } else if (job.projectType === 'hourly') {
+      if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
+        return `$${job.minBudget}/hour - $${job.maxBudget}/hour`;
+      } else if (job.minBudget) {
+        return `$${job.minBudget}/hour`;
+      }
     }
     return 'Budget not specified';
   };
@@ -532,10 +535,16 @@ const ClientDashboard = () => {
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
+                            <Link to={`/jobs/${job.id}`}>
+                              <Button variant="outline" size="sm" className="bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100">
+                                <Eye className="h-4 w-4 mr-1" />
+                                Public View
+                              </Button>
+                            </Link>
                             <Link to={`/client-jobs/${job.id}`}>
                               <Button variant="outline" size="sm">
                                 <Eye className="h-4 w-4 mr-1" />
-                                View
+                                Manage
                               </Button>
                             </Link>
                             <Link to={`/edit-job/${job.id}`}>

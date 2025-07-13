@@ -18,26 +18,18 @@ interface Job {
   id: string;
   title: string;
   description: string;
-  requirements: string[];
+
   budget: 'FIXED' | 'HOURLY';
   minBudget?: number;
   maxBudget?: number;
-  hourlyRate?: number;
   duration?: string;
   skills: string[];
   category: string;
   subcategory?: string;
   projectType?: string;
   experienceLevel?: string;
-  workingHours?: string;
-  timezone?: string;
-  communicationPreferences: string[];
-  location?: string;
-  isRemote: boolean;
   status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  isUrgent: boolean;
   visibility: string;
-  applicationDeadline?: string;
   clientId: string;
   createdAt: string;
   updatedAt: string;
@@ -174,14 +166,18 @@ const Jobs = () => {
 
   // Format budget display
   const formatBudget = (job: Job) => {
-    if (job.budget === 'FIXED') {
-      if (job.minBudget && job.maxBudget) {
+    if (job.projectType === 'fixed') {
+      if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
         return `$${job.minBudget.toLocaleString()} - $${job.maxBudget.toLocaleString()}`;
       } else if (job.minBudget) {
         return `$${job.minBudget.toLocaleString()}`;
       }
-    } else if (job.budget === 'HOURLY' && job.hourlyRate) {
-      return `$${job.hourlyRate}/hour`;
+    } else if (job.projectType === 'hourly') {
+      if (job.minBudget && job.maxBudget && job.minBudget !== job.maxBudget) {
+        return `$${job.minBudget} - $${job.maxBudget}/hour`;
+      } else if (job.minBudget) {
+        return `$${job.minBudget}/hour`;
+      }
     }
     return 'Budget not specified';
   };
@@ -233,8 +229,8 @@ const Jobs = () => {
                            job.category.toLowerCase().replace(/\s+/g, '-') === selectedCategory;
     
     const matchesJobType = selectedJobType === "all" || 
-                          (selectedJobType === "fixed" && job.budget === "FIXED") ||
-                          (selectedJobType === "hourly" && job.budget === "HOURLY");
+                          (selectedJobType === "fixed" && job.projectType === "fixed") ||
+                          (selectedJobType === "hourly" && job.projectType === "hourly");
     
     const matchesExperience = selectedExperience === "all" || 
                              job.experienceLevel?.toLowerCase() === selectedExperience;
@@ -607,7 +603,7 @@ const Jobs = () => {
                           
                           <div className="flex items-center flex-wrap gap-2 mb-3">
                             <Badge className="bg-teal-100 text-teal-800 border-teal-200">
-                              {job.budget === 'FIXED' ? 'Fixed Price' : 'Hourly Rate'}
+                              {job.projectType === 'fixed' ? 'Fixed Price' : 'Hourly Rate'}
                             </Badge>
                             {job.experienceLevel && (
                               <Badge variant="outline">

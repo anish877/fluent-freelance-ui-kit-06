@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users, Eye, MessageCircle, Calendar, CheckCircle, AlertCircle, BarChart3, FileText, Star, Award, Target, Briefcase, Activity, Loader2 } from "lucide-react";
+import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users, Eye, MessageCircle, Calendar, CheckCircle, AlertCircle, BarChart3, FileText, Star, Award, Target, Briefcase, Activity, Loader2, User, CalendarDays, Download } from "lucide-react";
 import axios from "axios";
 
 import Footer from "../components/layout/Footer";
@@ -21,6 +21,7 @@ interface Proposal {
   estimatedDuration: string;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
   createdAt: string;
+  attachments?: string[];
   job: {
     id: string;
     title: string;
@@ -55,9 +56,57 @@ interface ModalProposal {
   skills: string[];
   responses: number;
   lastActivity: string;
+  attachments?: string[];
   interviewScheduled?: {
     date: string;
     time: string;
+  };
+}
+
+// Add Offer type
+interface Offer {
+  id: string;
+  conversationId: string;
+  clientId: string;
+  freelancerId: string;
+  jobId: string;
+  budgetType: 'FIXED' | 'HOURLY';
+  amount: number;
+  duration: string;
+  milestones: Array<{
+    title: string;
+    description: string;
+    amount: number;
+    dueDate: string;
+    status?: 'pending' | 'in_progress' | 'completed';
+  }>;
+  terms?: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+  expiresAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  client: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+    companyName?: string;
+  };
+  freelancer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+    email: string;
+  };
+  job: {
+    id: string;
+    title: string;
+    description: string;
+  };
+  conversation: {
+    id: string;
+    projectName?: string;
   };
 }
 
@@ -75,6 +124,11 @@ const Dashboard = () => {
   const [selectedProposal, setSelectedProposal] = useState<ModalProposal | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string>('');
   const [showModal, setShowModal] = useState(false);
+
+  // Offers state
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [offersLoading, setOffersLoading] = useState(false);
+  const [offersError, setOffersError] = useState<string | null>(null);
 
   const stats = [
     {
@@ -313,6 +367,7 @@ const Dashboard = () => {
       skills: ["React", "Node.js", "TypeScript", "MongoDB", "PostgreSQL", "AWS"], // Enhanced skills list
       responses: proposal.job._count.proposals,
       lastActivity: "2 hours ago",
+      attachments: proposal.attachments,
       interviewScheduled: proposal.status === 'ACCEPTED' ? {
         date: "2024-12-25",
         time: "2:00 PM EST"
@@ -384,9 +439,29 @@ const Dashboard = () => {
     }
   };
 
+  // Fetch accepted offers for freelancer
+  const fetchAcceptedOffers = async () => {
+    if (user?.userType !== 'FREELANCER') return;
+    try {
+      setOffersLoading(true);
+      setOffersError(null);
+      const response = await axios.get('/offers/me?status=ACCEPTED');
+      if (response.data.success) {
+        setOffers(response.data.data);
+      } else {
+        setOffersError('Failed to fetch offers');
+      }
+    } catch (error) {
+      setOffersError('Failed to fetch offers');
+    } finally {
+      setOffersLoading(false);
+    }
+  };
+
   // Load proposals on component mount
   useEffect(() => {
     fetchProposals();
+    fetchAcceptedOffers();
   }, [user]);
 
   // Format proposal data for display
@@ -419,6 +494,13 @@ const Dashboard = () => {
       connects,
       competition
     };
+  };
+
+  // Helper for progress
+  const calculateProgress = (offer: Offer): number => {
+    if (!offer.milestones || offer.milestones.length === 0) return 0;
+    const completed = offer.milestones.filter(m => m.status === 'completed').length;
+    return Math.round((completed / offer.milestones.length) * 100);
   };
 
   return (
@@ -600,7 +682,7 @@ const Dashboard = () => {
             {/* Projects Tab */}
             <div className={activeTab === "projects" ? "block" : "hidden"}>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Active Projects ({recentJobs.length})</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Active Projects ({offers.length})</h3>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm">
                     <Activity className="h-4 w-4 mr-2" />
@@ -612,63 +694,109 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              <div className="space-y-4">
-                {recentJobs.map((job) => (
-                  <Card key={job.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h4 className="font-semibold text-gray-900 text-lg">{job.title}</h4>
-                            <Badge className={getPriorityColor(job.priority)}>
-                              {job.priority.toUpperCase()} PRIORITY
-                            </Badge>
+              {offersLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="h-12 w-12 animate-spin text-teal-600 mx-auto mb-4" />
+                  <p className="text-gray-600">Loading active projects...</p>
+                </div>
+              ) : offersError ? (
+                <div className="text-center py-16">
+                  <AlertCircle className="h-16 w-16 text-red-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading active projects</h3>
+                  <p className="text-gray-500 mb-6">{offersError}</p>
+                  <Button onClick={fetchAcceptedOffers} variant="outline">
+                    Try Again
+                  </Button>
+                </div>
+              ) : offers.length === 0 ? (
+                <div className="text-center py-16">
+                  <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No active projects yet</h3>
+                  <p className="text-gray-500 mb-6">
+                    Accepted offers will appear here as active projects.
+                  </p>
+                  <Button onClick={() => navigate('/jobs')}>
+                    Browse Jobs
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {offers.map((offer) => {
+                    const progress = calculateProgress(offer);
+                    const hasMilestones = offer.milestones && offer.milestones.length > 0;
+                    return (
+                      <Card key={offer.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h4 className="font-semibold text-gray-900 text-lg">{offer.job.title}</h4>
+                                <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">Active</Badge>
+                              </div>
+                              <p className="text-gray-600 mb-2">Client: {offer.client.companyName || `${offer.client.firstName} ${offer.client.lastName}`}</p>
+                              <div className="flex items-center gap-4 text-sm text-gray-500">
+                                <span>Started: {new Date(offer.createdAt).toLocaleDateString()}</span>
+                                <span>•</span>
+                                <span>Budget: <span className="font-semibold text-gray-900">${offer.amount.toLocaleString()} {offer.budgetType === 'HOURLY' && '/hr'}</span></span>
+                                <span>•</span>
+                                <span>Duration: {offer.duration}</span>
+                              </div>
+                            </div>
+                            {hasMilestones && (
+                              <div className="flex flex-col items-end gap-2">
+                                <Badge className="bg-blue-100 text-blue-800 text-xs">Milestones</Badge>
+                                <div className="flex items-center text-sm text-gray-600">
+                                  <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
+                                  {progress}% Complete
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          <p className="text-gray-600 mb-2">Client: {job.client}</p>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <span>Deadline: {job.deadline}</span>
-                            <span>•</span>
-                            <span>Budget: {job.budget}</span>
-                            <span>•</span>
-                            <span>Time Tracked: {job.timeTracked}</span>
+                          {hasMilestones && (
+                            <div className="mb-4">
+                              <div className="flex justify-between text-sm mb-2">
+                                <span>Project Progress</span>
+                                <span className="font-semibold">{progress}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className="bg-teal-600 h-2 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+                              </div>
+                            </div>
+                          )}
+                          {hasMilestones && (
+                            <div className="mb-2">
+                              <div className="flex flex-wrap gap-2">
+                                {offer.milestones.map((m, idx) => (
+                                  <Badge key={idx} className={
+                                    m.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                    m.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }>
+                                    {m.title}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-500">Last updated: {new Date(offer.updatedAt).toLocaleDateString()}</span>
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm" onClick={() => navigate(`/messages/${offer.conversationId}`)}>
+                                <MessageCircle className="h-4 w-4 mr-1" />
+                                Message
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/${offer.jobId}`)}>
+                                <Eye className="h-4 w-4 mr-1" />
+                                View Details
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <Badge className={getStatusColor(job.status)}>
-                            {job.status}
-                          </Badge>
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                            {job.clientRating}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span>Project Progress</span>
-                          <span className="font-semibold">{job.progress}%</span>
-                        </div>
-                        <Progress value={job.progress} className="h-3" />
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-500">Last activity: {job.lastActivity}</span>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <MessageCircle className="h-4 w-4 mr-1" />
-                            Message Client
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleViewJob(job.id)}>
-                            <Eye className="h-4 w-4 mr-1" />
-                            View Details
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Proposals Tab */}
@@ -735,6 +863,38 @@ const Dashboard = () => {
                             </Badge>
                           </div>
                           
+                          {/* Attachments */}
+                          {proposal.attachments && proposal.attachments.length > 0 && (
+                            <div className="mb-4">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText className="h-4 w-4 text-gray-500" />
+                                <span className="text-sm font-medium text-gray-700">Attachments ({proposal.attachments.length})</span>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {proposal.attachments.map((attachment, index) => (
+                                  <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="w-6 h-6 bg-teal-100 rounded flex items-center justify-center">
+                                      <span className="text-xs font-medium text-teal-600">
+                                        {attachment.split('.').pop()?.toUpperCase() || 'FILE'}
+                                      </span>
+                                    </div>
+                                    <span className="text-xs text-gray-700 truncate max-w-24">
+                                      {attachment.split('/').pop() || 'attachment'}
+                                    </span>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-6 w-6 p-0"
+                                      onClick={() => window.open(attachment, '_blank')}
+                                    >
+                                      <Download className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
                           <div className="flex justify-between items-center">
                             <div className="text-sm text-gray-600">
                               Competition: {formattedProposal.competition}
