@@ -5,7 +5,7 @@ import {
   Eye, MessageCircle, CheckCircle, XCircle, Award,
   FileText, Download, Edit, Trash2, AlertCircle,
   Filter, Search, SortAsc, MoreHorizontal,
-  TrendingUp, Target
+  TrendingUp, Target, ArrowLeft, DollarSign, Briefcase, Share2, Bookmark, BookmarkCheck
 } from "lucide-react";
 
 import Footer from "../components/layout/Footer";
@@ -23,6 +23,7 @@ import axios from "axios";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/AuthContext";
 import { useWebSocket } from "../hooks/socketContext";
+import InterviewSchedulingModal from "../components/modals/InterviewSchedulingModal";
 
 interface Job {
   id: string;
@@ -139,7 +140,10 @@ const ClientJobView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [acceptingProposalId, setAcceptingProposalId] = useState<string | null>(null);
-  const { createConversation } = useWebSocket();
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+  const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
+  const [selectedProposalForInterview, setSelectedProposalForInterview] = useState<Proposal | null>(null);
+  const { createConversation, sendInterviewMessage, messages, socketRef } = useWebSocket();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -278,6 +282,13 @@ const ClientJobView = () => {
             setProposals(proposalsResponse.data.data);
           }
         }
+      } else if (action === "interview") {
+        // Find the proposal to open interview modal
+        const proposal = proposals.find(p => p.id === proposalId);
+        if (proposal) {
+          setSelectedProposalForInterview(proposal);
+          setIsInterviewModalOpen(true);
+        }
       }
     } catch (err: unknown) {
       console.error(`Error ${action}ing proposal:`, err);
@@ -378,6 +389,103 @@ const ClientJobView = () => {
         variant: "destructive"
       });
     }
+  };
+
+  // Handle interview scheduling
+  const handleInterviewScheduled = async (interviewData: any) => {
+    try {
+      // Refresh proposals to show updated interview status
+      const proposalsResponse = await axios.get(`/proposals/job/${id}`);
+      if (proposalsResponse.data.success) {
+        setProposals(proposalsResponse.data.data);
+      }
+
+      // Send interview notification via WebSocket
+      if (selectedProposalForInterview?.freelancer?.email) {
+        const conversationId = await createConversation(
+          selectedProposalForInterview.freelancer.email,
+          job.title,
+          job.id
+        );
+        
+        if (conversationId) {
+          console.log('📅 Sending interview message to conversation:', conversationId);
+          console.log('📅 Interview data:', {
+            date: interviewData.date,
+            time: interviewData.time,
+            duration: interviewData.duration,
+            meetLink: interviewData.meetLink,
+            notes: interviewData.notes,
+            jobTitle: job.title,
+            clientName: `${user?.firstName} ${user?.lastName}`,
+            proposalId: selectedProposalForInterview.id
+          });
+          
+          // Check if an interview already exists in this conversation
+          const existingInterviewMessage = messages.find(msg => 
+            msg.type === 'interview' && 
+            msg.conversationId === conversationId &&
+            JSON.parse(msg.content).proposalId === selectedProposalForInterview.id
+          );
+
+          if (existingInterviewMessage) {
+            // Update existing interview message
+            console.log('📅 Updating existing interview message:', existingInterviewMessage.id);
+            
+            // Send WebSocket message to update existing interview
+            if (socketRef.current?.readyState === WebSocket.OPEN) {
+              socketRef.current.send(JSON.stringify({
+                type: 'interview_status_updated',
+                payload: {
+                  messageId: existingInterviewMessage.id,
+                  status: 'pending',
+                  interviewData: {
+                    date: interviewData.date,
+                    time: interviewData.time,
+                    duration: interviewData.duration,
+                    meetLink: interviewData.meetLink,
+                    notes: interviewData.notes,
+                    jobTitle: job.title,
+                    clientName: `${user?.firstName} ${user?.lastName}`,
+                    proposalId: selectedProposalForInterview.id
+                  }
+                }
+              }));
+            }
+          } else {
+            // Create new interview message
+            console.log('📅 Creating new interview message');
+            sendInterviewMessage({
+              date: interviewData.date,
+              time: interviewData.time,
+              duration: interviewData.duration,
+              meetLink: interviewData.meetLink,
+              notes: interviewData.notes,
+              jobTitle: job.title,
+              clientName: `${user?.firstName} ${user?.lastName}`,
+              proposalId: selectedProposalForInterview.id
+            }, conversationId);
+          }
+
+          toast({
+            title: "Interview Scheduled",
+            description: "Interview details have been sent to the candidate.",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error handling interview scheduling:', error);
+      toast({
+        title: "Warning",
+        description: "Interview scheduled but could not send notification.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCloseInterviewModal = () => {
+    setIsInterviewModalOpen(false);
+    setSelectedProposalForInterview(null);
   };
 
   if (loading) {
@@ -1364,6 +1472,18 @@ const ClientJobView = () => {
       </div>
 
       <Footer />
+
+      {/* Interview Scheduling Modal */}
+      {selectedProposalForInterview && (
+        <InterviewSchedulingModal
+          isOpen={isInterviewModalOpen}
+          onClose={handleCloseInterviewModal}
+          proposalId={selectedProposalForInterview.id}
+          freelancerName={`${selectedProposalForInterview.freelancer.firstName} ${selectedProposalForInterview.freelancer.lastName}`}
+          jobTitle={job.title}
+          onInterviewScheduled={handleInterviewScheduled}
+        />
+      )}
     </div>
   );
 };

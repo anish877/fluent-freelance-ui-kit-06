@@ -1,8 +1,8 @@
 import express, { Request, Response, RequestHandler, Router } from 'express';
 import { body, validationResult } from 'express-validator';
-import prisma from '../lib/prisma.js';
 import { protect, authorize, AuthRequest } from '../middleware/auth.js';
 import { Prisma } from '@prisma/client';
+import prisma from '../lib/prisma.js';
 const router: Router = express.Router();
 
 // @desc    Get all jobs
@@ -35,9 +35,11 @@ router.get('/', (async (req: Request, res: Response): Promise<void> => {
     }
     
     if (location) {
-      where.location = {
-        contains: location as string,
-        mode: 'insensitive'
+      where.client = {
+        location: {
+          contains: location as string,
+          mode: 'insensitive'
+        }
       };
     }
     
@@ -46,8 +48,14 @@ router.get('/', (async (req: Request, res: Response): Promise<void> => {
     }
     
     if (isRemote !== undefined) {
-      where.isRemote = isRemote === 'true';
+      where.client = {
+        location: {
+          contains: location as string,
+          mode: 'insensitive'
+        }
+      };
     }
+    
     
     if (status) {
       where.status = status as 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';

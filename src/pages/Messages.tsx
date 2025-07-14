@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, Plus, Send, Paperclip, Smile, MoreVertical, Phone, Video, Archive, Star, Circle, Briefcase, FileText, DollarSign } from "lucide-react";
+import InterviewNotification from "../components/ui/interview-notification";
+import InterviewRescheduleModal from "../components/modals/InterviewRescheduleModal";
+import { useLocation } from "react-router-dom";
 
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -18,6 +21,7 @@ import OfferDetailsModal from "@/components/modals/OfferDetailsModal";
 const Messages = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   
   // Simplified state
@@ -43,6 +47,8 @@ const Messages = () => {
   const [showOfferDetailsModal, setShowOfferDetailsModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [offerPayments, setOfferPayments] = useState({});
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [rescheduleData, setRescheduleData] = useState(null);
 
   // Debug clientJobs changes
   useEffect(() => {
@@ -61,7 +67,8 @@ const Messages = () => {
     onlineUsersMap,
     typingUsers,
     onlineUsers,
-    isUserOnline
+    isUserOnline,
+    socketRef
   } = useWebSocket();
 
   // Helper function to get other participant
@@ -138,6 +145,16 @@ useEffect(() => {
     
     return filteredMessages;
   }, [conversationId, currentConversationId, messages]);
+
+  // Handle calendar connection redirect
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('calendar_connected') === 'true') {
+      toast.success('Google Calendar connected successfully! You can now schedule interviews.');
+      // Clean up the URL
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
 
   // Fetch conversations on mount
   const fetchConversations = async () => {
@@ -367,6 +384,30 @@ useEffect(() => {
       return;
     }
     setShowOfferModal(true);
+  };
+
+  // Handle interview reschedule
+  const handleRescheduleSubmit = (interviewData) => {
+    try {
+      // Send WebSocket message for rescheduling
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        socketRef.current.send(JSON.stringify({
+          type: 'interview_rescheduled',
+          payload: {
+            messageId: rescheduleData.messageId,
+            interviewData: interviewData
+          }
+        }));
+        toast.success('Interview rescheduled successfully');
+        setShowRescheduleModal(false);
+        setRescheduleData(null);
+      } else {
+        toast.error('Connection lost. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error rescheduling interview:', error);
+      toast.error('Failed to reschedule interview');
+    }
   };
 
   // Timeline Sidebar component
@@ -790,7 +831,7 @@ useEffect(() => {
                         </h3>
                       </div>
                       <p className="text-sm text-gray-500 font-medium">
-                        {selectedConv.isOnline ? 'Online' : 'Offline'} • {selectedConv.project}
+                        {selectedConv.isOnline ? 'Online' : 'Offline'}  {selectedConv.project}
                       </p>
                     </div>
                   </div>
@@ -834,29 +875,167 @@ useEffect(() => {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 h-0 messages-scroll scrollbar-hide">
-                  {conversationMessages.map((message) => (
-                    <div 
-                      key={message.id} 
-                      className={`flex ${message.senderEmail === user?.email ? "justify-end" : "justify-start"}`}
-                    >
-                      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-xl ${
-                        message.senderEmail === user?.email
-                          ? "bg-green-600 text-white" 
-                          : "bg-gray-100 text-gray-900"
-                      }`}>
-                        <p className="text-sm leading-relaxed">{message.content}</p> 
-                        <p className={`text-xs mt-2 ${
-                          message.senderEmail === user?.email ? "text-green-100" : "text-gray-500"
+                <div className="flex-1 overflow-y-auto p-6 space-y-3 h-0 messages-scroll scrollbar-hide">
+                  {conversationMessages.map((message) => {
+                    // Handle interview messages
+                    if (message.type === 'interview') {
+                      try {
+                        const interviewData = JSON.parse(message.content);
+                        const isCurrentUserSender = message.senderEmail === user?.email;
+                        
+                        // Handle interview actions
+                        const handleAccept = () => {
+                          try {
+                            // Send WebSocket message for real-time update
+                            if (socketRef.current?.readyState === WebSocket.OPEN) {
+                              socketRef.current.send(JSON.stringify({
+                                type: 'interview_status_updated',
+                                payload: {
+                                  messageId: message.id,
+                                  status: 'accepted'
+                                }
+                              }));
+                              toast.success('Interview accepted successfully');
+                            } else {
+                              toast.error('Connection lost. Please try again.');
+                            }
+                          } catch (error) {
+                            console.error('Error accepting interview:', error);
+                            toast.error('Failed to accept interview');
+                          }
+                        };
+
+                        const handleDecline = () => {
+                          try {
+                            // Send WebSocket message for real-time update
+                            if (socketRef.current?.readyState === WebSocket.OPEN) {
+                              socketRef.current.send(JSON.stringify({
+                                type: 'interview_status_updated',
+                                payload: {
+                                  messageId: message.id,
+                                  status: 'declined'
+                                }
+                              }));
+                              toast.success('Interview declined');
+                            } else {
+                              toast.error('Connection lost. Please try again.');
+                            }
+                          } catch (error) {
+                            console.error('Error declining interview:', error);
+                            toast.error('Failed to decline interview');
+                          }
+                        };
+
+                        const handleWithdraw = () => {
+                          try {
+                            // Send WebSocket message for real-time update
+                            if (socketRef.current?.readyState === WebSocket.OPEN) {
+                              socketRef.current.send(JSON.stringify({
+                                type: 'interview_status_updated',
+                                payload: {
+                                  messageId: message.id,
+                                  status: 'withdrawn',
+                                  reason: 'Interview was withdrawn by the client'
+                                }
+                              }));
+                              toast.success('Interview withdrawn successfully');
+                            } else {
+                              toast.error('Connection lost. Please try again.');
+                            }
+                          } catch (error) {
+                            console.error('Error withdrawing interview:', error);
+                            toast.error('Failed to withdraw interview');
+                          }
+                        };
+
+                        const handleReschedule = () => {
+                          try {
+                            // Extract original data for rescheduling
+                            const originalData = interviewData.originalData || interviewData;
+                            
+                            // Set reschedule data and open modal
+                            setRescheduleData({
+                              messageId: message.id,
+                              originalData: originalData
+                            });
+                            setShowRescheduleModal(true);
+                          } catch (error) {
+                            console.error('Error opening reschedule modal:', error);
+                            toast.error('Failed to open reschedule modal');
+                          }
+                        };
+
+                        return (
+                          <div 
+                            key={message.id} 
+                            className={`flex ${message.senderEmail === user?.email ? "justify-end" : "justify-start"} my-1`}
+                          >
+                            <div className="w-80">
+                              <InterviewNotification
+                                interviewData={interviewData}
+                                onJoinInterview={() => window.open(interviewData.meetLink, '_blank')}
+                                onAccept={handleAccept}
+                                onDecline={handleDecline}
+                                onWithdraw={handleWithdraw}
+                                onReschedule={handleReschedule}
+                                status={interviewData.status || "pending"}
+                                currentUserEmail={user?.email}
+                                senderEmail={message.senderEmail}
+                              />
+                            </div>
+                          </div>
+                        );
+
+                        return (
+                          <div 
+                            key={message.id} 
+                            className={`flex ${message.senderEmail === user?.email ? "justify-end" : "justify-start"} my-1`}
+                          >
+                            <div className="w-80">
+                              <InterviewNotification
+                                interviewData={interviewData}
+                                onJoinInterview={() => window.open(interviewData.meetLink, '_blank')}
+                                onAccept={handleAccept}
+                                onDecline={handleDecline}
+                                onWithdraw={handleWithdraw}
+                                onReschedule={handleReschedule}
+                                status={interviewData.status || "pending"}
+                                currentUserEmail={user?.email}
+                                senderEmail={message.senderEmail}
+                              />
+                            </div>
+                          </div>
+                        );
+                      } catch (error) {
+                        console.error('Error parsing interview data:', error);
+                        // Fallback to regular message display
+                      }
+                    }
+
+                    // Regular message display
+                    return (
+                      <div 
+                        key={message.id} 
+                        className={`flex ${message.senderEmail === user?.email ? "justify-end" : "justify-start"}`}
+                      >
+                        <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-xl ${
+                          message.senderEmail === user?.email
+                            ? "bg-green-600 text-white" 
+                            : "bg-gray-100 text-gray-900"
                         }`}>
-                          {new Date(message.timestamp).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })} 
-                        </p>
+                          <p className="text-sm leading-relaxed">{message.content}</p> 
+                          <p className={`text-xs mt-2 ${
+                            message.senderEmail === user?.email ? "text-green-100" : "text-gray-500"
+                          }`}>
+                            {new Date(message.timestamp).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })} 
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   
                   {/* Typing Indicator */}
                   {typingUsers.length > 0 && (
@@ -959,6 +1138,19 @@ useEffect(() => {
               }
             }
           }}
+        />
+      )}
+
+      {/* Interview Reschedule Modal */}
+      {showRescheduleModal && rescheduleData && (
+        <InterviewRescheduleModal
+          isOpen={showRescheduleModal}
+          onClose={() => {
+            setShowRescheduleModal(false);
+            setRescheduleData(null);
+          }}
+          originalData={rescheduleData.originalData}
+          onReschedule={handleRescheduleSubmit}
         />
       )}
     </div>

@@ -10,7 +10,6 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  googleId  String?  @unique
   email     String   @unique
   password  String
   firstName String
@@ -137,6 +136,13 @@ model User {
   offersSent Offer[] @relation("OfferClient")
   offersReceived Offer[] @relation("OfferFreelancer")
 
+  // Google OAuth and Calendar
+  googleId  String?  @unique
+  googleCalendarId String?
+  accessToken String?
+  refreshToken String?
+  expiresAt DateTime?
+
   @@map("users")
 }
 
@@ -244,6 +250,7 @@ model Message {
   senderEmail    String
   receiverEmail  String
   conversationId String
+  type           String        @default("text") // "text", "file", "image", "interview"
   isRead         Boolean       @default(false)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
