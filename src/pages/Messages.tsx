@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import { Search, Plus, Send, Paperclip, Smile, MoreVertical, Phone, Video, Archive, Star, Circle, Briefcase, FileText, DollarSign, Calendar } from "lucide-react";
+import { Search, Plus, Send, Paperclip, Smile, MoreVertical, Phone, Video, Archive, Star, Circle, Briefcase, FileText, DollarSign, Calendar, Menu, User, LogOut, Settings, Home, Briefcase as BriefcaseIcon, Users, BarChart3, Loader2 } from "lucide-react";
 import InterviewNotification from "../components/ui/interview-notification";
 import InterviewRescheduleModal from "../components/modals/InterviewRescheduleModal";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Badge } from "../components/ui/badge";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "../components/ui/dropdown-menu";
 import { Conversation, useWebSocket } from "@/hooks/socketContext";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/AuthContext";
 import OfferModal from "@/components/modals/OfferModal";
 import OfferDetailsModal from "@/components/modals/OfferDetailsModal";
+import { MessageSkeleton, ConversationSkeleton } from "@/components/ui/skeleton";
 import { 
   messageService, 
   jobService, 
@@ -27,7 +28,7 @@ const Messages = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   // Simplified state
   const [localConversations, setLocalConversations] = useState([]);
@@ -55,6 +56,8 @@ const Messages = () => {
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [rescheduleData, setRescheduleData] = useState(null);
   const [messageUpdateTrigger, setMessageUpdateTrigger] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   const {
     isConnected,
@@ -182,27 +185,7 @@ const Messages = () => {
 
   // Messages for current conversation
   const conversationMessages = useMemo(() => {
-    console.log('🔍 Filtering messages:', {
-      conversationId,
-      currentConversationId,
-      messagesCount: messages?.length || 0,
-      messages: messages,
-      messageUpdateTrigger
-    });
-    
     const filteredMessages = (conversationId === currentConversationId) ? (messages || []) : [];
-    
-    console.log('🔍 Filtered messages count:', filteredMessages.length);
-    console.log('🔍 Filtered messages:', filteredMessages);
-    
-    // Log any interview invitation messages
-    const interviewInvitationMessages = filteredMessages.filter(msg => 
-      msg.type === 'interview_invitation' || 
-      (msg.content && typeof msg.content === 'string' && msg.content.includes('interview_invitation'))
-    );
-    if (interviewInvitationMessages.length > 0) {
-      console.log('📋 Found interview invitation messages:', interviewInvitationMessages);
-    }
     
     return filteredMessages;
   }, [conversationId, currentConversationId, messages, messageUpdateTrigger]);
@@ -233,6 +216,7 @@ const Messages = () => {
   // Fetch conversations on mount
   const fetchConversations = async () => {
     try {
+      setLoading(true);
       const result = await messageService.getConversations();
       if (result.success && result.data) {
         // The backend returns { success: true, conversations: [...] }
@@ -242,6 +226,8 @@ const Messages = () => {
       }
     } catch (error) {
       console.error('Error fetching conversations:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -249,18 +235,20 @@ const Messages = () => {
     fetchConversations();
   }, []);
 
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      toast.error('Logout failed');
+    }
+  };
+
   // Join conversation when conversationId changes
   useEffect(() => {
-    console.log('🔄 Conversation joining effect:', {
-      conversationId,
-      isConnected,
-      currentConversationId,
-      shouldJoin: conversationId && isConnected && conversationId !== currentConversationId,
-      messagesCount: messages?.length || 0
-    });
-    
     if (conversationId && isConnected && conversationId !== currentConversationId) {
-      console.log('🔄 Joining conversation:', conversationId);
       joinConversation(conversationId);
     }
   }, [conversationId, isConnected, currentConversationId, joinConversation, messages]);
@@ -544,70 +532,129 @@ const Messages = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+      {/* Header - Fixed height with custom dropdown */}
+      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
+          <div className="flex items-center space-x-3">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Messages</h1>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 w-8 sm:h-9 sm:w-9 p-0">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuItem onClick={() => navigate('/')}>
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/jobs')}>
+                  <BriefcaseIcon className="h-4 w-4 mr-2" />
+                  Find Work
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/talent')}>
+                  <Users className="h-4 w-4 mr-2" />
+                  Find Talent
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Dashboard
+                </DropdownMenuItem>
+                {user?.userType === 'FREELANCER' && (
+                  <DropdownMenuItem onClick={() => navigate('/job-invitations')}>
+                    <Briefcase className="h-4 w-4 mr-2" />
+                    Job Invitations
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                  <User className="h-4 w-4 mr-2" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <Button 
             onClick={() => setShowNewConversation(true)}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 text-sm sm:text-base"
           >
-            <Plus className="h-4 w-4 mr-2" />
-            New Conversation
+            <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">New Conversation</span>
+            <span className="sm:hidden">New</span>
           </Button>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content - Fixed height, no overflow */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Conversations Sidebar - Fixed */}
-        <div className="w-80 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
-          {/* Search */}
-          <div className="p-4 border-b border-gray-200">
+        {/* Conversations Sidebar - Fixed width, scrollable content */}
+        <div className="w-64 sm:w-80 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+          {/* Search - Fixed */}
+          <div className="p-3 sm:p-4 border-b border-gray-200 flex-shrink-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
           </div>
 
-          {/* Conversations List - Scrollable */}
+          {/* Conversations List - Scrollable only */}
           <div className="flex-1 overflow-y-auto">
-            {filteredConversations.map((conversation) => (
+            {loading ? (
+              <div className="space-y-2">
+                {[...Array(6)].map((_, i) => (
+                  <ConversationSkeleton key={i} />
+                ))}
+              </div>
+            ) : filteredConversations.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">
+                <p>No conversations found</p>
+              </div>
+            ) : (
+              filteredConversations.map((conversation) => (
               <div
                 key={conversation.id}
                 onClick={() => handleConversationSelect(conversation.id)}
-                className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
+                className={`p-3 sm:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
                   conversation.id === conversationId ? 'bg-green-50 border-green-200' : ''
                 }`}
               >
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
-                    <Avatar className="h-10 w-10">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="relative flex-shrink-0">
+                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                       <AvatarImage src={conversation.otherParticipant?.avatar} />
                       <AvatarFallback>
                         {conversation.otherParticipantEmail?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     {conversation.isOnline && (
-                      <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"></div>
+                      <div className="absolute -bottom-1 -right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 bg-green-500 rounded-full border-2 border-white"></div>
                     )}
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                         {conversation.otherParticipant?.firstName 
                           ? `${conversation.otherParticipant.firstName} ${conversation.otherParticipant.lastName || ''}`.trim()
                           : conversation.otherParticipantEmail
                         }
                       </p>
                       {conversation.lastMessage && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
                           {new Date(conversation.lastMessage.timestamp).toLocaleTimeString([], {
                             hour: '2-digit',
                             minute: '2-digit'
@@ -628,7 +675,7 @@ const Messages = () => {
                       </div>
                       
                       {conversation.unreadCount > 0 && (
-                        <Badge className="ml-2 bg-green-600 text-white text-xs">
+                        <Badge className="ml-2 bg-green-600 text-white text-xs flex-shrink-0">
                           {conversation.unreadCount}
                         </Badge>
                       )}
@@ -636,46 +683,47 @@ const Messages = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </div>
 
-        {/* Chat Area - Fixed height, scrollable content */}
+        {/* Chat Area - Fixed height, scrollable content only */}
         <div className="flex-1 flex flex-col bg-white">
           {selectedConv ? (
             <>
               {/* Chat Header - Fixed */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
-                <div className="flex items-center space-x-3">
-                  <Avatar className="h-8 w-8">
+              <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 flex-shrink-0">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                     <AvatarImage src={selectedConv.otherParticipant?.avatar} />
                     <AvatarFallback>
                       {selectedConv.otherParticipantEmail?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                       {selectedConv.otherParticipant?.firstName 
                         ? `${selectedConv.otherParticipant.firstName} ${selectedConv.otherParticipant.lastName || ''}`.trim()
                         : selectedConv.otherParticipantEmail
                       }
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-gray-500">
                       {selectedConv.isOnline ? 'Online' : 'Offline'}
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm">
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  <Button variant="outline" size="sm" className="h-8 w-8 sm:h-9 sm:w-9 p-0">
                     <Phone className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="h-8 w-8 sm:h-9 sm:w-9 p-0">
                     <Video className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="h-8 w-8 sm:h-9 sm:w-9 p-0">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -693,21 +741,23 @@ const Messages = () => {
                 </div>
               </div>
 
-              {/* Messages Area - Scrollable */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 messages-scroll">
-                {conversationMessages.map((message) => {
-                  console.log('�� Processing message in render:', message);
-                  
-                  // Check if it's an interview message
+              {/* Messages Area - Scrollable only */}
+              <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 messages-scroll">
+                {loadingMessages ? (
+                  <div className="space-y-4">
+                    {[...Array(8)].map((_, i) => (
+                      <MessageSkeleton key={i} isOwn={i % 2 === 0} />
+                    ))}
+                  </div>
+                ) : (
+                                    conversationMessages.map((message) => {
+                  // Check if it's an interview message (using the imported InterviewNotification component)
                   if (message.type === 'interview' || (message.content && typeof message.content === 'string')) {
-                    console.log('📨 Message type check passed:', { type: message.type, hasContent: !!message.content });
                     
                     // For interview messages, the content is already JSON
                     if (message.type === 'interview') {
-                      console.log('📨 Processing interview message with type interview');
                       try {
                         const parsed = JSON.parse(message.content);
-                        console.log('📨 Parsed interview message content:', parsed);
                         
                         const interviewData = parsed;
                         
@@ -740,7 +790,7 @@ const Messages = () => {
                                 type: 'interview_status_updated',
                                 payload: {
                                   messageId: message.id,
-                                  status: 'declined'
+                                  status: 'rejected'
                                 }
                               };
                               
@@ -761,8 +811,7 @@ const Messages = () => {
                                 type: 'interview_status_updated',
                                 payload: {
                                   messageId: message.id,
-                                  status: 'withdrawn',
-                                  reason: 'Interview was withdrawn by the client'
+                                  status: 'withdrawn'
                                 }
                               };
                               
@@ -776,48 +825,30 @@ const Messages = () => {
                         };
 
                         const handleReschedule = () => {
-                          try {
-                            // Extract original data for rescheduling with safe defaults
-                            const originalData = interviewData.originalData || interviewData;
-                            
-                            // Ensure we have all required fields with defaults
-                            const safeOriginalData = {
-                              date: originalData?.date || '',
-                              time: originalData?.time || '',
-                              duration: originalData?.duration || 30,
-                              notes: originalData?.notes || '',
-                              jobTitle: originalData?.jobTitle || 'Interview',
-                              clientName: originalData?.clientName || 'Client'
-                            };
-                            
-                            // Set reschedule data and open modal
-                            setRescheduleData({
-                              messageId: message.id,
-                              originalData: safeOriginalData
-                            });
-                            setShowRescheduleModal(true);
-                          } catch (error) {
-                            console.error('Error opening reschedule modal:', error);
-                            toast.error('Failed to open reschedule modal');
-                          }
+                          setRescheduleData({
+                            messageId: message.id,
+                            originalData: interviewData
+                          });
+                          setShowRescheduleModal(true);
                         };
 
                         return (
-                          <div 
-                            key={message.id} 
-                            className={`flex ${message.senderEmail === user?.email ? "justify-end" : "justify-start"} my-1`}
-                          >
-                            <div className="w-80">
+                          <div key={message.id} className={`flex ${message.senderEmail === user?.email ? 'justify-end' : 'justify-start'} mb-4`}>
+                            <div className="max-w-sm">
                               <InterviewNotification
                                 interviewData={interviewData}
-                                onJoinInterview={() => window.open(interviewData.meetLink, '_blank')}
+                                status={interviewData.status || 'pending'}
+                                currentUserEmail={user?.email}
+                                senderEmail={message.senderEmail}
                                 onAccept={handleAccept}
                                 onDecline={handleDecline}
                                 onWithdraw={handleWithdraw}
                                 onReschedule={handleReschedule}
-                                status={interviewData.status || "pending"}
-                                currentUserEmail={user?.email}
-                                senderEmail={message.senderEmail}
+                                onJoinInterview={() => {
+                                  if (interviewData.meetLink) {
+                                    window.open(interviewData.meetLink, '_blank');
+                                  }
+                                }}
                               />
                             </div>
                           </div>
@@ -827,173 +858,19 @@ const Messages = () => {
                         // Fallback to regular message display
                       }
                     }
-                    
-                    // Check for other JSON messages (legacy format)
-                    if (message.content && typeof message.content === 'string') {
-                      // First check if it looks like JSON (starts with { or [)
-                      if (message.content.trim().startsWith('{') || message.content.trim().startsWith('[')) {
-                        try {
-                          const parsed = JSON.parse(message.content);
-                          console.log('📨 Parsed message content:', parsed);
-                          
-                          if (parsed.type === 'interview' || parsed.type === 'interview_scheduled' || parsed.interviewData) {
-                            console.log('📨 Found interview message:', parsed);
-                            const interviewData = parsed.interviewData || parsed;
-                          
-                            const handleAccept = async () => {
+                        }
+                        
+                        // Check if it's an interview invitation message
+                        if (message.type === 'interview_invitation' || (message.content && typeof message.content === 'string' && message.content.includes('interview_invitation'))) {
+                          try {
+                            const invitationData = typeof message.content === 'string' ? JSON.parse(message.content) : message.content;
+                            
+                            const handleAcceptInvitation = async () => {
                               try {
                                 // Send accept status update via websocket
                                 if (socketRef.current?.readyState === WebSocket.OPEN && conversationId) {
                                   const statusPayload = {
-                                    type: 'interview_status_updated',
-                                    payload: {
-                                      messageId: message.id,
-                                      status: 'accepted'
-                                    }
-                                  };
-                                  
-                                  socketRef.current.send(JSON.stringify(statusPayload));
-                                }
-                                toast.success('Interview accepted');
-                              } catch (error) {
-                                console.error('Error accepting interview:', error);
-                                toast.error('Failed to accept interview');
-                              }
-                            };
-
-                            const handleReject = async () => {
-                              try {
-                                // Send reject status update via websocket
-                                if (socketRef.current?.readyState === WebSocket.OPEN && conversationId) {
-                                  const statusPayload = {
-                                    type: 'interview_status_updated',
-                                    payload: {
-                                      messageId: message.id,
-                                      status: 'rejected'
-                                    }
-                                  };
-                                  
-                                  socketRef.current.send(JSON.stringify(statusPayload));
-                                }
-                                toast.success('Interview rejected');
-                              } catch (error) {
-                                console.error('Error rejecting interview:', error);
-                                toast.error('Failed to reject interview');
-                              }
-                            };
-
-                            const handleReschedule = () => {
-                              setRescheduleData({
-                                messageId: message.id,
-                                originalData: interviewData
-                              });
-                              setShowRescheduleModal(true);
-                            };
-
-                            return (
-                              <div key={message.id} className={`flex ${message.senderEmail === user?.email ? 'justify-end' : 'justify-start'} mb-4`}>
-                                <div className={`max-w-xs lg:max-w-md ${message.senderEmail === user?.email ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2`}>
-                                  <div className="flex items-center space-x-2 mb-2">
-                                    <Calendar className="h-4 w-4" />
-                                    <span className="text-sm font-medium">Interview Invitation</span>
-                                  </div>
-                                  
-                                  <div className="space-y-2 text-sm">
-                                    <div>
-                                      <span className="font-medium">Job:</span> {interviewData.jobTitle || 'N/A'}
-                                    </div>
-                                    <div>
-                                      <span className="font-medium">Date:</span> {interviewData.date || 'TBD'}
-                                    </div>
-                                    <div>
-                                      <span className="font-medium">Time:</span> {interviewData.time || 'TBD'}
-                                    </div>
-                                    {interviewData.duration && (
-                                      <div>
-                                        <span className="font-medium">Duration:</span> {interviewData.duration}
-                                      </div>
-                                    )}
-                                    {interviewData.notes && (
-                                      <div>
-                                        <span className="font-medium">Notes:</span> {interviewData.notes}
-                                      </div>
-                                    )}
-                                    {interviewData.meetLink && (
-                                      <div>
-                                        <span className="font-medium">Meeting Link:</span>
-                                        <a 
-                                          href={interviewData.meetLink} 
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className="text-blue-500 hover:text-blue-600 underline ml-1"
-                                        >
-                                          Join Meeting
-                                        </a>
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {interviewData.status === 'pending' && user?.userType === 'FREELANCER' && (
-                                    <div className="flex space-x-2 mt-3">
-                                      <Button
-                                        size="sm"
-                                        onClick={handleAccept}
-                                        className="bg-green-600 hover:bg-green-700 text-white text-xs"
-                                      >
-                                        Accept
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={handleReject}
-                                        className="text-xs"
-                                      >
-                                        Decline
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={handleReschedule}
-                                        className="text-xs"
-                                      >
-                                        Reschedule
-                                      </Button>
-                                    </div>
-                                  )}
-
-                                  {interviewData.status === 'accepted' && (
-                                    <div className="mt-2 text-green-600 text-xs">
-                                      ✅ Interview Accepted
-                                    </div>
-                                  )}
-
-                                  {interviewData.status === 'rejected' && (
-                                    <div className="mt-2 text-red-600 text-xs">
-                                      ❌ Interview Declined
-                                    </div>
-                                  )}
-
-                                  {interviewData.status === 'withdrawn' && (
-                                    <div className="mt-2 text-gray-600 text-xs">
-                                      ⏸️ Interview Withdrawn
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          }
-                          
-                          // Check if it's an interview invitation message
-                          if (parsed.type === 'interview_invitation' || parsed.invitationData) {
-                            console.log('📨 Found interview invitation message:', parsed);
-                            const invitationData = parsed.invitationData || parsed;
-                          
-                            const handleAcceptInvitation = async () => {
-                              try {
-                                // Send accept invitation update via websocket
-                                if (socketRef.current?.readyState === WebSocket.OPEN && conversationId) {
-                                  const statusPayload = {
-                                    type: 'interview_invitation_updated',
+                                    type: 'interview_invitation_status_updated',
                                     payload: {
                                       messageId: message.id,
                                       status: 'accepted'
@@ -1011,10 +888,10 @@ const Messages = () => {
 
                             const handleRejectInvitation = async () => {
                               try {
-                                // Send reject invitation update via websocket
+                                // Send reject status update via websocket
                                 if (socketRef.current?.readyState === WebSocket.OPEN && conversationId) {
                                   const statusPayload = {
-                                    type: 'interview_invitation_updated',
+                                    type: 'interview_invitation_status_updated',
                                     payload: {
                                       messageId: message.id,
                                       status: 'rejected'
@@ -1029,337 +906,32 @@ const Messages = () => {
                                 toast.error('Failed to reject interview invitation');
                               }
                             };
-
+ 
+                            
                             return (
-                              <div key={`${message.id}-${message.content}`} className={`flex ${message.senderEmail === user?.email ? 'justify-end' : 'justify-start'} mb-4`}>
-                                <div className={`max-w-xs lg:max-w-md ${message.senderEmail === user?.email ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2`}>
-                                  <div className="flex items-center space-x-2 mb-2">
-                                    <Calendar className="h-4 w-4" />
-                                    <span className="text-sm font-medium">Interview Invitation</span>
-                                  </div>
-                                  
-                                  <div className="space-y-2 text-sm">
-                                    <div>
-                                      <span className="font-medium">Job:</span> {invitationData.jobTitle || 'N/A'}
-                                    </div>
-                                    <div>
-                                      <span className="font-medium">Client:</span> {invitationData.clientName || 'N/A'}
-                                    </div>
-                                    {invitationData.message && (
-                                      <div>
-                                        <span className="font-medium">Message:</span> {invitationData.message}
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {invitationData.status === 'pending' && user?.userType === 'FREELANCER' && (
-                                    <div className="flex space-x-2 mt-3">
-                                      <Button
-                                        size="sm"
-                                        onClick={handleAcceptInvitation}
-                                        className="bg-green-600 hover:bg-green-700 text-white text-xs"
-                                      >
-                                        Accept
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={handleRejectInvitation}
-                                        className="text-xs"
-                                      >
-                                        Decline
-                                      </Button>
-                                    </div>
-                                  )}
-
-                                  {invitationData.status === 'accepted' && (
-                                    <div className="mt-2 text-green-600 text-xs">
-                                      ✅ Interview Invitation Accepted
-                                    </div>
-                                  )}
-
-                                  {invitationData.status === 'rejected' && (
-                                    <div className="mt-2 text-red-600 text-xs">
-                                      ❌ Interview Invitation Declined
-                                    </div>
-                                  )}
+                              <div key={message.id} className={`flex ${message.senderEmail === user?.email ? 'justify-end' : 'justify-start'} mb-4`}>
+                                <div className="max-w-sm">
+                                  <InterviewNotification
+                                    interviewData={invitationData}
+                                    status={invitationData.status || 'pending'}
+                                    currentUserEmail={user?.email}
+                                    senderEmail={message.senderEmail}
+                                    onAccept={handleAcceptInvitation}
+                                    onDecline={handleRejectInvitation}
+                                    onJoinInterview={() => {
+                                      if (invitationData.meetLink) {
+                                        window.open(invitationData.meetLink, '_blank');
+                                      }
+                                    }}
+                                  />
                                 </div>
                               </div>
                             );
+                          } catch (error) {
+                            console.error('Error parsing interview data:', error);
+                            // Fallback to regular message display
                           }
-                        } catch (error) {
-                          console.error('Error parsing interview data:', error);
-                          // Fallback to regular message display
                         }
-                      }
-                    }
-                  }
-
-                  // Check for other JSON messages (legacy format)
-                  if (message.content && typeof message.content === 'string') {
-                    // First check if it looks like JSON (starts with { or [)
-                    if (message.content.trim().startsWith('{') || message.content.trim().startsWith('[')) {
-                      try {
-                        const parsed = JSON.parse(message.content);
-                        console.log('📨 Parsed message content:', parsed);
-                        
-                        if (parsed.type === 'interview' || parsed.type === 'interview_scheduled' || parsed.interviewData) {
-                          console.log('📨 Found interview message:', parsed);
-                          const interviewData = parsed.interviewData || parsed;
-                        
-                          const handleAccept = async () => {
-                            try {
-                              // Send accept status update via websocket
-                              if (socketRef.current?.readyState === WebSocket.OPEN && conversationId) {
-                                const statusPayload = {
-                                  type: 'interview_status_updated',
-                                  payload: {
-                                    messageId: message.id,
-                                    status: 'accepted'
-                                  }
-                                };
-                                
-                                socketRef.current.send(JSON.stringify(statusPayload));
-                              }
-                              toast.success('Interview accepted');
-                            } catch (error) {
-                              console.error('Error accepting interview:', error);
-                              toast.error('Failed to accept interview');
-                            }
-                          };
-
-                          const handleReject = async () => {
-                            try {
-                              // Send reject status update via websocket
-                              if (socketRef.current?.readyState === WebSocket.OPEN && conversationId) {
-                                const statusPayload = {
-                                  type: 'interview_status_updated',
-                                  payload: {
-                                    messageId: message.id,
-                                    status: 'rejected'
-                                  }
-                                };
-                                
-                                socketRef.current.send(JSON.stringify(statusPayload));
-                              }
-                              toast.success('Interview rejected');
-                            } catch (error) {
-                              console.error('Error rejecting interview:', error);
-                              toast.error('Failed to reject interview');
-                            }
-                          };
-
-                          const handleReschedule = () => {
-                            setRescheduleData({
-                              messageId: message.id,
-                              originalData: interviewData
-                            });
-                            setShowRescheduleModal(true);
-                          };
-
-                          return (
-                            <div key={message.id} className={`flex ${message.senderEmail === user?.email ? 'justify-end' : 'justify-start'} mb-4`}>
-                              <div className={`max-w-xs lg:max-w-md ${message.senderEmail === user?.email ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2`}>
-                                <div className="flex items-center space-x-2 mb-2">
-                                  <Calendar className="h-4 w-4" />
-                                  <span className="text-sm font-medium">Interview Invitation</span>
-                                </div>
-                                
-                                <div className="space-y-2 text-sm">
-                                  <div>
-                                    <span className="font-medium">Job:</span> {interviewData.jobTitle || 'N/A'}
-                                  </div>
-                                  <div>
-                                    <span className="font-medium">Date:</span> {interviewData.date || 'TBD'}
-                                  </div>
-                                  <div>
-                                    <span className="font-medium">Time:</span> {interviewData.time || 'TBD'}
-                                  </div>
-                                  {interviewData.duration && (
-                                    <div>
-                                      <span className="font-medium">Duration:</span> {interviewData.duration}
-                                    </div>
-                                  )}
-                                  {interviewData.notes && (
-                                    <div>
-                                      <span className="font-medium">Notes:</span> {interviewData.notes}
-                                    </div>
-                                  )}
-                                  {interviewData.meetLink && (
-                                    <div>
-                                      <span className="font-medium">Meeting Link:</span>
-                                      <a 
-                                        href={interviewData.meetLink} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="text-blue-500 hover:text-blue-600 underline ml-1"
-                                      >
-                                        Join Meeting
-                                      </a>
-                                    </div>
-                                  )}
-                                </div>
-
-                                {interviewData.status === 'pending' && user?.userType === 'FREELANCER' && (
-                                  <div className="flex space-x-2 mt-3">
-                                    <Button
-                                      size="sm"
-                                      onClick={handleAccept}
-                                      className="bg-green-600 hover:bg-green-700 text-white text-xs"
-                                    >
-                                      Accept
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={handleReject}
-                                      className="text-xs"
-                                    >
-                                      Decline
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={handleReschedule}
-                                      className="text-xs"
-                                    >
-                                      Reschedule
-                                    </Button>
-                                  </div>
-                                )}
-
-                                {interviewData.status === 'accepted' && (
-                                  <div className="mt-2 text-green-600 text-xs">
-                                    ✅ Interview Accepted
-                                  </div>
-                                )}
-
-                                {interviewData.status === 'rejected' && (
-                                  <div className="mt-2 text-red-600 text-xs">
-                                    ❌ Interview Declined
-                                  </div>
-                                )}
-
-                                {interviewData.status === 'withdrawn' && (
-                                  <div className="mt-2 text-gray-600 text-xs">
-                                    ⏸️ Interview Withdrawn
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        }
-                        
-                        // Check if it's an interview invitation message
-                        if (parsed.type === 'interview_invitation' || parsed.invitationData) {
-                          console.log('📨 Found interview invitation message:', parsed);
-                          const invitationData = parsed.invitationData || parsed;
-                        
-                          const handleAcceptInvitation = async () => {
-                            try {
-                              // Send accept invitation update via websocket
-                              if (socketRef.current?.readyState === WebSocket.OPEN && conversationId) {
-                                const statusPayload = {
-                                  type: 'interview_invitation_updated',
-                                  payload: {
-                                    messageId: message.id,
-                                    status: 'accepted'
-                                  }
-                                };
-                                
-                                socketRef.current.send(JSON.stringify(statusPayload));
-                              }
-                              toast.success('Interview invitation accepted');
-                            } catch (error) {
-                              console.error('Error accepting interview invitation:', error);
-                              toast.error('Failed to accept interview invitation');
-                            }
-                          };
-
-                          const handleRejectInvitation = async () => {
-                            try {
-                              // Send reject invitation update via websocket
-                              if (socketRef.current?.readyState === WebSocket.OPEN && conversationId) {
-                                const statusPayload = {
-                                  type: 'interview_invitation_updated',
-                                  payload: {
-                                    messageId: message.id,
-                                    status: 'rejected'
-                                  }
-                                };
-                                
-                                socketRef.current.send(JSON.stringify(statusPayload));
-                              }
-                              toast.success('Interview invitation rejected');
-                            } catch (error) {
-                              console.error('Error rejecting interview invitation:', error);
-                              toast.error('Failed to reject interview invitation');
-                            }
-                          };
-
-                          return (
-                            <div key={message.id} className={`flex ${message.senderEmail === user?.email ? 'justify-end' : 'justify-start'} mb-4`}>
-                              <div className={`max-w-xs lg:max-w-md ${message.senderEmail === user?.email ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2`}>
-                                <div className="flex items-center space-x-2 mb-2">
-                                  <Calendar className="h-4 w-4" />
-                                  <span className="text-sm font-medium">Interview Invitation</span>
-                                </div>
-                                
-                                <div className="space-y-2 text-sm">
-                                  <div>
-                                    <span className="font-medium">Job:</span> {invitationData.jobTitle || 'N/A'}
-                                  </div>
-                                  <div>
-                                    <span className="font-medium">Client:</span> {invitationData.clientName || 'N/A'}
-                                  </div>
-                                  {invitationData.message && (
-                                    <div>
-                                      <span className="font-medium">Message:</span> {invitationData.message}
-                                    </div>
-                                  )}
-                                </div>
-
-                                {invitationData.status === 'pending' && user?.userType === 'FREELANCER' && (
-                                  <div className="flex space-x-2 mt-3">
-                                    <Button
-                                      size="sm"
-                                      onClick={handleAcceptInvitation}
-                                      className="bg-green-600 hover:bg-green-700 text-white text-xs"
-                                    >
-                                      Accept
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={handleRejectInvitation}
-                                      className="text-xs"
-                                    >
-                                      Decline
-                                    </Button>
-                                  </div>
-                                )}
-
-                                {invitationData.status === 'accepted' && (
-                                  <div className="mt-2 text-green-600 text-xs">
-                                    ✅ Interview Invitation Accepted
-                                  </div>
-                                )}
-
-                                {invitationData.status === 'rejected' && (
-                                  <div className="mt-2 text-red-600 text-xs">
-                                    ❌ Interview Invitation Declined
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        }
-                      } catch (error) {
-                        console.error('Error parsing interview data:', error);
-                        // Fallback to regular message display
-                      }
-                    }
-                  }
 
                   // Regular message display
                   return (
@@ -1367,13 +939,13 @@ const Messages = () => {
                       key={message.id} 
                       className={`flex ${message.senderEmail === user?.email ? "justify-end" : "justify-start"}`}
                     >
-                      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-xl ${
+                      <div className={`max-w-xs lg:max-w-md px-3 sm:px-4 py-2 sm:py-3 rounded-xl ${
                         message.senderEmail === user?.email
                           ? "bg-green-600 text-white" 
                           : "bg-gray-100 text-gray-900"
                       }`}>
                         <p className="text-sm leading-relaxed">{message.content}</p> 
-                        <p className={`text-xs mt-2 ${
+                        <p className={`text-xs mt-1 sm:mt-2 ${
                           message.senderEmail === user?.email ? "text-green-100" : "text-gray-500"
                         }`}>
                           {new Date(message.timestamp).toLocaleTimeString([], {
@@ -1384,12 +956,13 @@ const Messages = () => {
                       </div>
                     </div>
                   );
-                })}
+                })
+                )}
                 
                 {/* Typing Indicator */}
                 {typingUsers.length > 0 && (
                   <div className="flex justify-start">
-                    <div className="bg-gray-100 text-gray-900 px-4 py-3 rounded-xl">
+                    <div className="bg-gray-100 text-gray-900 px-3 sm:px-4 py-2 sm:py-3 rounded-xl">
                       <p className="text-sm">
                         {typingUsers.map(user => user.userName).join(', ')} 
                         {typingUsers.length === 1 ? ' is' : ' are'} typing...
@@ -1400,9 +973,9 @@ const Messages = () => {
               </div>
 
               {/* Message Input - Fixed */}
-              <div className="p-6 border-t border-gray-100 flex-shrink-0 bg-white">
-                <div className="flex items-end space-x-3">
-                  <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50 flex-shrink-0">
+              <div className="p-3 sm:p-6 border-t border-gray-100 flex-shrink-0 bg-white">
+                <div className="flex items-end space-x-2 sm:space-x-3">
+                  <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50 flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9 p-0">
                     <Paperclip className="h-4 w-4" />
                   </Button>
                   
@@ -1414,18 +987,18 @@ const Messages = () => {
                       onKeyPress={handleKeyPress}
                       rows={2}
                       maxLength={1000}
-                      className="resize-none border-gray-200 focus:border-green-500 focus:ring-green-500 w-full max-h-32"
+                      className="resize-none border-gray-200 focus:border-green-500 focus:ring-green-500 w-full max-h-32 text-sm"
                     />
                   </div>
                   
-                  <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50 flex-shrink-0">
+                  <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-50 flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9 p-0">
                     <Smile className="h-4 w-4" />
                   </Button>
                   
                   <Button 
                     onClick={handleSendMessage}
                     disabled={!messageText.trim()}
-                    className="bg-green-600 hover:bg-green-700 text-white flex-shrink-0"
+                    className="bg-green-600 hover:bg-green-700 text-white flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9 p-0"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
@@ -1435,16 +1008,16 @@ const Messages = () => {
           ) : (
             <div className="flex-1 flex items-center justify-center text-gray-500">
               <div className="text-center">
-                <h3 className="text-xl font-semibold mb-3 text-gray-900">Select a conversation</h3>
-                <p className="text-gray-600">Choose a conversation from the sidebar to start messaging</p>
+                <h3 className="text-lg sm:text-xl font-semibold mb-3 text-gray-900">Select a conversation</h3>
+                <p className="text-gray-600 text-sm sm:text-base">Choose a conversation from the sidebar to start messaging</p>
               </div>
             </div>
           )}
         </div>
         
-        {/* Timeline Sidebar - Fixed */}
+        {/* Timeline Sidebar - Fixed width, scrollable content */}
         {selectedConv && (
-          <div className="w-80 border-l border-gray-200 flex-shrink-0">
+          <div className="w-64 sm:w-80 border-l border-gray-200 flex-shrink-0 hidden lg:block">
             <TimelineSidebar job={job} offers={offers} />
           </div>
         )}

@@ -349,7 +349,7 @@ const InterviewNotification: React.FC<InterviewNotificationProps> = ({
           </div>
         )}
 
-        {status === 'accepted' && isActive && (
+        {(status === 'accepted' || (status === 'pending' && interviewDataToUse.meetLink)) && isActive && (
           <div className="flex space-x-1.5">
             <Button
               onClick={onJoinInterview}
