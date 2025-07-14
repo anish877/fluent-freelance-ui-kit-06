@@ -1,10 +1,10 @@
-import express, { Request, Response, RequestHandler } from 'express';
+import express, { Request, Response, RequestHandler, Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import prisma from '../lib/prisma.js';
 import { protect, authorize, AuthRequest } from '../middleware/auth.js';
 
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // @desc    Get proposals for a job
 // @route   GET /api/proposals/job/:jobId
@@ -30,6 +30,26 @@ router.get('/job/:jobId', protect, (async (req: AuthRequest, res: Response): Pro
     const proposals = await prisma.proposal.findMany({
       where: { jobId: req.params.jobId },
       include: {
+        job: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            budget: true,
+            minBudget: true,
+            maxBudget: true,
+            category: true,
+            status: true,
+            client: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                companyName: true
+              }
+            }
+          }
+        },
         freelancer: {
           select: {
             id: true,
@@ -352,6 +372,141 @@ router.put('/:id/status', protect, authorize('CLIENT'), [
     res.json({
       success: true,
       data: updatedProposal
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
+// @desc    Schedule interview for a proposal
+// @route   POST /api/proposals/:id/schedule-interview
+// @access  Private (Job owner only)
+router.post('/:id/schedule-interview', protect, authorize('CLIENT'), [
+  body('interviewData').isObject().withMessage('Interview data is required'),
+  body('conversationId').isString().withMessage('Conversation ID is required')
+], (async (req: AuthRequest, res: Response): Promise<void> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  try {
+    const { interviewData, conversationId } = req.body;
+    const proposalId = req.params.id;
+
+    // Check if proposal exists
+    const proposal = await prisma.proposal.findUnique({
+      where: { id: proposalId },
+      include: {
+        job: true
+      }
+    });
+
+    if (!proposal) {
+      res.status(404).json({ message: 'Proposal not found' });
+      return;
+    }
+
+    // Check if user owns the job
+    if (proposal.job.clientId !== req.user!.id) {
+      res.status(403).json({ message: 'Not authorized to schedule interview for this proposal' });
+      return;
+    }
+
+    // Check if conversation exists and user is participant
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId }
+    });
+
+    if (!conversation) {
+      res.status(404).json({ message: 'Conversation not found' });
+      return;
+    }
+
+    if (!conversation.participants.includes(req.user!.email)) {
+      res.status(403).json({ message: 'Access denied to this conversation' });
+      return;
+    }
+
+    // Check if an interview message already exists in this conversation
+    const existingInterviewMessage = await prisma.message.findFirst({
+      where: {
+        conversationId: conversationId,
+        type: 'interview'
+      }
+    });
+
+    let interviewMessage;
+
+    if (existingInterviewMessage) {
+      // Update existing interview message
+      interviewMessage = await prisma.message.update({
+        where: { id: existingInterviewMessage.id },
+        data: {
+          content: JSON.stringify(interviewData),
+          updatedAt: new Date()
+        },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatar: true,
+              userType: true
+            }
+          }
+        }
+      });
+    } else {
+      // Create new interview message
+      interviewMessage = await prisma.message.create({
+        data: {
+          content: JSON.stringify(interviewData),
+          senderEmail: req.user!.email,
+          receiverEmail: conversation.participants.find(p => p !== req.user!.email) || '',
+          conversationId: conversationId,
+          type: 'interview'
+        },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatar: true,
+              userType: true
+            }
+          }
+        }
+      });
+    }
+
+    // Update conversation's lastMessage
+    await prisma.conversation.update({
+      where: { id: conversationId },
+      data: {
+        lastMessageId: interviewMessage.id,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Update proposal with interview data
+    await prisma.proposal.update({
+      where: { id: proposalId },
+      data: {
+        interview: interviewData
+      }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        message: interviewMessage,
+        interviewData
+      }
     });
   } catch (error) {
     console.error(error);

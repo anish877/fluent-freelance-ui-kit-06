@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Check, X, Clock, Briefcase, DollarSign, Calendar, MapPin, Star, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/AuthContext";
 
@@ -10,38 +9,8 @@ import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import Footer from "../components/layout/Footer";
-
-interface JobInvitation {
-  id: string;
-  jobId: string;
-  clientId: string;
-  freelancerEmail: string;
-  message?: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
-  createdAt: string;
-  job: {
-    id: string;
-    title: string;
-    description: string;
-    budget: string;
-    skills: string[];
-    category: string;
-    client: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      companyName?: string;
-      avatar?: string;
-    };
-  };
-  client: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    companyName?: string;
-    avatar?: string;
-  };
-}
+import { jobInvitationsService } from "../services";
+import { JobInvitation } from "../types";
 
 const JobInvitations = () => {
   const { user } = useAuth();
@@ -61,8 +30,8 @@ const JobInvitations = () => {
   const fetchInvitations = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/job-invitations/freelancer');
-      setInvitations(response.data.data || []);
+      const response = await jobInvitationsService.getFreelancerInvitations();
+      setInvitations(response);
     } catch (error) {
       console.error('Error fetching invitations:', error);
       toast.error('Failed to fetch job invitations');
@@ -74,9 +43,9 @@ const JobInvitations = () => {
   const handleAcceptInvitation = async (invitationId: string) => {
     try {
       setProcessingId(invitationId);
-      const response = await axios.put(`/api/job-invitations/${invitationId}/accept`);
+      const response = await jobInvitationsService.acceptInvitation(invitationId);
       
-      if (response.data.success) {
+      if (response.success) {
         toast.success('Job invitation accepted! Proposal created successfully.');
         fetchInvitations(); // Refresh the list
       } else {
@@ -93,9 +62,9 @@ const JobInvitations = () => {
   const handleRejectInvitation = async (invitationId: string) => {
     try {
       setProcessingId(invitationId);
-      const response = await axios.put(`/api/job-invitations/${invitationId}/reject`);
+      const response = await jobInvitationsService.rejectInvitation(invitationId);
       
-      if (response.data.success) {
+      if (response.success) {
         toast.success('Job invitation declined');
         fetchInvitations(); // Refresh the list
       } else {
@@ -230,19 +199,19 @@ const JobInvitations = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={invitation.client.avatar} alt={invitation.client.firstName} />
+                        <AvatarImage src={invitation.job.client.avatar} alt={invitation.job.client.firstName} />
                         <AvatarFallback>
-                          {invitation.client.firstName?.charAt(0)}{invitation.client.lastName?.charAt(0)}
+                          {invitation.job.client.firstName?.charAt(0)}{invitation.job.client.lastName?.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
                           <h3 className="text-lg font-semibold text-gray-900">
-                            {invitation.client.firstName} {invitation.client.lastName}
+                            {invitation.job.client.firstName} {invitation.job.client.lastName}
                           </h3>
-                          {invitation.client.companyName && (
+                          {invitation.job.client.companyName && (
                             <span className="text-sm text-gray-500">
-                              • {invitation.client.companyName}
+                              • {invitation.job.client.companyName}
                             </span>
                           )}
                           {getStatusBadge(invitation.status)}
@@ -266,7 +235,7 @@ const JobInvitations = () => {
                     <div className="flex flex-wrap gap-2 mb-3">
                       <div className="flex items-center text-sm text-gray-600">
                         <DollarSign className="h-4 w-4 mr-1" />
-                        {invitation.job.budget}
+                        {invitation.job.budget === 'FIXED' ? 'Fixed Price' : 'Hourly Rate'}
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
                         <Briefcase className="h-4 w-4 mr-1" />

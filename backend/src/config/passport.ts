@@ -45,12 +45,18 @@ passport.deserializeUser(async (id: string, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID!,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  callbackURL: '/api/auth/google/callback'
+  callbackURL: '/api/auth/google/callback',
+  scope: [
+    'profile',
+    'email',
+    'https://www.googleapis.com/auth/calendar'
+  ]
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     
     const email = profile.emails?.[0]?.value;
     const googleId = profile.id;
+    const expiresIn = 3600 * 1000; // 1 hour
     
     if (!email) {
       console.log('❌ No email found in Google profile');
@@ -78,6 +84,26 @@ passport.use(new GoogleStrategy({
     });
 
     if (user) {
+      // Check if either access token or refresh token is missing
+      const userWithTokens = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          accessToken: true,
+          refreshToken: true
+        }
+      });
+
+      // Update tokens if access token is missing or if we have new tokens
+      if (!userWithTokens?.accessToken || accessToken || refreshToken) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            accessToken: accessToken,
+            refreshToken: refreshToken || undefined,
+            expiresAt: new Date(Date.now() + expiresIn)
+          }
+        });
+      }
       return done(null, user);
     }
 
@@ -102,13 +128,31 @@ passport.use(new GoogleStrategy({
     });
 
     if (user) {
-      // Link the Google account to existing user
+      // Check if either access token or refresh token is missing
+      const userWithTokens = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          accessToken: true,
+          refreshToken: true
+        }
+      });
+
+      // Link the Google account to existing user and update tokens if needed
+      const updateData: any = { 
+        googleId,
+        avatar: user.avatar || profile.photos?.[0]?.value
+      };
+
+      // Only update tokens if access token is missing or if we have new tokens
+      if (!userWithTokens?.accessToken || accessToken || refreshToken) {
+        updateData.accessToken = accessToken;
+        updateData.refreshToken = refreshToken || undefined;
+        updateData.expiresAt = new Date(Date.now() + expiresIn);
+      }
+
       user = await prisma.user.update({
         where: { id: user.id },
-        data: { 
-          googleId,
-          avatar: user.avatar || profile.photos?.[0]?.value 
-        },
+        data: updateData,
         select: {
           id: true,
           email: true,
@@ -125,13 +169,11 @@ passport.use(new GoogleStrategy({
           updatedAt: true,
         }
       });
-      
 
       return done(null, user);
     }
 
     // Create new user
-
     const names = profile.displayName?.split(' ') || [];
     const firstName = names[0] || '';
     const lastName = names.slice(1).join(' ') || '';
@@ -147,6 +189,9 @@ passport.use(new GoogleStrategy({
         userType: 'FREELANCER', // Default, they can change during onboarding
         isOnboarded: false,
         onboardingStep: 0,
+        accessToken: accessToken,
+        refreshToken: refreshToken || undefined,
+        expiresAt: new Date(Date.now() + expiresIn)
       },
       select: {
         id: true,

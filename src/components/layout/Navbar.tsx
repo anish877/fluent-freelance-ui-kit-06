@@ -59,21 +59,21 @@ const Navbar = () => {
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <div className="bg-teal-600 text-white px-3 py-1 rounded-lg font-bold text-xl">
+            <div className="bg-teal-600 text-white px-2 sm:px-3 py-1 rounded-lg font-bold text-lg sm:text-xl">
               FL
             </div>
-            <span className="ml-2 text-xl font-bold text-gray-900">FreelanceHub</span>
+            <span className="ml-2 text-lg sm:text-xl font-bold text-gray-900">FreelanceHub</span>
           </Link>
 
           {/* Desktop Navigation - Only show for authenticated users */}
           {isAuthenticated && (
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
               <Link 
                 to="/jobs" 
-                className={`font-medium transition-colors ${
+                className={`font-medium transition-colors text-sm lg:text-base ${
                   isActive('/jobs') ? 'text-teal-600' : 'text-gray-700 hover:text-teal-600'
                 }`}
               >
@@ -81,7 +81,7 @@ const Navbar = () => {
               </Link>
               <Link 
                 to="/talent" 
-                className={`font-medium transition-colors ${
+                className={`font-medium transition-colors text-sm lg:text-base ${
                   isActive('/talent') ? 'text-teal-600' : 'text-gray-700 hover:text-teal-600'
                 }`}
               >
@@ -89,7 +89,7 @@ const Navbar = () => {
               </Link>
               <Link 
                 to="/dashboard" 
-                className={`font-medium transition-colors ${
+                className={`font-medium transition-colors text-sm lg:text-base ${
                   isActive('/dashboard') ? 'text-teal-600' : 'text-gray-700 hover:text-teal-600'
                 }`}
               >
@@ -98,7 +98,7 @@ const Navbar = () => {
               {user?.userType === 'FREELANCER' && (
                 <Link 
                   to="/job-invitations" 
-                  className={`font-medium transition-colors ${
+                  className={`font-medium transition-colors text-sm lg:text-base ${
                     isActive('/job-invitations') ? 'text-teal-600' : 'text-gray-700 hover:text-teal-600'
                   }`}
                 >
@@ -109,13 +109,13 @@ const Navbar = () => {
           )}
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
             {isAuthenticated ? (
               <>
                 {/* Notifications */}
                 <div className="relative">
-                  <Bell className="h-6 w-6 text-gray-600 hover:text-gray-900 cursor-pointer transition-colors" />
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  <Bell className="h-5 w-5 lg:h-6 lg:w-6 text-gray-600 hover:text-gray-900 cursor-pointer transition-colors" />
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center">
                     3
                   </span>
                 </div>
@@ -123,16 +123,16 @@ const Navbar = () => {
                 {/* User Menu */}
                 <Dropdown 
                   trigger={
-                    <div className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                      <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center">
+                    <div className="flex items-center space-x-2 cursor-pointer p-1.5 lg:p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="w-7 h-7 lg:w-8 lg:h-8 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center">
                         {user?.avatar ? (
                           <img 
                             src={user.avatar} 
                             alt={user.firstName || "User"} 
-                            className="w-8 h-8 rounded-full object-cover"
+                            className="w-7 h-7 lg:w-8 lg:h-8 rounded-full object-cover"
                           />
                         ) : (
-                          <User className="h-5 w-5 text-white" />
+                          <User className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
                         )}
                       </div>
                       <div className="hidden lg:block text-left">
@@ -161,14 +161,14 @@ const Navbar = () => {
               </>
             ) : (
               /* Auth Buttons for Non-authenticated Users */
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 lg:space-x-3">
                 <Link to="/login">
-                  <Button variant="outline" size="sm" className="font-medium">
+                  <Button variant="outline" size="sm" className="font-medium text-xs lg:text-sm">
                     Log In
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <Button size="sm" className="font-medium">
+                  <Button size="sm" className="font-medium text-xs lg:text-sm">
                     Sign Up
                   </Button>
                 </Link>
@@ -180,38 +180,38 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-gray-600 hover:text-gray-900 transition-colors p-1"
               disabled={isLoggingOut}
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-4">
+          <div className="md:hidden py-3 sm:py-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-3 sm:space-y-4">
               {isAuthenticated ? (
                 <>
                   {/* User Info */}
-                  <div className="flex items-center space-x-3 px-2 pb-4 border-b border-gray-100">
-                    <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center">
+                  <div className="flex items-center space-x-3 px-2 pb-3 sm:pb-4 border-b border-gray-100">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center">
                       {user?.avatar ? (
                         <img 
                           src={user.avatar} 
                           alt={user.firstName || "User"} 
-                          className="w-10 h-10 rounded-full object-cover"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover"
                         />
                       ) : (
-                        <User className="h-6 w-6 text-white" />
+                        <User className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                       )}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-gray-900 text-sm sm:text-base">
                         {user?.firstName || "User"}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500">
                         {user?.email}
                       </p>
                     </div>
@@ -220,21 +220,21 @@ const Navbar = () => {
                   {/* Navigation Links */}
                   <Link 
                     to="/jobs" 
-                    className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1 rounded transition-colors"
+                    className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1.5 sm:py-2 rounded transition-colors text-sm sm:text-base"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Find Work
                   </Link>
                   <Link 
                     to="/talent" 
-                    className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1 rounded transition-colors"
+                    className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1.5 sm:py-2 rounded transition-colors text-sm sm:text-base"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Find Talent
                   </Link>
                   <Link 
                     to="/dashboard" 
-                    className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1 rounded transition-colors"
+                    className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1.5 sm:py-2 rounded transition-colors text-sm sm:text-base"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Dashboard
@@ -242,7 +242,7 @@ const Navbar = () => {
                   {user?.userType === 'FREELANCER' && (
                     <Link 
                       to="/job-invitations" 
-                      className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1 rounded transition-colors"
+                      className="text-gray-700 hover:text-teal-600 font-medium px-2 py-1.5 sm:py-2 rounded transition-colors text-sm sm:text-base"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Job Invitations
@@ -250,17 +250,17 @@ const Navbar = () => {
                   )}
 
                   {/* User Actions */}
-                  <div className="pt-4 border-t border-gray-200 space-y-2">
+                  <div className="pt-3 sm:pt-4 border-t border-gray-200 space-y-2">
                     <Link 
                       to="/profile" 
-                      className="block text-gray-700 hover:text-teal-600 font-medium px-2 py-1 rounded transition-colors"
+                      className="block text-gray-700 hover:text-teal-600 font-medium px-2 py-1.5 sm:py-2 rounded transition-colors text-sm sm:text-base"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Profile
                     </Link>
                     <Link 
                       to="/settings" 
-                      className="block text-gray-700 hover:text-teal-600 font-medium px-2 py-1 rounded transition-colors"
+                      className="block text-gray-700 hover:text-teal-600 font-medium px-2 py-1.5 sm:py-2 rounded transition-colors text-sm sm:text-base"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Settings
@@ -271,7 +271,7 @@ const Navbar = () => {
                         handleLogout();
                       }}
                       disabled={isLoggingOut}
-                      className="flex items-center space-x-2 w-full text-left text-gray-700 hover:text-red-600 font-medium px-2 py-1 rounded transition-colors disabled:opacity-50"
+                      className="flex items-center space-x-2 w-full text-left text-gray-700 hover:text-red-600 font-medium px-2 py-1.5 sm:py-2 rounded transition-colors disabled:opacity-50 text-sm sm:text-base"
                     >
                       {isLoggingOut ? (
                         <>
@@ -289,14 +289,14 @@ const Navbar = () => {
                 </>
               ) : (
                 /* Auth Buttons for Mobile */
-                <div className="pt-4 border-t border-gray-200 space-y-3">
+                <div className="pt-3 sm:pt-4 border-t border-gray-200 space-y-3">
                   <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full text-sm sm:text-base">
                       Log In
                     </Button>
                   </Link>
                   <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full">
+                    <Button className="w-full text-sm sm:text-base">
                       Sign Up
                     </Button>
                   </Link>
@@ -309,9 +309,9 @@ const Navbar = () => {
         {/* Global Logout Loading Overlay */}
         {isLoggingOut && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 flex items-center space-x-3">
-              <Loader2 className="h-6 w-6 animate-spin text-teal-600" />
-              <span className="text-lg font-medium text-gray-900">Logging out...</span>
+            <div className="bg-white rounded-lg p-4 sm:p-6 flex items-center space-x-3">
+              <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-teal-600" />
+              <span className="text-base sm:text-lg font-medium text-gray-900">Logging out...</span>
             </div>
           </div>
         )}

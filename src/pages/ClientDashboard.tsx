@@ -6,7 +6,6 @@ import {
   Filter, Search, Calendar, BarChart3, PieChart, Loader2,
   User, CalendarDays, FileText, Target
 } from "lucide-react";
-import axios from "axios";
 
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -14,94 +13,25 @@ import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { useAuth } from "../hooks/AuthContext";
-
-// Types for backend data
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-
-  budget: 'FIXED' | 'HOURLY';
-  minBudget?: number;
-  maxBudget?: number;
-  duration?: string;
-  skills: string[];
-  category: string;
-  subcategory?: string;
-  projectType?: string;
-  experienceLevel?: string;
-  workingHours?: string;
-  timezone?: string;
-  communicationPreferences: string[];
-  location?: string;
-  isRemote: boolean;
-  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  isUrgent: boolean;
-  visibility: string;
-  applicationDeadline?: string;
-  clientId: string;
-  createdAt: string;
-  updatedAt: string;
-  _count: {
-    proposals: number;
-  };
-}
-
-interface Offer {
-  id: string;
-  conversationId: string;
-  clientId: string;
-  freelancerId: string;
-  jobId: string;
-  budgetType: 'FIXED' | 'HOURLY';
-  amount: number;
-  duration: string;
-  milestones: Array<{
-    title: string;
-    description: string;
-    amount: number;
-    dueDate: string;
-    status?: 'pending' | 'in_progress' | 'completed';
-  }>;
-  terms?: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
-  expiresAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  client: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    companyName?: string;
-  };
-  freelancer: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    email: string;
-  };
-  job: {
-    id: string;
-    title: string;
-    description: string;
-  };
-  conversation: {
-    id: string;
-    projectName?: string;
-  };
-}
+import { jobService, proposalService, offerService } from "../services";
+import { Job, Proposal, Offer } from "../types";
 
 const ClientDashboard = () => {
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  
   // Jobs state
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [jobsError, setJobsError] = useState<string | null>(null);
+
+  // Proposals state
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [proposalsLoading, setProposalsLoading] = useState(true);
+  const [proposalsError, setProposalsError] = useState<string | null>(null);
+  const [proposalsByJob, setProposalsByJob] = useState<Record<string, Proposal[]>>({});
 
   // Offers state
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -126,16 +56,11 @@ const ClientDashboard = () => {
       setJobsLoading(true);
       setJobsError(null);
       
-      const response = await axios.get('/jobs/client/me');
-      
-      if (response.data.success) {
-        setJobs(response.data.data);
-      } else {
-        setJobsError('Failed to fetch jobs');
-      }
+      const response = await jobService.getClientJobs();
+      setJobs(response);
     } catch (error) {
       console.error('Error fetching jobs:', error);
-      setJobsError(error.response?.data?.message || 'Failed to fetch jobs');
+      setJobsError('Failed to fetch jobs');
     } finally {
       setJobsLoading(false);
     }
@@ -147,27 +72,124 @@ const ClientDashboard = () => {
       setOffersLoading(true);
       setOffersError(null);
       
-      const response = await axios.get('/offers/me?status=ACCEPTED');
-      
-      if (response.data.success) {
-        setOffers(response.data.data);
-      } else {
-        setOffersError('Failed to fetch offers');
-      }
+      const response = await offerService.getOffersByStatus('ACCEPTED');
+      setOffers(response);
     } catch (error) {
       console.error('Error fetching offers:', error);
-      setOffersError(error.response?.data?.message || 'Failed to fetch offers');
+      setOffersError('Failed to fetch offers');
     } finally {
       setOffersLoading(false);
+    }
+  };
+
+  // Fetch proposals for all jobs
+  const fetchProposals = async () => {
+    try {
+      setProposalsLoading(true);
+      setProposalsError(null);
+      
+      const allProposals: Proposal[] = [];
+      const proposalsByJobMap: Record<string, Proposal[]> = {};
+      
+      // Fetch proposals for each job
+      for (const job of jobs) {
+        try {
+          const jobProposals = await proposalService.getJobProposalsArray(job.id);
+          allProposals.push(...jobProposals);
+          proposalsByJobMap[job.id] = jobProposals;
+        } catch (error) {
+          console.error(`Error fetching proposals for job ${job.id}:`, error);
+        }
+      }
+      
+      setProposals(allProposals);
+      setProposalsByJob(proposalsByJobMap);
+    } catch (error) {
+      console.error('Error fetching proposals:', error);
+      setProposalsError('Failed to fetch proposals');
+    } finally {
+      setProposalsLoading(false);
+    }
+  };
+
+  // Update proposal status (accept/reject)
+  const updateProposalStatus = async (proposalId: string, status: 'ACCEPTED' | 'REJECTED') => {
+    try {
+      const response = await proposalService.updateProposalStatus(proposalId, status);
+      
+      if (response.success) {
+        // Update the proposal in state
+        setProposals(prevProposals => 
+          prevProposals.map(proposal => 
+            proposal.id === proposalId 
+              ? { ...proposal, status } 
+              : proposal
+          )
+        );
+        
+        // Update proposals by job
+        setProposalsByJob(prev => {
+          const updated = { ...prev };
+          Object.keys(updated).forEach(jobId => {
+            updated[jobId] = updated[jobId].map(proposal => 
+              proposal.id === proposalId 
+                ? { ...proposal, status } 
+                : proposal
+            );
+          });
+          return updated;
+        });
+      }
+    } catch (error) {
+      console.error('Error updating proposal status:', error);
+    }
+  };
+
+  // Update proposal (client notes, rating, etc.)
+  const updateProposal = async (proposalId: string, updateData: {
+    clientNotes?: string;
+    rating?: number;
+    interview?: any;
+    isShortlisted?: boolean;
+    clientViewed?: boolean;
+  }) => {
+    try {
+      const response = await proposalService.updateProposal(proposalId, updateData);
+      
+      if (response.success) {
+        // Update the proposal in state
+        setProposals(prevProposals => 
+          prevProposals.map(proposal => 
+            proposal.id === proposalId 
+              ? { ...proposal, ...updateData } 
+              : proposal
+          )
+        );
+        
+        // Update proposals by job
+        setProposalsByJob(prev => {
+          const updated = { ...prev };
+          Object.keys(updated).forEach(jobId => {
+            updated[jobId] = updated[jobId].map(proposal => 
+              proposal.id === proposalId 
+                ? { ...proposal, ...updateData } 
+                : proposal
+            );
+          });
+          return updated;
+        });
+      }
+    } catch (error) {
+      console.error('Error updating proposal:', error);
     }
   };
 
   // Delete job
   const deleteJob = async (jobId: string) => {
     try {
-      const response = await axios.delete(`/jobs/${jobId}`);
+      const response = await jobService.deleteJob(jobId);
       
-      if (response.data.success) {
+      if (response.success) {
         // Remove the job from state
         setJobs(jobs.filter(job => job.id !== jobId));
       } else {
@@ -210,6 +232,13 @@ const ClientDashboard = () => {
       fetchAcceptedOffers();
     }
   }, [user]);
+
+  // Fetch proposals when jobs are loaded
+  useEffect(() => {
+    if (jobs.length > 0) {
+      fetchProposals();
+    }
+  }, [jobs]);
 
   // Format budget display
   const formatBudget = (job: Job) => {
@@ -311,47 +340,6 @@ const ClientDashboard = () => {
       deadline: "2024-02-15",
       category: "Writing",
       views: 98
-    }
-  ];
-
-  const topProposals = [
-    {
-      id: 1,
-      jobTitle: "Full-Stack React Developer",
-      freelancer: {
-        name: "Alex Thompson",
-        avatar: "/placeholder.svg",
-        rating: 4.9,
-        completedJobs: 47,
-        skills: ["React", "Node.js", "TypeScript"]
-      },
-      proposal: {
-        budget: "$4,200",
-        timeline: "8 weeks",
-        coverLetter: "I have extensive experience building e-commerce platforms with React and Node.js. I've completed 15+ similar projects...",
-        attachments: 2
-      },
-      submittedDate: "2024-01-16",
-      status: "pending"
-    },
-    {
-      id: 2,
-      jobTitle: "Mobile App UI/UX Designer", 
-      freelancer: {
-        name: "Maria Garcia",
-        avatar: "/placeholder.svg",
-        rating: 4.8,
-        completedJobs: 32,
-        skills: ["Figma", "React Native", "User Research"]
-      },
-      proposal: {
-        budget: "$3,500",
-        timeline: "6 weeks",
-        coverLetter: "Your mobile app project aligns perfectly with my expertise in creating user-centered designs...",
-        attachments: 5
-      },
-      submittedDate: "2024-01-14",
-      status: "shortlisted"
     }
   ];
 
@@ -582,89 +570,162 @@ const ClientDashboard = () => {
                 <CardDescription>Review and manage proposals from freelancers</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  {topProposals.map((proposal) => (
-                    <div key={proposal.id} className="border border-gray-200 rounded-lg p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">{proposal.jobTitle}</h3>
-                          <p className="text-sm text-gray-600">
-                            Submitted on {new Date(proposal.submittedDate).toLocaleDateString()}
-                          </p>
+                {proposalsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+                    <span className="ml-2 text-gray-600">Loading proposals...</span>
+                  </div>
+                ) : proposalsError ? (
+                  <div className="text-center py-8">
+                    <p className="text-red-600 mb-4">{proposalsError}</p>
+                    <Button onClick={fetchProposals} variant="outline">
+                      Try Again
+                    </Button>
+                  </div>
+                ) : proposals.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 mb-4">No proposals found</p>
+                    <p className="text-sm text-gray-500">Proposals will appear here once freelancers submit them to your jobs.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {proposals.map((proposal) => (
+                      <div key={proposal.id} className="border border-gray-200 rounded-lg p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                              {proposal.job?.title || 'Job Title Not Available'}
+                            </h3>
+                            <p className="text-sm text-gray-600">
+                              Submitted on {new Date(proposal.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Badge className={getStatusColor(proposal.status.toLowerCase())}>
+                            {getStatusText(proposal.status.toLowerCase())}
+                          </Badge>
                         </div>
-                        <Badge className={getStatusColor(proposal.status)}>
-                          {getStatusText(proposal.status)}
-                        </Badge>
-                      </div>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Freelancer Info */}
-                        <div className="lg:col-span-1">
-                          <div className="flex items-center space-x-3 mb-3">
-                            <img 
-                              src={proposal.freelancer.avatar} 
-                              alt={proposal.freelancer.name}
-                              className="w-12 h-12 rounded-full"
-                            />
-                            <div>
-                              <h4 className="font-semibold text-gray-900">{proposal.freelancer.name}</h4>
-                              <div className="flex items-center text-sm text-gray-600">
-                                <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-                                {proposal.freelancer.rating} ({proposal.freelancer.completedJobs} jobs)
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                          {/* Freelancer Info */}
+                          <div className="lg:col-span-1">
+                            <div className="flex items-center space-x-3 mb-3">
+                              <img 
+                                src={proposal.freelancer?.avatar || "/placeholder.svg"} 
+                                alt={`${proposal.freelancer?.firstName || 'Freelancer'} ${proposal.freelancer?.lastName || ''}`}
+                                className="w-12 h-12 rounded-full"
+                              />
+                              <div>
+                                <h4 className="font-semibold text-gray-900">
+                                  {proposal.freelancer?.firstName || 'Unknown'} {proposal.freelancer?.lastName || 'Freelancer'}
+                                </h4>
+                                <div className="flex items-center text-sm text-gray-600">
+                                  <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                                  {proposal.freelancer?.successRate || 0}% success rate
+                                  {proposal.freelancer?.completedJobs && (
+                                    <span className="ml-2">({proposal.freelancer.completedJobs} jobs)</span>
+                                  )}
+                                </div>
+                                {proposal.freelancer?.hourlyRate && (
+                                  <p className="text-sm text-gray-600">
+                                    ${proposal.freelancer.hourlyRate}/hr
+                                  </p>
+                                )}
                               </div>
                             </div>
+                            <div className="flex flex-wrap gap-1">
+                              {proposal.freelancer?.topSkills?.slice(0, 3).map((skill, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
-                          <div className="flex flex-wrap gap-1">
-                            {proposal.freelancer.skills.slice(0, 3).map((skill, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {skill}
-                              </Badge>
-                            ))}
+
+                          {/* Proposal Details */}
+                          <div className="lg:col-span-2">
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                              <div>
+                                <p className="text-sm text-gray-600">Proposed Budget</p>
+                                <p className="font-semibold text-gray-900">
+                                  ${proposal.bidAmount.toLocaleString()}
+                                  {proposal.bidType === 'HOURLY' && '/hr'}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">Timeline</p>
+                                <p className="font-semibold text-gray-900">{proposal.estimatedDuration}</p>
+                              </div>
+                            </div>
+                            <div className="mb-4">
+                              <p className="text-sm text-gray-600 mb-2">Cover Letter</p>
+                              <p className="text-gray-700 text-sm leading-relaxed">
+                                {proposal.coverLetter}
+                              </p>
+                            </div>
+                            {proposal.attachments.length > 0 && (
+                              <p className="text-sm text-blue-600">
+                                {proposal.attachments.length} attachments included
+                              </p>
+                            )}
+                            {proposal.milestones.length > 0 && (
+                              <div className="mt-3">
+                                <p className="text-sm text-gray-600 mb-2">Proposed Milestones</p>
+                                <div className="space-y-2">
+                                  {proposal.milestones.slice(0, 2).map((milestone, index) => (
+                                    <div key={index} className="text-sm bg-gray-50 p-2 rounded">
+                                      <span className="font-medium">{milestone.title}</span>
+                                      <span className="text-gray-600 ml-2">${milestone.amount.toLocaleString()}</span>
+                                    </div>
+                                  ))}
+                                  {proposal.milestones.length > 2 && (
+                                    <p className="text-xs text-gray-500">
+                                      +{proposal.milestones.length - 2} more milestones
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
 
-                        {/* Proposal Details */}
-                        <div className="lg:col-span-2">
-                          <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                              <p className="text-sm text-gray-600">Proposed Budget</p>
-                              <p className="font-semibold text-gray-900">{proposal.proposal.budget}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Timeline</p>
-                              <p className="font-semibold text-gray-900">{proposal.proposal.timeline}</p>
-                            </div>
-                          </div>
-                          <div className="mb-4">
-                            <p className="text-sm text-gray-600 mb-2">Cover Letter</p>
-                            <p className="text-gray-700 text-sm leading-relaxed">
-                              {proposal.proposal.coverLetter}
-                            </p>
-                          </div>
-                          {proposal.proposal.attachments > 0 && (
-                            <p className="text-sm text-blue-600">
-                              {proposal.proposal.attachments} attachments included
-                            </p>
+                        <div className="flex justify-end space-x-2 mt-4 pt-4 border-t border-gray-200">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => updateProposal(proposal.id, { isShortlisted: !proposal.isShortlisted })}
+                          >
+                            {proposal.isShortlisted ? 'Remove from Shortlist' : 'Add to Shortlist'}
+                          </Button>
+                          <a href={`/freelancers/${proposal.freelancerId}`}>
+                            <Button variant="outline" size="sm">
+                              View Profile
+                            </Button>
+                          </a>
+                          {proposal.status === 'PENDING' && (
+                            <>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => updateProposalStatus(proposal.id, 'REJECTED')}
+                              >
+                                Reject
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                className="bg-teal-600 hover:bg-teal-700"
+                                onClick={() => updateProposalStatus(proposal.id, 'ACCEPTED')}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                                Accept
+                              </Button>
+                            </>
                           )}
                         </div>
                       </div>
-
-                      <div className="flex justify-end space-x-2 mt-4 pt-4 border-t border-gray-200">
-                        <Button variant="outline" size="sm">
-                          <MessageCircle className="h-4 w-4 mr-1" />
-                          Message
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          View Profile
-                        </Button>
-                        <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          Hire
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

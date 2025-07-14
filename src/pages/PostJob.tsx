@@ -12,30 +12,8 @@ import BudgetVisibilityStep from "../components/forms/BudgetVisibilityStep";
 import JobReviewStep from "../components/forms/JobReviewStep";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/AuthContext";
-import axios from "axios";
-import { uploadService } from "../lib/uploadService";
-
-export interface JobFormData {
-  // Basic Info
-  title: string;
-  description: string;
-  category: string;
-  skills: string[];
-  experienceLevel: string; // entry-level, intermediate, expert
-  projectType: string; // hourly, fixed-price
-  duration: string; // ongoing, short-term, one-time
-  
-  // Budget
-  budgetType: 'hourly' | 'fixed';
-  minBudget?: number;
-  maxBudget?: number;
-  hideBudget: boolean;
-  
-  // Visibility & Files
-  visibility: 'public' | 'invite-only' | 'private';
-  attachments?: File[];
-  attachmentUrls?: string[]; // Store uploaded URLs
-}
+import { jobService, uploadService } from "../services";
+import { JobFormData } from "../types";
 
 const PostJob = () => {
   const navigate = useNavigate();
@@ -51,6 +29,7 @@ const PostJob = () => {
     experienceLevel: "",
     projectType: "",
     duration: "",
+    budget: "HOURLY",
     budgetType: "hourly",
     minBudget: 0,
     maxBudget: 0,
@@ -128,7 +107,7 @@ const PostJob = () => {
       if (formData.attachments && formData.attachments.length > 0) {
         try {
           const uploadResponse = await uploadService.uploadMultiple(formData.attachments);
-          attachmentUrls = uploadResponse.data.map(file => file.url);
+          attachmentUrls = uploadResponse.map(file => file.url);
         } catch (uploadError) {
           console.error('File upload error:', uploadError);
           toast({
@@ -149,17 +128,18 @@ const PostJob = () => {
         experienceLevel: formData.experienceLevel,
         projectType: formData.projectType,
         duration: formData.duration,
+        budget: formData.budget,
         budgetType: formData.budgetType,
         minBudget: formData.minBudget,
         maxBudget: formData.maxBudget,
         hideBudget: formData.hideBudget,
         visibility: formData.visibility,
-        attachments: attachmentUrls // Send URLs instead of File objects
+        attachmentUrls: attachmentUrls // Send URLs instead of File objects
       };
 
-      const response = await axios.post('/jobs', jobData);
+      const response = await jobService.createJob(jobData);
       
-      if (response.data.success) {
+      if (response.success) {
         toast({
           title: "Job Posted Successfully!",
           description: "Your job has been posted and is now live on the platform.",
@@ -167,7 +147,7 @@ const PostJob = () => {
         
         navigate('/client-dashboard');
       } else {
-        throw new Error(response.data.message || 'Failed to post job');
+        throw new Error(response.message || 'Failed to post job');
       }
     } catch (error: unknown) {
       console.error('Error posting job:', error);

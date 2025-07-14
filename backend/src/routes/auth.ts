@@ -272,7 +272,7 @@ router.post('/logout', (req: Request, res: Response) => {
 router.get('/google', (req, res, next) => {
   
   passport.authenticate('google', {
-    scope: ['profile', 'email']
+    scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar']
   })(req, res, next);
 });
 
@@ -280,27 +280,44 @@ router.get('/google/callback',
   passport.authenticate('google', { 
     failureRedirect: `${process.env.CLIENT_URL}/login?error=oauth_failed` 
   }),
-  (req, res) => {
-    
-    // Redirect to frontend with success
-    const signOptions: SignOptions = { expiresIn: '7d' };
-    const user = req.user as { id: string; email: string; firstName: string; lastName: string; userType: string; isOnboarded: boolean };
-    const token = jwt.sign(
-      { id: user.id },
-      process.env.JWT_SECRET as Secret,
-      signOptions
-    );
-    
-    if (user.isOnboarded) {
-      res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    })
-    res.redirect(`${process.env.CLIENT_URL}/dashboard?from=oauth`);
-    } else {
-      res.redirect(`${process.env.CLIENT_URL}/onboarding`);
+  async (req, res) => {
+    try {
+      // Check if this is a calendar connection for existing user
+      const state = req.query.state as string;
+      
+      if (state) {
+        // This is a calendar connection for existing user
+        const userId = state;
+        
+        // The tokens are already saved by passport strategy
+        // We just need to redirect back to the interview scheduling flow
+        res.redirect(`${process.env.CLIENT_URL}/messages?from=calendar_oauth`);
+        return;
+      }
+      
+      // Regular OAuth login flow
+      const signOptions: SignOptions = { expiresIn: '7d' };
+      const user = req.user as { id: string; email: string; firstName: string; lastName: string; userType: string; isOnboarded: boolean };
+      const token = jwt.sign(
+        { id: user.id },
+        process.env.JWT_SECRET as Secret,
+        signOptions
+      );
+      
+      if (user.isOnboarded) {
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+        res.redirect(`${process.env.CLIENT_URL}/dashboard?from=oauth`);
+      } else {
+        res.redirect(`${process.env.CLIENT_URL}/onboarding`);
+      }
+    } catch (error) {
+      console.error('Error in Google OAuth callback:', error);
+      res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
     }
   }
 );

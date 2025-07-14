@@ -10,54 +10,10 @@ import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
-import axios from "axios";
 import { useToast } from "../hooks/use-toast";
- import { useAuth } from "../hooks/AuthContext";
-
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-  budget: 'FIXED' | 'HOURLY';
-  minBudget?: number;
-  maxBudget?: number;
-  duration?: string;
-  skills: string[];
-  category: string;
-  subcategory?: string;
-  projectType?: string;
-  experienceLevel?: string;
-  location?: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  visibility: string;
-  attachments?: string[]; // URLs to attached files
-  createdAt: string;
-  updatedAt: string;
-  client: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    bio?: string;
-    location?: string;
-    companyName?: string;
-    companySize?: string;
-    industry?: string;
-  };
-  _count: {
-    proposals: number;
-  };
-}
-
-interface ExistingProposal {
-  id: string;
-  coverLetter: string;
-  bidAmount: number;
-  estimatedDuration: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
-  createdAt: string;
-  updatedAt: string;
-}
+import { useAuth } from "../hooks/AuthContext";
+import { jobService, proposalService, uploadService } from "../services";
+import { Job, ExistingProposal } from "../types";
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -81,9 +37,9 @@ const JobDetails = () => {
     const fetchJobDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/jobs/${id}`);
-        if (response.data.success) {
-          setJob(response.data.data);
+        const response = await jobService.getJob(id!);
+        if (response.success && response.data) {
+          setJob(response.data);
         } else {
           setError('Failed to fetch job details');
         }
@@ -106,13 +62,13 @@ const JobDetails = () => {
       
       try {
         setCheckingProposal(true);
-        const response = await axios.get(`/proposals/check/${id}`);
-        if (response.data.success && response.data.data) {
-          setExistingProposal(response.data.data);
+        const response = await proposalService.checkExistingProposal(id);
+        if (response.success && response.data) {
+          setExistingProposal(response.data);
           // Pre-fill the form with existing proposal data
-          setProposal(response.data.data.coverLetter);
-          setProposalBudget(response.data.data.bidAmount.toString());
-          setProposalDelivery(response.data.data.estimatedDuration);
+          setProposal(response.data.coverLetter);
+          setProposalBudget(response.data.bidAmount.toString());
+          setProposalDelivery(response.data.estimatedDuration);
         }
       } catch (err: unknown) {
         console.error('Error checking existing proposal:', err);
@@ -204,19 +160,9 @@ const JobDetails = () => {
       const uploadedAttachments: string[] = [];
       if (proposalAttachments.length > 0) {
         for (const file of proposalAttachments) {
-          const formData = new FormData();
-          formData.append('file', file);
-          
           try {
-            const uploadResponse = await axios.post('/upload/single', formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            });
-            
-            if (uploadResponse.data.success) {
-              uploadedAttachments.push(uploadResponse.data.data.url);
-            }
+            const uploadResponse = await uploadService.uploadSingle(file);
+            uploadedAttachments.push(uploadResponse.url);
           } catch (uploadErr) {
             console.error('Error uploading file:', uploadErr);
             toast({
@@ -229,21 +175,17 @@ const JobDetails = () => {
       }
       
       const proposalData = {
-        jobId: id,
+        jobId: id!,
         coverLetter: proposal,
         bidAmount: parseFloat(proposalBudget),
-        bidType: job.projectType === 'hourly' ? 'HOURLY' : 'FIXED', // Match job project type
+        bidType: job!.projectType === 'hourly' ? 'HOURLY' : 'FIXED', // Match job project type
         estimatedDuration: proposalDelivery,
-        attachments: uploadedAttachments
+        attachmentUrls: uploadedAttachments
       };
 
-      const response = await axios.post('/proposals', proposalData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await proposalService.submitProposal(proposalData);
 
-      if (response.data.success) {
+      if (response.success) {
         toast({
           title: "Success",
           description: "Proposal submitted successfully!",
@@ -254,9 +196,9 @@ const JobDetails = () => {
         setProposalDelivery("");
         setProposalAttachments([]);
         // Refresh the existing proposal data
-        const checkResponse = await axios.get(`/proposals/check/${id}`);
-        if (checkResponse.data.success && checkResponse.data.data) {
-          setExistingProposal(checkResponse.data.data);
+        const checkResponse = await proposalService.checkExistingProposal(id!);
+        if (checkResponse.success && checkResponse.data) {
+          setExistingProposal(checkResponse.data);
         }
       }
     } catch (err: unknown) {
@@ -291,19 +233,9 @@ const JobDetails = () => {
       const uploadedAttachments: string[] = [];
       if (proposalAttachments.length > 0) {
         for (const file of proposalAttachments) {
-          const formData = new FormData();
-          formData.append('file', file);
-          
           try {
-            const uploadResponse = await axios.post('/upload/single', formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            });
-            
-            if (uploadResponse.data.success) {
-              uploadedAttachments.push(uploadResponse.data.data.url);
-            }
+            const uploadResponse = await uploadService.uploadSingle(file);
+            uploadedAttachments.push(uploadResponse.url);
           } catch (uploadErr) {
             console.error('Error uploading file:', uploadErr);
             toast({
@@ -320,22 +252,18 @@ const JobDetails = () => {
         bidAmount: parseFloat(proposalBudget),
         bidType: proposalBudgetType === 'hourly' ? 'HOURLY' : 'FIXED', // Add bid type (hourly/fixed)
         estimatedDuration: proposalDelivery,
-        attachments: uploadedAttachments
+        attachmentUrls: uploadedAttachments
       };
 
-      const response = await axios.put(`/proposals/${existingProposal.id}/update`, proposalData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await proposalService.updateProposal(existingProposal.id, proposalData);
 
-      if (response.data.success) {
+      if (response.success) {
         toast({
           title: "Success",
           description: "Proposal updated successfully!",
         });
         // Update the existing proposal data
-        setExistingProposal(response.data.data);
+        setExistingProposal(response.data as unknown as ExistingProposal);
         setProposalAttachments([]);
       }
     } catch (err: unknown) {
@@ -357,19 +285,15 @@ const JobDetails = () => {
     try {
       setSubmittingProposal(true);
       
-      const response = await axios.put(`/proposals/${existingProposal.id}/withdraw`, {}, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await proposalService.withdrawProposal(existingProposal.id);
 
-      if (response.data.success) {
+      if (response.success) {
         toast({
           title: "Success",
           description: "Proposal withdrawn successfully!",
         });
         // Update the existing proposal data
-        setExistingProposal(response.data.data);
+        setExistingProposal(null);
         // Clear the form
         setProposal("");
         setProposalBudget("");

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Search, Plus, TrendingUp, DollarSign, Clock, Users, Eye, MessageCircle, Calendar, CheckCircle, AlertCircle, BarChart3, FileText, Star, Award, Target, Briefcase, Activity, Loader2, User, CalendarDays, Download } from "lucide-react";
-import axios from "axios";
 
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
@@ -12,103 +11,8 @@ import { Separator } from "../components/ui/separator";
 import { Progress } from "../components/ui/progress";
 import { useAuth } from "../hooks/AuthContext";
 import ProposalDetailsModal from "../components/modals/ProposalDetailsModal";
-
-// Types for backend data
-interface Proposal {
-  id: string;
-  coverLetter: string;
-  bidAmount: number;
-  estimatedDuration: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
-  createdAt: string;
-  attachments?: string[];
-  job: {
-    id: string;
-    title: string;
-    _count: {
-      proposals: number;
-    };
-    client: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      companyName?: string;
-    };
-  };
-}
-
-// Interface for the modal proposal format
-interface ModalProposal {
-  id: number;
-  jobTitle: string;
-  client: {
-    name: string;
-    rating: number;
-    jobsPosted: number;
-  };
-  submittedDate: string;
-  status: "pending" | "accepted" | "rejected" | "interview" | "withdrawn";
-  bidAmount: string;
-  coverLetter: string;
-  timeline: string;
-  jobBudget: string;
-  jobType: "fixed" | "hourly";
-  skills: string[];
-  responses: number;
-  lastActivity: string;
-  attachments?: string[];
-  interviewScheduled?: {
-    date: string;
-    time: string;
-  };
-}
-
-// Add Offer type
-interface Offer {
-  id: string;
-  conversationId: string;
-  clientId: string;
-  freelancerId: string;
-  jobId: string;
-  budgetType: 'FIXED' | 'HOURLY';
-  amount: number;
-  duration: string;
-  milestones: Array<{
-    title: string;
-    description: string;
-    amount: number;
-    dueDate: string;
-    status?: 'pending' | 'in_progress' | 'completed';
-  }>;
-  terms?: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
-  expiresAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  client: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    companyName?: string;
-  };
-  freelancer: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    email: string;
-  };
-  job: {
-    id: string;
-    title: string;
-    description: string;
-  };
-  conversation: {
-    id: string;
-    projectName?: string;
-  };
-}
+import { proposalService, offerService } from "../services";
+import { Proposal, ModalProposal, Offer } from "../types";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -424,10 +328,10 @@ const Dashboard = () => {
       setProposalsLoading(true);
       setProposalsError(null);
       
-      const response = await axios.get('/proposals/freelancer/me?limit=5');
+      const response = await proposalService.getMyProposals();
       
-      if (response.data.success) {
-        setProposals(response.data.data);
+      if (response.success && response.data) {
+        setProposals(response.data.data || []);
       } else {
         setProposalsError('Failed to fetch proposals');
       }
@@ -445,12 +349,8 @@ const Dashboard = () => {
     try {
       setOffersLoading(true);
       setOffersError(null);
-      const response = await axios.get('/offers/me?status=ACCEPTED');
-      if (response.data.success) {
-        setOffers(response.data.data);
-      } else {
-        setOffersError('Failed to fetch offers');
-      }
+      const response = await offerService.getOffersByStatus('ACCEPTED');
+      setOffers(response);
     } catch (error) {
       setOffersError('Failed to fetch offers');
     } finally {

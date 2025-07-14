@@ -1,85 +1,17 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
-
-// Types (matching your server)
-interface User {
-  id: string;
-  name: string;
-  type: 'client' | 'freelancer';
-  avatar?: string;
-}
-
-interface OnlineUser {
-  userEmail: string;
-  userName: string;
-  lastSeen?: string;
-}
-
-
-interface WSMessage {
-  type: 'authenticate' | "online_users_list" | "error" | "user_left" | "user_joined" | "user_stop_typing" | "user_typing" | "messages_loaded" | "new_message" | 'authentication_success' | 'connection_established' | 'join_conversation' | 'send_message' | 'typing' | 'stop_typing' | 'user_online' | 'user_offline';
-  payload: any;
-}
-
-interface Message {
-  id: string;
-  conversationId: string;
-  senderEmail: string;
-  // senderName: string;
-  content: string;
-  timestamp: string;
-  type: 'text' | 'file' | 'image';
-}
-
-interface Conversation {
-  id: string;
-  participants: string[];
-  projectName: string;
-  lastMessage?: Message;
-  createdAt: string;
-}
-
-interface TypingUser {
-  userEmail: string;
-  userName: string;
-}
-
-interface WebSocketContextType {
-  // Connection state
-  isConnected: boolean;
-  isConnecting: boolean;
-  error: string | null;
-
-  socketRef: React.RefObject<WebSocket | null>;
-  
-  // Data
-  conversations: Conversation[];
-  messages: Message[];
-  currentConversationId: string | null;
-  typingUsers: TypingUser[];
-  onlineUsers: OnlineUser[]; // Array for components
-  onlineUsersMap: Map<string, OnlineUser>; // Map for advanced usage
-  isUserOnline: (userEmail: string) => boolean;
-  
-  // Actions
-  joinConversation: (conversationId: string) => void;
-  createConversation: (otherUserEmail: string, projectName?: string, jobId?: string) => Promise<string | null>;
-  sendMessage: (content: string, type?: 'text' | 'file' | 'image') => void;
-  startTyping: () => void;
-  stopTyping: () => void;
-  
-  // Connection control
-  connect: () => void;
-  disconnect: () => void;
-}
+import { 
+  WSUser,
+  OnlineUser,
+  WSMessage,
+  WSMessageData as Message,
+  WSConversation as Conversation,
+  TypingUser,
+  WebSocketContextType,
+  WebSocketProviderProps
+} from '../types';
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
-
-interface WebSocketProviderProps {
-  children: ReactNode;
-  wsUrl?: string;
-  maxRetries?: number;
-}
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ 
   children, 
@@ -197,7 +129,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
             });
           break;
           case 'online_users_list':
-            console.log("online users received: ", wsMessage.payload.users)
             setOnlineUsers(prev => {
               const newMap = new Map(prev);
               wsMessage.payload.users.forEach((user) => {
@@ -212,6 +143,129 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
             const newMap = new Map(prev);
             newMap.delete(wsMessage.payload.userEmail);
             return newMap;
+          });
+        break;
+
+        case 'interview_scheduled':
+          
+          const interviewMessage = {
+            id: wsMessage.payload.id,
+            conversationId: wsMessage.payload.conversationId,
+            senderEmail: wsMessage.payload.senderEmail,
+            content: JSON.stringify(wsMessage.payload.interviewData || wsMessage.payload.content),
+            timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
+            type: 'interview' as const
+          };
+
+
+          setMessages(prevMessages => {
+            
+            const messageExists = prevMessages.some(msg => msg.id === interviewMessage.id);
+            if (messageExists) {
+              return prevMessages.map(msg =>
+                msg.id === interviewMessage.id ? interviewMessage : msg
+              );
+            }
+
+            const newTimestamp = new Date(interviewMessage.timestamp);
+            let insertIndex = prevMessages.length;
+            
+            if (prevMessages.length > 0 && newTimestamp.getTime() < new Date(prevMessages[prevMessages.length - 1].timestamp).getTime()) {
+              insertIndex = prevMessages.findIndex(msg => new Date(msg.timestamp).getTime() > newTimestamp.getTime());
+              if (insertIndex === -1) insertIndex = prevMessages.length;
+            }
+
+            const updatedMessages = [...prevMessages];
+            updatedMessages.splice(insertIndex, 0, interviewMessage);
+            return updatedMessages;
+          });
+        break;
+
+        case 'interview_status_updated':
+          const updatedInterviewMessage = {
+            id: wsMessage.payload.id,
+            conversationId: wsMessage.payload.conversationId,
+            senderEmail: wsMessage.payload.senderEmail,
+            content: wsMessage.payload.content || JSON.stringify(wsMessage.payload.interviewData),
+            timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
+            type: 'interview' as const
+          };
+          
+          // Update the existing interview message with new content
+          setMessages(prevMessages => {
+            return prevMessages.map(msg => 
+              msg.id === updatedInterviewMessage.id ? updatedInterviewMessage : msg
+            );
+          });
+        break;
+
+        case 'interview_rescheduled':
+          const rescheduledInterviewMessage = {
+            id: wsMessage.payload.id,
+            conversationId: wsMessage.payload.conversationId,
+            senderEmail: wsMessage.payload.senderEmail,
+            content: wsMessage.payload.content || JSON.stringify(wsMessage.payload.interviewData),
+            timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
+            type: 'interview' as const
+          };
+          
+          // Update the existing interview message with new content
+          setMessages(prevMessages => {
+            return prevMessages.map(msg => 
+              msg.id === rescheduledInterviewMessage.id ? rescheduledInterviewMessage : msg
+            );
+          });
+        break;
+
+        case 'interview_invitation_sent':
+          const interviewInvitationMessage = {
+            id: wsMessage.payload.id,
+            conversationId: wsMessage.payload.conversationId,
+            senderEmail: wsMessage.payload.senderEmail,
+            content: JSON.stringify(wsMessage.payload.invitationData || wsMessage.payload.content),
+            timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
+            type: 'interview_invitation' as const
+          };
+
+          setMessages(prevMessages => {
+            const messageExists = prevMessages.some(msg => msg.id === interviewInvitationMessage.id);
+            if (messageExists) {
+              // Update existing message with new content
+              return prevMessages.map(msg =>
+                msg.id === interviewInvitationMessage.id ? interviewInvitationMessage : msg
+              );
+            }
+            // Add new message
+            const newTimestamp = new Date(interviewInvitationMessage.timestamp);
+            let insertIndex = prevMessages.length;
+            if (prevMessages.length > 0 && newTimestamp.getTime() < new Date(prevMessages[prevMessages.length - 1].timestamp).getTime()) {
+              insertIndex = prevMessages.findIndex(msg => new Date(msg.timestamp).getTime() > newTimestamp.getTime());
+              if (insertIndex === -1) insertIndex = prevMessages.length;
+            }
+            const updatedMessages = [...prevMessages];
+            updatedMessages.splice(insertIndex, 0, interviewInvitationMessage);
+            return updatedMessages;
+          });
+        break;
+
+        case 'interview_invitation_updated':
+          const updatedInterviewInvitationMessage = {
+            id: wsMessage.payload.id,
+            conversationId: wsMessage.payload.conversationId,
+            senderEmail: wsMessage.payload.senderEmail,
+            content: wsMessage.payload.content || JSON.stringify(wsMessage.payload.invitationData),
+            timestamp: wsMessage.payload.timestamp || wsMessage.payload.createdAt,
+            type: 'interview_invitation' as const
+          };
+          setMessages(prevMessages => {
+            const messageExists = prevMessages.some(msg => msg.id === updatedInterviewInvitationMessage.id);
+            if (messageExists) {
+              return prevMessages.map(msg =>
+                msg.id === updatedInterviewInvitationMessage.id ? updatedInterviewInvitationMessage : msg
+              );
+            }
+            // Add new message if not found (shouldn't happen, but for safety)
+            return [...prevMessages, updatedInterviewInvitationMessage];
           });
         break;
 
@@ -232,12 +286,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           );
           break;
           
-        // case 'user_joined':
-        //   console.log(`${wsMessage.payload.userEmail} joined the conversation`);
-        //   break;
+        case 'user_joined':
+          break;
           
         case 'user_left':
-          console.log(`${wsMessage.payload.userEmail} left the conversation`);
           // Remove from typing users if they were typing
           setTypingUsers(prev => 
             prev.filter(u => u.userEmail !== wsMessage.payload.userEmail)
@@ -245,9 +297,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           break;
 
         case 'connection_established':
-          console.log('Connected to server, waiting for authentication...');
           if (socketRef.current && user) {
-            console.log("uegfowq")
             socketRef.current.send(JSON.stringify({
               type: 'authenticate',
               payload: {
@@ -262,7 +312,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           break;
           
         case 'authentication_success':
-          console.log('User authenticated successfully');
           connectionStateRef.current = 'connected';
           setIsConnected(true);
           setIsConnecting(false);
@@ -286,7 +335,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           break;
                 
         default:
-          console.log('Unknown message type:', wsMessage.type);
+          console.error('Unknown message type:', wsMessage.type);
       }
     } catch (err) {
       console.error('Error parsing WebSocket message:', err);
@@ -296,7 +345,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Connection handlers
   const handleOpen = useCallback(() => {
-    console.log('WebSocket connected, registering user...');
     setIsConnecting(true); // Keep connecting state until authenticated
     setError(null);
     
@@ -315,8 +363,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   }, [user]);
 
   const handleClose = useCallback((event: CloseEvent) => {
-    console.log('WebSocket disconnected:', event.code, event.reason);
-    
     connectionStateRef.current = 'disconnected';
     setIsConnected(false);
     setIsConnecting(false);
@@ -347,15 +393,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       // FIXED: Uncommented the reconnection logic
       reconnectTimeoutRef.current = setTimeout(() => {
         if (shouldReconnectRef.current && connectionStateRef.current === 'disconnected') {
-          console.log(`Reconnection attempt ${retryCountRef.current}/${maxRetries}`);
           connect();
         }
       }, retryDelay);
     } else if (retryCountRef.current >= maxRetries) {
       setError(`Failed to connect after ${maxRetries} attempts. Please check your connection and try again.`);
       shouldReconnectRef.current = false;
-    } else if (wasManualDisconnect) {
-      console.log('Manual disconnect, not attempting to reconnect');
     }
   }, [maxRetries]);
 
@@ -377,7 +420,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const connect = useCallback(() => {
     // Don't connect if already connected or connecting
     if (connectionStateRef.current === 'connected' || connectionStateRef.current === 'connecting') {
-      console.log(`Already ${connectionStateRef.current}, skipping connection attempt`);
       return;
     }
 
@@ -387,7 +429,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       return;
     }
 
-    console.log('Attempting to connect...');
     connectionStateRef.current = 'connecting';
     setIsConnecting(true);
     setError(null);
@@ -418,8 +459,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Disconnect function
   const disconnect = useCallback(() => {
-    console.log('Manual disconnect initiated');
-    
     // Mark as manual disconnect
     isManualDisconnectRef.current = true;
     shouldReconnectRef.current = false;
@@ -453,7 +492,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Manual reconnect function (resets retry count)
   const manualReconnect = useCallback(() => {
-    console.log('Manual reconnect initiated');
     retryCountRef.current = 0;
     shouldReconnectRef.current = true;
     isManualDisconnectRef.current = false;
@@ -463,21 +501,15 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
   // Action functions
   const joinConversation = useCallback((conversationId: string) => {
-    console.log('🚪 joinConversation called');
-    console.log('🔌 WebSocket ready state:', socketRef.current?.readyState);
-    console.log('📧 Target conversation ID:', conversationId);
-    
     if (socketRef.current?.readyState === WebSocket.OPEN) {
-      console.log('✅ Sending join_conversation request');
       const joinPayload = {
         type: 'join_conversation',
         payload: { conversationId }
       };
-      console.log('📨 Join payload:', joinPayload);
       
       socketRef.current.send(JSON.stringify(joinPayload));
     } else {
-      console.log('❌ Cannot join conversation - WebSocket not open');
+      console.error('❌ Cannot join conversation - WebSocket not open');
     }
   }, []);
 
@@ -499,7 +531,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       const data = await response.json();
       
       if (data.success) {
-        console.log('Conversation created successfully:', data.data.id);
         return data.data.id;
       } else {
         console.error('Failed to create conversation:', data.message);
@@ -544,13 +575,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   }, [currentConversationId, stopTyping]);
 
   const sendMessage = useCallback((content: string, type: 'text' | 'file' | 'image' = 'text') => {
-    console.log('📤 sendMessage called');
-    console.log('🔌 WebSocket ready state:', socketRef.current?.readyState);
-    console.log('🔗 Current conversation ID:', currentConversationId);
-    console.log('💬 Content:', content);
-    
     if (socketRef.current?.readyState === WebSocket.OPEN && currentConversationId && content.trim()) {
-      console.log("✅ Sending message via WebSocket");
       const messagePayload = {
         type: 'send_message',
         payload: { 
@@ -559,29 +584,42 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           type 
         }
       };
-      console.log('📨 Message payload:', messagePayload);
       
       socketRef.current.send(JSON.stringify(messagePayload));
       
       // Stop typing when message is sent
       stopTyping();
     } else {
-      console.log('❌ Cannot send message:');
-      console.log('- WebSocket open:', socketRef.current?.readyState === WebSocket.OPEN);
-      console.log('- Has conversation ID:', !!currentConversationId);
-      console.log('- Has content:', !!content.trim());
+      console.error('❌ Cannot send message - WebSocket not open or missing conversation/content');
     }
   }, [currentConversationId, stopTyping]);
 
+  const sendInterviewMessage = useCallback((interviewData: any, conversationId?: string, proposalId?: string) => {
+    const targetConversationId = conversationId || currentConversationId;
+    
+    if (socketRef.current?.readyState === WebSocket.OPEN && targetConversationId) {
+      const interviewPayload = {
+        type: 'interview_scheduled',
+        payload: { 
+          conversationId: targetConversationId, 
+          interviewData,
+          proposalId
+        }
+      };
+      
+      socketRef.current.send(JSON.stringify(interviewPayload));
+    } else {
+      console.error('❌ Cannot send interview message - WebSocket not open or missing conversation');
+    }
+  }, [currentConversationId]);
+
   // Auto-connect when provider mounts
   useEffect(() => {
-    console.log('🔌 WebSocketProvider MOUNTED - ID:', providerId);
     shouldReconnectRef.current = true;
     connect();
     
     // Cleanup on unmount
     return () => {
-      console.log('🔌 WebSocketProvider UNMOUNTING - ID:', providerId);
       shouldReconnectRef.current = false;
       disconnect();
     };
@@ -616,6 +654,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     joinConversation,
     createConversation,
     sendMessage,
+    sendInterviewMessage,
     startTyping,
     stopTyping,
     
@@ -643,4 +682,4 @@ export const useWebSocket = (): WebSocketContextType => {
 };
 
 // Export types for use in components
-export type { Message, Conversation, User, TypingUser };
+export type { Message, Conversation, WSUser as User, TypingUser };

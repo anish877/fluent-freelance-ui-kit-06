@@ -578,4 +578,231 @@ router.get('/search', protect, (async (req: AuthRequest, res: Response): Promise
   }
 }) as RequestHandler);
 
+// @desc    Update interview message status
+// @route   PUT /api/messages/interview/:messageId/status
+// @access  Private
+router.put('/interview/:messageId/status', protect, [
+  body('status').isIn(['accepted', 'declined', 'withdrawn']).withMessage('Invalid status'),
+  body('reason').optional().isString().withMessage('Reason must be a string')
+], (async (req: AuthRequest, res: Response): Promise<void> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  try {
+    const { messageId } = req.params;
+    const { status, reason } = req.body;
+
+    // Find the message and verify it's an interview message
+    const message = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: {
+        conversation: {
+          select: {
+            participants: true
+          }
+        }
+      }
+    });
+
+    if (!message) {
+      res.status(404).json({ message: 'Message not found' });
+      return;
+    }
+
+    // Check if user is participant in this conversation
+    if (!message.conversation.participants.includes(req.user!.email)) {
+      res.status(403).json({ message: 'Access denied to this message' });
+      return;
+    }
+
+    // Check if it's an interview message
+    if (message.type !== 'interview') {
+      res.status(400).json({ message: 'This is not an interview message' });
+      return;
+    }
+
+    // Parse the current interview data
+    let interviewData;
+    try {
+      interviewData = JSON.parse(message.content);
+    } catch (error) {
+      res.status(400).json({ message: 'Invalid interview data format' });
+      return;
+    }
+
+    // Update the interview data based on status
+    const updatedInterviewData = {
+      ...interviewData,
+      status,
+      ...(status === 'withdrawn' && {
+        withdrawnBy: req.user!.email,
+        withdrawnReason: reason || 'Interview was withdrawn by the client',
+        withdrawnAt: new Date().toISOString(),
+        // Preserve original data for rescheduling
+        originalData: {
+          date: interviewData.date,
+          time: interviewData.time,
+          duration: interviewData.duration,
+          notes: interviewData.notes,
+          meetLink: interviewData.meetLink,
+          jobTitle: interviewData.jobTitle,
+          clientName: interviewData.clientName
+        }
+      })
+    };
+
+    // Update the message content with new status
+    const updatedMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: {
+        content: JSON.stringify(updatedInterviewData)
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+            userType: true
+          }
+        }
+      }
+    });
+
+    res.json({
+      success: true,
+      data: updatedMessage
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
+// @desc    Reschedule interview
+// @route   PUT /api/messages/interview/:messageId/reschedule
+// @access  Private
+router.put('/interview/:messageId/reschedule', protect, [
+  body('interviewData').isObject().withMessage('Interview data is required'),
+  body('proposalId').optional().isString().withMessage('Proposal ID must be a string')
+], (async (req: AuthRequest, res: Response): Promise<void> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  try {
+    const { messageId } = req.params;
+    const { interviewData, proposalId } = req.body;
+
+    // Find the message and verify it's an interview message
+    const message = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: {
+        conversation: {
+          select: {
+            participants: true
+          }
+        }
+      }
+    });
+
+    if (!message) {
+      res.status(404).json({ message: 'Message not found' });
+      return;
+    }
+
+    // Check if user is participant in this conversation
+    if (!message.conversation.participants.includes(req.user!.email)) {
+      res.status(403).json({ message: 'Access denied to this message' });
+      return;
+    }
+
+    // Check if it's an interview message
+    if (message.type !== 'interview') {
+      res.status(400).json({ message: 'This is not an interview message' });
+      return;
+    }
+
+    // Parse the current interview data
+    let currentInterviewData;
+    try {
+      currentInterviewData = JSON.parse(message.content);
+    } catch (error) {
+      res.status(400).json({ message: 'Invalid interview data format' });
+      return;
+    }
+
+    // Update the interview data with new schedule
+    const updatedInterviewData = {
+      ...currentInterviewData,
+      ...interviewData,
+      status: 'pending',
+      // Remove withdrawn fields
+      withdrawnBy: undefined,
+      withdrawnReason: undefined,
+      withdrawnAt: undefined,
+      // Keep original data for future reference
+      originalData: currentInterviewData.originalData || {
+        date: currentInterviewData.date,
+        time: currentInterviewData.time,
+        duration: currentInterviewData.duration,
+        notes: currentInterviewData.notes,
+        meetLink: currentInterviewData.meetLink,
+        jobTitle: currentInterviewData.jobTitle,
+        clientName: currentInterviewData.clientName
+      }
+    };
+
+    // Update the message content with new schedule
+    const updatedMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: {
+        content: JSON.stringify(updatedInterviewData)
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
+            userType: true
+          }
+        }
+      }
+    });
+
+    // Update proposal if proposalId is provided
+    if (proposalId) {
+      try {
+        await prisma.proposal.update({
+          where: { id: proposalId },
+          data: {
+            interview: updatedInterviewData
+          }
+        });
+      } catch (proposalError) {
+        console.log(`⚠️ Failed to update proposal ${proposalId}:`, proposalError);
+      }
+    }
+
+    res.json({
+      success: true,
+      data: {
+        message: updatedMessage,
+        interviewData: updatedInterviewData
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}) as RequestHandler);
+
 export default router;

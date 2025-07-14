@@ -30,7 +30,12 @@ interface WSMessage {
     | "typing"
     | "stop_typing"
     | "user_online"
-    | "user_offline";
+    | "user_offline"
+    | "interview_scheduled"
+    | "interview_status_updated"
+    | "interview_rescheduled"
+    | "interview_invitation_sent"
+    | "interview_invitation_updated";
   payload: any;
 }
 
@@ -723,6 +728,742 @@ wss.on("connection", (ws: WebSocket, req) => {
           } else {
             console.log(`❌ Cannot broadcast stop typing - missing connection or conversation ID`);
           }
+          break;
+
+        case "interview_scheduled":
+          console.log(`📅 Interview scheduling event from ${currentConnection?.userEmail}`);
+          console.log(`📅 Full message payload:`, message.payload);
+          (async () => {
+            if (!currentConnection) {
+              console.log(`❌ Interview scheduling attempted without authentication`);
+              sendError(ws, "Not authenticated", 4001);
+              return;
+            }
+
+            const { conversationId, interviewData, proposalId } = message.payload;
+            console.log(`📅 Interview data:`, interviewData);
+
+            try {
+              // Verify conversation exists and user is participant
+              const conversation = await prisma.conversation.findUnique({
+                where: { id: conversationId },
+                include: {
+                  job: {
+                    select: {
+                      id: true,
+                      title: true
+                    }
+                  }
+                }
+              });
+
+              if (!conversation) {
+                console.log(`❌ Conversation not found: ${conversationId}`);
+                sendError(ws, "Conversation not found", 4004);
+                return;
+              }
+
+              if (!conversation.participants.includes(currentConnection.userEmail)) {
+                console.log(`🚫 Access denied - ${currentConnection.userEmail} not in participants list`);
+                sendError(ws, "Access denied to this conversation", 4003);
+                return;
+              }
+
+              // Ensure interviewData has all required fields with defaults
+              const normalizedInterviewData = {
+                type: 'interview_scheduled',
+                scheduled: true,
+                date: interviewData.date || new Date().toISOString().split('T')[0],
+                time: interviewData.time || '09:00',
+                duration: interviewData.duration || 30,
+                notes: interviewData.notes || '',
+                meetLink: interviewData.meetLink || '',
+                jobTitle: interviewData.jobTitle || conversation.job?.title || 'Interview',
+                clientName: interviewData.clientName || currentConnection.userName,
+                status: 'pending',
+                ...interviewData // Keep any additional fields
+              };
+
+              // Check if an interview message already exists in this conversation
+              const existingInterviewMessage = await prisma.message.findFirst({
+                where: {
+                  conversationId: conversationId,
+                  type: 'interview'
+                }
+              });
+
+              let interviewMessage;
+
+              if (existingInterviewMessage) {
+                // Update existing interview message
+                console.log(`🔄 Updating existing interview message: ${existingInterviewMessage.id}`);
+                
+                interviewMessage = await prisma.message.update({
+                  where: { id: existingInterviewMessage.id },
+                  data: {
+                    content: JSON.stringify(normalizedInterviewData),
+                    updatedAt: new Date()
+                  },
+                  include: {
+                    sender: {
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        avatar: true,
+                        userType: true
+                      }
+                    }
+                  }
+                });
+                
+                console.log(`✅ Interview message updated in database with ID: ${interviewMessage.id}`);
+              } else {
+                // Create new interview message
+                console.log(`🆕 Creating new interview message`);
+                
+                interviewMessage = await prisma.message.create({
+                  data: {
+                    content: JSON.stringify(normalizedInterviewData),
+                    senderEmail: currentConnection!.userEmail,
+                    receiverEmail: conversation.participants.find(p => p !== currentConnection!.userEmail) || '',
+                    conversationId: conversationId,
+                    type: 'interview'
+                  },
+                  include: {
+                    sender: {
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        avatar: true,
+                        userType: true
+                      }
+                    }
+                  }
+                });
+                
+                console.log(`✅ Interview message created in database with ID: ${interviewMessage.id}`);
+              }
+
+              // Update conversation's lastMessage and updatedAt
+              await prisma.conversation.update({
+                where: { id: conversationId },
+                data: {
+                  lastMessageId: interviewMessage.id,
+                  updatedAt: new Date(),
+                },
+              });
+
+              // Update proposal if proposalId is provided
+              if (proposalId) {
+                console.log(`📝 Updating proposal ${proposalId} with interview data`);
+                
+                try {
+                  await prisma.proposal.update({
+                    where: { id: proposalId },
+                    data: {
+                      interview: normalizedInterviewData
+                    }
+                  });
+                  console.log(`✅ Proposal ${proposalId} updated with interview data`);
+                } catch (proposalError) {
+                  console.log(`⚠️ Failed to update proposal ${proposalId}:`, proposalError);
+                  // Don't fail the entire operation if proposal update fails
+                }
+              }
+
+              // Broadcast interview message to all participants in the conversation
+              console.log(`📢 Broadcasting interview message to conversation participants`);
+              
+              broadcastToRoom(
+                conversationId,
+                {
+                  type: "interview_scheduled",
+                  payload: {
+                    ...interviewMessage,
+                    interviewData: normalizedInterviewData,
+                    isOwn: false,
+                  },
+                }
+              );
+
+              console.log(`📤 Sending interview message confirmation to sender ${currentConnection.userEmail}`);
+
+              ws.send(JSON.stringify({
+                type: "interview_scheduled",
+                payload: {
+                  ...interviewMessage,
+                  interviewData: normalizedInterviewData,
+                  isOwn: true,
+                },
+              }));
+
+              console.log(`✅ Interview message sent successfully by ${currentConnection.userEmail}`);
+
+            } catch (error) {
+              console.error(`❌ Error sending interview message from ${currentConnection.userEmail}:`, error);
+              sendError(ws, "Failed to send interview message", 4500);
+            }
+          })();
+          break;
+
+        case "interview_status_updated":
+          console.log(`📅 Interview status update event from ${currentConnection?.userEmail}`);
+          console.log(`📅 Full message payload:`, message.payload);
+          (async () => {
+            if (!currentConnection) {
+              console.log(`❌ Interview status update attempted without authentication`);
+              sendError(ws, "Not authenticated", 4001);
+              return;
+            }
+
+            const { messageId, status, reason } = message.payload;
+            console.log(`📅 Interview status update: ${status} for message ${messageId}`);
+
+            try {
+              // Find the message and verify it's an interview message
+              const message = await prisma.message.findUnique({
+                where: { id: messageId },
+                include: {
+                  conversation: {
+                    select: {
+                      participants: true
+                    }
+                  }
+                }
+              });
+
+              if (!message) {
+                console.log(`❌ Message not found: ${messageId}`);
+                sendError(ws, "Message not found", 4004);
+                return;
+              }
+
+              // Check if user is participant in this conversation
+              if (!message.conversation.participants.includes(currentConnection.userEmail)) {
+                console.log(`🚫 Access denied - ${currentConnection.userEmail} not in participants list`);
+                sendError(ws, "Access denied to this message", 4003);
+                return;
+              }
+
+              // Check if it's an interview message
+              if (message.type !== 'interview') {
+                console.log(`❌ This is not an interview message: ${messageId}`);
+                sendError(ws, "This is not an interview message", 4005);
+                return;
+              }
+
+              // Parse the current interview data
+              let interviewData;
+              try {
+                interviewData = JSON.parse(message.content);
+              } catch (error) {
+                console.log(`❌ Invalid interview data format: ${messageId}`);
+                sendError(ws, "Invalid interview data format", 4006);
+                return;
+              }
+
+              // Update the interview data based on status and new data
+              const updatedInterviewData = {
+                ...interviewData,
+                status,
+                ...(status === 'withdrawn' && {
+                  withdrawnBy: currentConnection.userEmail,
+                  withdrawnReason: reason || 'Interview was withdrawn by the client',
+                  withdrawnAt: new Date().toISOString(),
+                  // Preserve original data for rescheduling
+                  originalData: {
+                    date: interviewData.date,
+                    time: interviewData.time,
+                    duration: interviewData.duration,
+                    notes: interviewData.notes,
+                    meetLink: interviewData.meetLink,
+                    jobTitle: interviewData.jobTitle,
+                    clientName: interviewData.clientName
+                  }
+                })
+              };
+
+              // Update the message content with new status
+              const updatedMessage = await prisma.message.update({
+                where: { id: messageId },
+                data: {
+                  content: JSON.stringify(updatedInterviewData)
+                },
+                include: {
+                  sender: {
+                    select: {
+                      id: true,
+                      firstName: true,
+                      lastName: true,
+                      avatar: true,
+                      userType: true
+                    }
+                  }
+                }
+              });
+
+              console.log(`✅ Interview status updated in database: ${messageId} -> ${status}`);
+
+              // Broadcast status update to all participants in the conversation
+              console.log(`📢 Broadcasting interview status update to conversation participants`);
+              
+              broadcastToRoom(
+                message.conversationId,
+                {
+                  type: "interview_status_updated",
+                  payload: {
+                    ...updatedMessage,
+                    interviewData: updatedInterviewData,
+                    isOwn: false,
+                  },
+                }
+              );
+
+              console.log(`📤 Sending interview status update confirmation to sender ${currentConnection.userEmail}`);
+
+              ws.send(JSON.stringify({
+                type: "interview_status_updated",
+                payload: {
+                  ...updatedMessage,
+                  interviewData: updatedInterviewData,
+                  isOwn: true,
+                },
+              }));
+
+              console.log(`✅ Interview status update sent successfully by ${currentConnection.userEmail}`);
+
+            } catch (error) {
+              console.error(`❌ Error updating interview status from ${currentConnection.userEmail}:`, error);
+              sendError(ws, "Failed to update interview status", 4501);
+            }
+          })();
+          break;
+
+        case "interview_rescheduled":
+          console.log(`📅 Interview rescheduling event from ${currentConnection?.userEmail}`);
+          console.log(`📅 Full message payload:`, message.payload);
+          (async () => {
+            if (!currentConnection) {
+              console.log(`❌ Interview rescheduling attempted without authentication`);
+              sendError(ws, "Not authenticated", 4001);
+              return;
+            }
+
+            const { messageId, interviewData, proposalId } = message.payload;
+            console.log(`📅 Interview rescheduling: ${messageId} with new data`);
+
+            try {
+              // Find the message and verify it's an interview message
+              const message = await prisma.message.findUnique({
+                where: { id: messageId },
+                include: {
+                  conversation: {
+                    select: {
+                      participants: true
+                    }
+                  }
+                }
+              });
+
+              if (!message) {
+                console.log(`❌ Message not found: ${messageId}`);
+                sendError(ws, "Message not found", 4004);
+                return;
+              }
+
+              // Check if user is participant in this conversation
+              if (!message.conversation.participants.includes(currentConnection.userEmail)) {
+                console.log(`🚫 Access denied - ${currentConnection.userEmail} not in participants list`);
+                sendError(ws, "Access denied to this message", 4003);
+                return;
+              }
+
+              // Check if it's an interview message
+              if (message.type !== 'interview') {
+                console.log(`❌ This is not an interview message: ${messageId}`);
+                sendError(ws, "This is not an interview message", 4005);
+                return;
+              }
+
+              // Parse the current interview data
+              let currentInterviewData;
+              try {
+                currentInterviewData = JSON.parse(message.content);
+              } catch (error) {
+                console.log(`❌ Invalid interview data format: ${messageId}`);
+                sendError(ws, "Invalid interview data format", 4006);
+                return;
+              }
+
+              // Update the interview data with new schedule
+              const updatedInterviewData = {
+                ...currentInterviewData,
+                ...interviewData,
+                status: 'pending',
+                // Remove withdrawn fields
+                withdrawnBy: undefined,
+                withdrawnReason: undefined,
+                withdrawnAt: undefined,
+                // Keep original data for future reference
+                originalData: currentInterviewData.originalData || {
+                  date: currentInterviewData.date,
+                  time: currentInterviewData.time,
+                  duration: currentInterviewData.duration,
+                  notes: currentInterviewData.notes,
+                  meetLink: currentInterviewData.meetLink,
+                  jobTitle: currentInterviewData.jobTitle,
+                  clientName: currentInterviewData.clientName
+                }
+              };
+
+              // Update the message content with new schedule
+              const updatedMessage = await prisma.message.update({
+                where: { id: messageId },
+                data: {
+                  content: JSON.stringify(updatedInterviewData)
+                },
+                include: {
+                  sender: {
+                    select: {
+                      id: true,
+                      firstName: true,
+                      lastName: true,
+                      avatar: true,
+                      userType: true
+                    }
+                  }
+                }
+              });
+
+              console.log(`✅ Interview rescheduled in database: ${messageId}`);
+
+              // Update proposal if proposalId is provided
+              if (proposalId) {
+                console.log(`📝 Updating proposal ${proposalId} with rescheduled interview data`);
+                
+                try {
+                  await prisma.proposal.update({
+                    where: { id: proposalId },
+                    data: {
+                      interview: updatedInterviewData
+                    }
+                  });
+                  console.log(`✅ Proposal ${proposalId} updated with rescheduled interview data`);
+                } catch (proposalError) {
+                  console.log(`⚠️ Failed to update proposal ${proposalId}:`, proposalError);
+                }
+              }
+
+              // Broadcast reschedule to all participants in the conversation
+              console.log(`📢 Broadcasting interview reschedule to conversation participants`);
+              
+              broadcastToRoom(
+                message.conversationId,
+                {
+                  type: "interview_rescheduled",
+                  payload: {
+                    ...updatedMessage,
+                    interviewData: updatedInterviewData,
+                    isOwn: false,
+                  },
+                }
+              );
+
+              console.log(`📤 Sending interview reschedule confirmation to sender ${currentConnection.userEmail}`);
+
+              ws.send(JSON.stringify({
+                type: "interview_rescheduled",
+                payload: {
+                  ...updatedMessage,
+                  interviewData: updatedInterviewData,
+                  isOwn: true,
+                },
+              }));
+
+              console.log(`✅ Interview rescheduled successfully by ${currentConnection.userEmail}`);
+
+            } catch (error) {
+              console.error(`❌ Error rescheduling interview from ${currentConnection.userEmail}:`, error);
+              sendError(ws, "Failed to reschedule interview", 4502);
+            }
+          })();
+          break;
+
+        case "interview_invitation_sent":
+          console.log(`📋 Interview invitation sent event from ${currentConnection?.userEmail}`);
+          console.log(`📋 Full message payload:`, message.payload);
+          (async () => {
+            if (!currentConnection) {
+              console.log(`❌ Interview invitation attempted without authentication`);
+              sendError(ws, "Not authenticated", 4001);
+              return;
+            }
+
+            const { conversationId, invitationData } = message.payload;
+            console.log(`📋 Invitation data:`, invitationData);
+
+            try {
+              // Verify conversation exists and user is participant
+              const conversation = await prisma.conversation.findUnique({
+                where: { id: conversationId },
+                include: {
+                  job: {
+                    select: {
+                      id: true,
+                      title: true
+                    }
+                  }
+                }
+              });
+
+              if (!conversation) {
+                console.log(`❌ Conversation not found: ${conversationId}`);
+                sendError(ws, "Conversation not found", 4004);
+                return;
+              }
+
+              if (!conversation.participants.includes(currentConnection.userEmail)) {
+                console.log(`🚫 Access denied - ${currentConnection.userEmail} not in participants list`);
+                sendError(ws, "Access denied to this conversation", 4003);
+                return;
+              }
+
+              // Ensure invitationData has all required fields with defaults
+              const normalizedInvitationData = {
+                type: 'interview_invitation',
+                jobTitle: invitationData.jobTitle || conversation.job?.title || 'Job Interview',
+                clientName: invitationData.clientName || currentConnection.userName,
+                message: invitationData.message || '',
+                status: 'pending',
+                ...invitationData // Keep any additional fields
+              };
+
+              // Check if an interview invitation message already exists in this conversation
+              const existingInvitationMessage = await prisma.message.findFirst({
+                where: {
+                  conversationId: conversationId,
+                  type: 'interview_invitation'
+                }
+              });
+
+              let invitationMessage;
+
+              if (existingInvitationMessage) {
+                // Update existing invitation message
+                console.log(`🔄 Updating existing interview invitation message: ${existingInvitationMessage.id}`);
+                
+                invitationMessage = await prisma.message.update({
+                  where: { id: existingInvitationMessage.id },
+                  data: {
+                    content: JSON.stringify(normalizedInvitationData),
+                    updatedAt: new Date()
+                  },
+                  include: {
+                    sender: {
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        avatar: true,
+                        userType: true
+                      }
+                    }
+                  }
+                });
+                
+                console.log(`✅ Interview invitation message updated in database with ID: ${invitationMessage.id}`);
+              } else {
+                // Create new invitation message
+                console.log(`🆕 Creating new interview invitation message`);
+                
+                invitationMessage = await prisma.message.create({
+                  data: {
+                    content: JSON.stringify(normalizedInvitationData),
+                    senderEmail: currentConnection!.userEmail,
+                    receiverEmail: conversation.participants.find(p => p !== currentConnection!.userEmail) || '',
+                    conversationId: conversationId,
+                    type: 'interview_invitation'
+                  },
+                  include: {
+                    sender: {
+                      select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        avatar: true,
+                        userType: true
+                      }
+                    }
+                  }
+                });
+                
+                console.log(`✅ Interview invitation message created in database with ID: ${invitationMessage.id}`);
+              }
+
+              // Update conversation's lastMessage and updatedAt
+              await prisma.conversation.update({
+                where: { id: conversationId },
+                data: {
+                  lastMessageId: invitationMessage.id,
+                  updatedAt: new Date(),
+                },
+              });
+
+              // Broadcast invitation message to all participants in the conversation
+              console.log(`📢 Broadcasting interview invitation message to conversation participants`);
+              
+              broadcastToRoom(
+                conversationId,
+                {
+                  type: "interview_invitation_sent",
+                  payload: {
+                    ...invitationMessage,
+                    invitationData: normalizedInvitationData,
+                    isOwn: false,
+                  },
+                }
+              );
+
+              console.log(`📤 Sending interview invitation message confirmation to sender ${currentConnection.userEmail}`);
+
+              ws.send(JSON.stringify({
+                type: "interview_invitation_sent",
+                payload: {
+                  ...invitationMessage,
+                  invitationData: normalizedInvitationData,
+                  isOwn: true,
+                },
+              }));
+
+              console.log(`✅ Interview invitation message sent successfully by ${currentConnection.userEmail}`);
+
+            } catch (error) {
+              console.error(`❌ Error sending interview invitation from ${currentConnection.userEmail}:`, error);
+              sendError(ws, "Failed to send interview invitation", 4503);
+            }
+          })();
+          break;
+
+        case "interview_invitation_updated":
+          console.log(`📋 Interview invitation update event from ${currentConnection?.userEmail}`);
+          console.log(`📋 Full message payload:`, message.payload);
+          (async () => {
+            if (!currentConnection) {
+              console.log(`❌ Interview invitation update attempted without authentication`);
+              sendError(ws, "Not authenticated", 4001);
+              return;
+            }
+
+            const { messageId, status } = message.payload;
+            console.log(`📋 Interview invitation update: ${status} for message ${messageId}`);
+
+            try {
+              // Find the message and verify it's an interview invitation message
+              const message = await prisma.message.findUnique({
+                where: { id: messageId },
+                include: {
+                  conversation: {
+                    select: {
+                      id: true,
+                      participants: true
+                    }
+                  }
+                }
+              });
+
+              if (!message) {
+                console.log(`❌ Message not found: ${messageId}`);
+                sendError(ws, "Message not found", 4004);
+                return;
+              }
+
+              // Check if user is participant in this conversation
+              if (!message.conversation.participants.includes(currentConnection.userEmail)) {
+                console.log(`🚫 Access denied - ${currentConnection.userEmail} not in participants list`);
+                sendError(ws, "Access denied to this message", 4003);
+                return;
+              }
+
+              // Check if it's an interview invitation message
+              if (message.type !== 'interview_invitation') {
+                console.log(`❌ This is not an interview invitation message: ${messageId}`);
+                sendError(ws, "This is not an interview invitation message", 4005);
+                return;
+              }
+
+              // Parse the current invitation data
+              let invitationData;
+              try {
+                invitationData = JSON.parse(message.content);
+              } catch (error) {
+                console.log(`❌ Invalid invitation data format: ${messageId}`);
+                sendError(ws, "Invalid invitation data format", 4006);
+                return;
+              }
+
+              // Update the invitation data based on status
+              const updatedInvitationData = {
+                ...invitationData,
+                status: status,
+                updatedAt: new Date().toISOString()
+              };
+
+              // Update the message content with new status
+              const updatedMessage = await prisma.message.update({
+                where: { id: messageId },
+                data: {
+                  content: JSON.stringify(updatedInvitationData)
+                },
+                include: {
+                  sender: {
+                    select: {
+                      id: true,
+                      firstName: true,
+                      lastName: true,
+                      avatar: true,
+                      userType: true
+                    }
+                  }
+                }
+              });
+
+              console.log(`✅ Interview invitation status updated in database: ${messageId} -> ${status}`);
+
+              // Broadcast status update to all participants in the conversation
+              console.log(`📢 Broadcasting interview invitation status update to conversation participants`);
+              
+              broadcastToRoom(
+                message.conversationId,
+                {
+                  type: "interview_invitation_updated",
+                  payload: {
+                    ...updatedMessage,
+                    invitationData: updatedInvitationData,
+                    isOwn: false,
+                  },
+                }
+              );
+
+              console.log(`📤 Sending interview invitation status update confirmation to sender ${currentConnection.userEmail}`);
+
+              ws.send(JSON.stringify({
+                type: "interview_invitation_updated",
+                payload: {
+                  ...updatedMessage,
+                  invitationData: updatedInvitationData,
+                  isOwn: true,
+                },
+              }));
+
+              console.log(`✅ Interview invitation status update sent successfully by ${currentConnection.userEmail}`);
+
+            } catch (error) {
+              console.error(`❌ Error updating interview invitation status from ${currentConnection.userEmail}:`, error);
+              sendError(ws, "Failed to update interview invitation status", 4504);
+            }
+          })();
           break;
 
         default:

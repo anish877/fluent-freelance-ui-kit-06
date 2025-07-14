@@ -6,8 +6,8 @@ import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Badge } from '../ui/badge';
-import axios from 'axios';
 import { toast } from 'sonner';
+import { offerService } from '../../services/offer.service';
 
 interface OfferModalProps {
   isOpen: boolean;
@@ -115,9 +115,9 @@ const OfferModal: React.FC<OfferModalProps> = ({
         milestones: milestones.length > 0 ? milestones : undefined
       };
 
-      const response = await axios.post('/offers', payload);
+      const response = await offerService.createOffer(payload);
       
-      if (response.data.success) {
+      if (response.success) {
         toast.success('Offer sent successfully!');
         onOfferCreated?.();
         onClose();

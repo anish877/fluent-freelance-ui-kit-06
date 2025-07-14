@@ -1,35 +1,18 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import axios from "axios";
 
 import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/AuthContext";
-import { uploadService } from "../lib/uploadService";
+import { jobService, uploadService } from "../services";
 import JobDetailsStep from "../components/forms/JobDetailsStep";
 import ProjectScopeStep from "../components/forms/ProjectScopeStep";
 import BudgetVisibilityStep from "../components/forms/BudgetVisibilityStep";
 import JobReviewStep from "../components/forms/JobReviewStep";
-
-interface JobFormData {
-  title: string;
-  description: string;
-  category: string;
-  skills: string[];
-  experienceLevel: string; // entry-level, intermediate, expert
-  projectType: string; // hourly, fixed
-  duration: string; // one-time, short-term, ongoing
-  budgetType: 'hourly' | 'fixed';
-  minBudget?: number;
-  maxBudget?: number;
-  hideBudget: boolean;
-  visibility: 'public' | 'invite-only' | 'private';
-  attachments?: File[];
-  attachmentUrls?: string[]; // Store uploaded URLs
-}
+import { JobFormData } from "../types";
 
 const EditJob = () => {
   const { id } = useParams();
@@ -49,6 +32,7 @@ const EditJob = () => {
     experienceLevel: "",
     projectType: "",
     duration: "",
+    budget: "FIXED",
     budgetType: "fixed",
     minBudget: 0,
     maxBudget: 0,
@@ -71,10 +55,10 @@ const EditJob = () => {
         setIsLoading(true);
         setError(null);
         
-        const response = await axios.get(`/jobs/${id}`);
+        const response = await jobService.getJob(id!);
         
-        if (response.data.success) {
-          const job = response.data.data;
+        if (response.success && response.data) {
+          const job = response.data;
           
           // Transform backend data to frontend format
           const transformedData: JobFormData = {
@@ -85,10 +69,11 @@ const EditJob = () => {
             experienceLevel: job.experienceLevel || "",
             projectType: job.projectType || "",
             duration: job.duration || "",
+            budget: job.budget || "FIXED",
             budgetType: job.projectType === 'fixed' ? 'fixed' : 'hourly',
             minBudget: job.minBudget || 0,
             maxBudget: job.maxBudget || 0,
-            hideBudget: job.hideBudget || false,
+            hideBudget: false,
             visibility: job.visibility || "public",
             attachments: [], // New files to upload
             attachmentUrls: job.attachments || [] // Existing uploaded URLs
@@ -167,7 +152,7 @@ const EditJob = () => {
       if (formData.attachments && formData.attachments.length > 0) {
         try {
           const uploadResponse = await uploadService.uploadMultiple(formData.attachments);
-          newAttachmentUrls = uploadResponse.data.map(file => file.url);
+          newAttachmentUrls = uploadResponse.map(file => file.url);
         } catch (uploadError) {
           console.error('File upload error:', uploadError);
           toast({
@@ -191,17 +176,17 @@ const EditJob = () => {
         experienceLevel: formData.experienceLevel,
         projectType: formData.projectType,
         duration: formData.duration,
-        budget: formData.projectType === 'fixed' ? 'FIXED' : 'HOURLY',
+        budget: formData.projectType === 'fixed' ? 'FIXED' as const : 'HOURLY' as const,
         minBudget: formData.minBudget,
         maxBudget: formData.maxBudget,
         hideBudget: formData.hideBudget,
         visibility: formData.visibility,
-        attachments: allAttachmentUrls
+        attachmentUrls: allAttachmentUrls
       };
 
-      const response = await axios.put(`/jobs/${id}`, jobData);
+      const response = await jobService.updateJob(id!, jobData);
       
-      if (response.data.success) {
+      if (response.success) {
         toast({
           title: "Job Updated Successfully!",
           description: "Your job has been updated and is now live on the platform.",
@@ -209,7 +194,7 @@ const EditJob = () => {
         
         navigate('/client-dashboard');
       } else {
-        throw new Error(response.data.message || 'Failed to update job');
+        throw new Error(response.message || 'Failed to update job');
       }
     } catch (error: any) {
       console.error('Error updating job:', error);

@@ -5,7 +5,7 @@ import {
   Eye, MessageCircle, CheckCircle, XCircle, Award,
   FileText, Download, Edit, Trash2, AlertCircle,
   Filter, Search, SortAsc, MoreHorizontal,
-  TrendingUp, Target
+  TrendingUp, Target, ArrowLeft, DollarSign, Briefcase, Share2, Bookmark, BookmarkCheck
 } from "lucide-react";
 
 import Footer from "../components/layout/Footer";
@@ -19,111 +19,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Progress } from "../components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import axios from "axios";
 import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/AuthContext";
 import { useWebSocket } from "../hooks/socketContext";
-
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-  budget: 'FIXED' | 'HOURLY';
-  minBudget?: number;
-  maxBudget?: number;
-  duration?: string;
-  skills: string[];
-  category: string;
-  subcategory?: string;
-  projectType?: string;
-  experienceLevel?: string;
-  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  visibility: string;
-
-  createdAt: string;
-  updatedAt: string;
-  client: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    bio?: string;
-    location?: string;
-    companyName?: string;
-    companySize?: string;
-    industry?: string;
-  };
-  _count: {
-    proposals: number;
-  };
-}
-
-interface Proposal {
-  id: string;
-  coverLetter: string;
-  bidAmount: number;
-  bidType?: 'hourly' | 'fixed'; // Add bid type
-  estimatedDuration: string;
-  attachments: string[];
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
-  jobId: string;
-  freelancerId: string;
-  createdAt: string;
-  updatedAt: string;
-  questionResponses?: Array<{
-    question: string;
-    answer: string;
-  }>;
-  milestones?: Array<{
-    title: string;
-    duration: string;
-    amount: number;
-  }>;
-  clientNotes?: string;
-  clientViewed: boolean;
-  rating?: number;
-  interview?: {
-    scheduled: boolean;
-    date?: string;
-    notes?: string;
-  };
-  originalBudget?: number;
-  isShortlisted: boolean;
-  freelancer: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatar?: string;
-    title?: string;
-    location?: string;
-    skills?: Array<{
-      name: string;
-      category?: string;
-      level?: string;
-      yearsOfExperience?: number;
-    }> | string[];
-    hourlyRate?: number;
-    totalEarnings?: string;
-    successRate?: number;
-    completedJobs?: number;
-    onTime?: number;
-    responseTime?: string;
-    lastActive?: string;
-    topRatedPlus?: boolean;
-    verified?: boolean;
-    languages?: Array<{
-      name: string;
-      level: string;
-    }>;
-    education?: Array<{
-      school: string;
-      degree: string;
-      year: string;
-    }>;
-    certifications?: string[];
-    email?: string; // Added email to freelancer interface
-  };
-}
+import InterviewSchedulingModal from "../components/modals/InterviewSchedulingModal";
+import { jobService, proposalService } from "../services";
+import { Job, Proposal } from "../types";
 
 const ClientJobView = () => {
   const { id } = useParams();
@@ -139,7 +40,10 @@ const ClientJobView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [acceptingProposalId, setAcceptingProposalId] = useState<string | null>(null);
-  const { createConversation } = useWebSocket();
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+  const [isInterviewModalOpen, setIsInterviewModalOpen] = useState(false);
+  const [selectedProposalForInterview, setSelectedProposalForInterview] = useState<Proposal | null>(null);
+  const { createConversation, sendInterviewMessage, messages, socketRef } = useWebSocket();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -148,22 +52,12 @@ const ClientJobView = () => {
         setLoading(true);
         
         // Fetch job details
-        const jobResponse = await axios.get(`/jobs/${id}`);
-        if (jobResponse.data.success) {
-          setJob(jobResponse.data.data);
-        } else {
-          setError('Failed to fetch job details');
-          return;
-        }
+        const jobResponse = await jobService.getJob(id!);
+        setJob(jobResponse.data);
 
         // Fetch proposals for this job
-        const proposalsResponse = await axios.get(`/proposals/job/${id}`);
-        if (proposalsResponse.data.success) {
-          setProposals(proposalsResponse.data.data);
-        } else {
-          setError('Failed to fetch proposals');
-          return;
-        }
+        const proposalsResponse = await proposalService.getJobProposalsArray(id!);
+        setProposals(proposalsResponse);
       } catch (err: unknown) {
         console.error('Error fetching job and proposals:', err);
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch data';
@@ -185,9 +79,9 @@ const ClientJobView = () => {
 
   const filteredProposals = proposals.filter(proposal => {
     const matchesSearch = 
-      proposal.freelancer.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proposal.freelancer.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proposal.coverLetter.toLowerCase().includes(searchTerm.toLowerCase());
+      (proposal.freelancer?.firstName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (proposal.freelancer?.lastName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (proposal.coverLetter?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     
     if (filterBy === "all") return matchesSearch;
     return matchesSearch && proposal.status.toLowerCase() === filterBy;
@@ -200,7 +94,7 @@ const ClientJobView = () => {
       case "price":
         return a.bidAmount - b.bidAmount;
       case "rating":
-        return (b.freelancer.successRate || 0) - (a.freelancer.successRate || 0);
+        return (b.freelancer?.successRate || 0) - (a.freelancer?.successRate || 0);
       default:
         return 0;
     }
@@ -234,57 +128,51 @@ const ClientJobView = () => {
   const handleProposalAction = async (proposalId: string, action: string) => {
     try {
       if (action === "accept") {
-        const response = await axios.put(`/proposals/${proposalId}/status`, {
-          status: 'ACCEPTED'
-        });
-        if (response.data.success) {
+        const response = await proposalService.updateProposalStatus(proposalId, 'ACCEPTED');
+        if (response.success) {
           toast({
             title: "Success",
             description: "Proposal accepted successfully!",
           });
           // Refresh proposals
-          const proposalsResponse = await axios.get(`/proposals/job/${id}`);
-          if (proposalsResponse.data.success) {
-            setProposals(proposalsResponse.data.data);
-          }
+          const proposalsResponse = await proposalService.getJobProposalsArray(id!);
+          setProposals(proposalsResponse);
         }
       } else if (action === "reject") {
-        const response = await axios.put(`/proposals/${proposalId}/status`, {
-          status: 'REJECTED'
-        });
-        if (response.data.success) {
+        const response = await proposalService.updateProposalStatus(proposalId, 'REJECTED');
+        if (response.success) {
           toast({
             title: "Success",
             description: "Proposal rejected successfully!",
           });
           // Refresh proposals
-          const proposalsResponse = await axios.get(`/proposals/job/${id}`);
-          if (proposalsResponse.data.success) {
-            setProposals(proposalsResponse.data.data);
-          }
+          const proposalsResponse = await proposalService.getJobProposalsArray(id!);
+          setProposals(proposalsResponse);
         }
       } else if (action === "shortlist") {
-        const response = await axios.put(`/proposals/${proposalId}`, {
-          isShortlisted: true
-        });
-        if (response.data.success) {
+        const response = await proposalService.updateProposal(proposalId, { isShortlisted: true });
+        if (response.success) {
           toast({
             title: "Success",
             description: "Proposal added to shortlist!",
           });
           // Refresh proposals
-          const proposalsResponse = await axios.get(`/proposals/job/${id}`);
-          if (proposalsResponse.data.success) {
-            setProposals(proposalsResponse.data.data);
-          }
+          const proposalsResponse = await proposalService.getJobProposalsArray(id!);
+          setProposals(proposalsResponse);
+        }
+      } else if (action === "interview") {
+        // Find the proposal to open interview modal
+        const proposal = proposals.find(p => p.id === proposalId);
+        if (proposal) {
+          setSelectedProposalForInterview(proposal);
+          setIsInterviewModalOpen(true);
         }
       }
-    } catch (err: unknown) {
-      console.error(`Error ${action}ing proposal:`, err);
-      const errorMessage = err instanceof Error ? err.message : `Failed to ${action} proposal`;
+    } catch (error) {
+      console.error('Error updating proposal:', error);
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Failed to update proposal",
         variant: "destructive"
       });
     }
@@ -295,40 +183,40 @@ const ClientJobView = () => {
       setAcceptingProposalId(proposalId);
       
       // First, accept the proposal
-      const acceptResponse = await axios.put(`/proposals/${proposalId}/status`, {
-        status: 'ACCEPTED'
-      });
+      const acceptResponse = await proposalService.updateProposalStatus(proposalId, 'ACCEPTED');
       
-      if (acceptResponse.data.success) {
+      if (acceptResponse.success) {
         toast({
           title: "Success",
-          description: "Proposal accepted successfully! Starting conversation...",
+          description: "Proposal accepted! Creating conversation...",
         });
         
-        // Refresh proposals
-        const proposalsResponse = await axios.get(`/proposals/job/${id}`);
-        if (proposalsResponse.data.success) {
-          setProposals(proposalsResponse.data.data);
+        // Create conversation with the freelancer
+        const conversationId = await createConversation(
+          freelancerEmail,
+          projectName,
+          jobId
+        );
+        
+        if (conversationId) {
+          toast({
+            title: "Success",
+            description: "Conversation created! You can now message the freelancer.",
+          });
+          
+          // Navigate to messages
+          navigate(`/messages/${conversationId}`);
         }
         
-        // Then start a conversation and redirect to messages
-        const conversationId = await createConversation(freelancerEmail, projectName, jobId);
-        if (conversationId) {
-          navigate(`/messages/${conversationId}`);
-        } else {
-          toast({
-            title: "Warning",
-            description: "Proposal accepted but could not start conversation. You can message the freelancer from the messages page.",
-            variant: "destructive"
-          });
-        }
+        // Refresh proposals
+        const proposalsResponse = await proposalService.getJobProposalsArray(id!);
+        setProposals(proposalsResponse);
       }
-    } catch (err: unknown) {
-      console.error('Error accepting proposal and starting conversation:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to accept proposal and start conversation';
+    } catch (error) {
+      console.error('Error accepting proposal and creating conversation:', error);
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Failed to accept proposal or create conversation",
         variant: "destructive"
       });
     } finally {
@@ -378,6 +266,92 @@ const ClientJobView = () => {
         variant: "destructive"
       });
     }
+  };
+
+  // Handle interview scheduling
+  const handleInterviewScheduled = async (interviewData: any) => {
+    try {
+      // Refresh proposals to show updated interview status
+      const proposalsResponse = await proposalService.getJobProposalsArray(id!);
+      setProposals(proposalsResponse);
+
+      // Close the modal
+      setIsInterviewModalOpen(false);
+      setSelectedProposalForInterview(null);
+
+      toast({
+        title: "Success",
+        description: "Interview scheduled successfully!",
+      });
+
+      console.log("Reached here");
+
+      // Send interview message to freelancer
+      if (selectedProposalForInterview && job) {
+        const conversationId = await createConversation(
+          selectedProposalForInterview.freelancer.email,
+          job?.title || '',
+          job?.id || ''
+        );
+
+        console.log("Reached here 2", conversationId);
+        
+        if (conversationId) {
+          // Send interview message
+          await sendInterviewMessage(
+            {
+              type: 'interview_scheduled',
+              scheduled: true,
+              date: interviewData.date,
+              time: interviewData.time,
+              duration: interviewData.duration,
+              meetLink: interviewData.meetLink,
+              notes: interviewData.notes,
+              jobTitle: job?.title,
+              clientName: `${user?.firstName} ${user?.lastName}`,
+              proposalId: selectedProposalForInterview.id
+            },
+            conversationId,
+            selectedProposalForInterview.id
+          );
+
+          console.log("Reached here 3");
+
+          // Update proposal with interview details
+          await proposalService.updateProposal(selectedProposalForInterview.id, {
+            interview: {
+              scheduled: true,
+              date: interviewData.date,
+              time: interviewData.time,
+              meetLink: interviewData.meetLink,
+              notes: interviewData.notes,
+              jobTitle: job?.title,
+              clientName: `${user?.firstName} ${user?.lastName}`,
+              proposalId: selectedProposalForInterview.id
+            }
+          });
+
+          console.log("Reached here 4");
+
+          toast({
+            title: "Success",
+            description: "Interview message sent to freelancer!",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error scheduling interview:', error);
+      toast({
+        title: "Error",
+        description: "Failed to schedule interview",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCloseInterviewModal = () => {
+    setIsInterviewModalOpen(false);
+    setSelectedProposalForInterview(null);
   };
 
   if (loading) {
@@ -580,51 +554,51 @@ const ClientJobView = () => {
                   </CardContent>
                 </Card>
               ) : (
-                sortedProposals.map((proposal) => (
+                sortedProposals.map((proposal: Proposal) => (
                   <Card key={proposal.id} className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-4">
                       <div className="flex justify-between items-start">
                         <div className="flex items-start space-x-4">
                           <Avatar className="h-16 w-16">
-                            <AvatarImage src={proposal.freelancer.avatar} />
+                            <AvatarImage src={proposal.freelancer?.avatar} />
                             <AvatarFallback>
-                              {proposal.freelancer.firstName[0]}{proposal.freelancer.lastName[0]}
+                              {proposal.freelancer?.firstName?.[0] || ''}{proposal.freelancer?.lastName?.[0] || ''}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {proposal.freelancer.firstName} {proposal.freelancer.lastName}
-                          </h3>
-                          {proposal.freelancer.topRatedPlus && (
-                            <Badge variant="secondary" className="text-xs">
-                              <Award className="h-3 w-3 mr-1" />
-                              Top Rated Plus
-                            </Badge>
-                          )}
-                          {proposal.freelancer.verified && (
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                          )}
-                          <Link to={`/freelancer/${proposal.freelancer.id}`}>
-                            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                              <Eye className="h-3 w-3 mr-1" />
-                              Profile
-                            </Button>
-                          </Link>
-                        </div>
-                            <p className="text-gray-600 mb-2">{proposal.freelancer.title || 'Freelancer'}</p>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-lg font-semibold text-gray-900">
+                                {proposal.freelancer?.firstName || 'Unknown'} {proposal.freelancer?.lastName || 'User'}
+                              </h3>
+                              {proposal.freelancer?.topRatedPlus && (
+                                <Badge variant="secondary" className="text-xs">
+                                  <Award className="h-3 w-3 mr-1" />
+                                  Top Rated Plus
+                                </Badge>
+                              )}
+                              {proposal.freelancer?.verified && (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              )}
+                              <Link to={`/freelancer/${proposal.freelancer?.id}`}>
+                                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  Profile
+                                </Button>
+                              </Link>
+                            </div>
+                            <p className="text-gray-600 mb-2">{proposal.freelancer?.title || 'Freelancer'}</p>
                             <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
                               <div className="flex items-center">
                                 <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-                                {proposal.freelancer.successRate || 0}% success rate
+                                {proposal.freelancer?.successRate || 0}% success rate
                               </div>
-                              <span>{proposal.freelancer.location || 'Location not specified'}</span>
-                              <span className="text-green-600">{proposal.freelancer.lastActive || 'Recently active'}</span>
+                              <span>{proposal.freelancer?.location || 'Location not specified'}</span>
+                              <span className="text-green-600">{proposal.freelancer?.lastActive || 'Recently active'}</span>
                             </div>
                             <div className="flex items-center gap-4 text-sm text-gray-600">
-                              <span>${proposal.freelancer.hourlyRate || 0}/hr</span>
-                              <span>{proposal.freelancer.totalEarnings || '$0'} earned</span>
-                              <span>{proposal.freelancer.completedJobs || 0} jobs completed</span>
+                              <span>${proposal.freelancer?.hourlyRate || 0}/hr</span>
+                              <span>{proposal.freelancer?.totalEarnings || '$0'} earned</span>
+                              <span>{proposal.freelancer?.completedJobs || 0} jobs completed</span>
                             </div>
                           </div>
                         </div>
@@ -639,7 +613,7 @@ const ClientJobView = () => {
                           <div className="text-right text-sm">
                             <p className="font-semibold text-gray-900">
                               ${proposal.bidAmount.toLocaleString()}
-                              {proposal.bidType === 'hourly' && '/hr'}
+                                                              {proposal.bidType === 'HOURLY' && '/hr'}
                             </p>
                             <p className="text-gray-600">{proposal.estimatedDuration}</p>
                           </div>
@@ -655,7 +629,7 @@ const ClientJobView = () => {
                       </div>
 
                       {/* Skills */}
-                      {proposal.freelancer.skills && (
+                      {proposal.freelancer?.skills && (
                         <div className="flex flex-wrap gap-2 mb-4">
                           {Array.isArray(proposal.freelancer.skills) ? 
                             proposal.freelancer.skills.map((skill: string | { name: string; category?: string; level?: string; yearsOfExperience?: number }, index: number) => (
@@ -715,7 +689,7 @@ const ClientJobView = () => {
                           )}
                         </div>
                         <div className="flex gap-2">
-                          <Link to={`/freelancer/${proposal.freelancer.id}`}>
+                          <Link to={`/freelancer/${proposal.freelancer?.id}`}>
                             <Button variant="outline" size="sm">
                               <Eye className="h-4 w-4 mr-1" />
                               View Profile
@@ -731,7 +705,7 @@ const ClientJobView = () => {
                             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
                               <DialogHeader>
                                 <DialogTitle className="break-words overflow-wrap-anywhere">
-                                  Proposal from {proposal.freelancer.firstName} {proposal.freelancer.lastName}
+                                  Proposal from {proposal.freelancer?.firstName || 'Unknown'} {proposal.freelancer?.lastName || 'User'}
                                 </DialogTitle>
                               </DialogHeader>
                               <div className="space-y-6 overflow-hidden">
@@ -740,30 +714,30 @@ const ClientJobView = () => {
                                   <h3 className="font-semibold mb-3">Freelancer Profile</h3>
                                   <div className="flex items-start space-x-4 mb-4">
                                     <Avatar className="h-20 w-20">
-                                      <AvatarImage src={proposal.freelancer.avatar} />
+                                      <AvatarImage src={proposal.freelancer?.avatar} />
                                       <AvatarFallback>
-                                        {proposal.freelancer.firstName[0]}{proposal.freelancer.lastName[0]}
+                                        {proposal.freelancer?.firstName?.[0] || ''}{proposal.freelancer?.lastName?.[0] || ''}
                                       </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1">
-                                      <h4 className="text-lg font-semibold">{proposal.freelancer.firstName} {proposal.freelancer.lastName}</h4>
-                                      <p className="text-gray-600 mb-2">{proposal.freelancer.title || 'Freelancer'}</p>
+                                      <h4 className="text-lg font-semibold">{proposal.freelancer?.firstName || 'Unknown'} {proposal.freelancer?.lastName || 'User'}</h4>
+                                      <p className="text-gray-600 mb-2">{proposal.freelancer?.title || 'Freelancer'}</p>
                                       <div className="grid grid-cols-2 gap-4 text-sm">
                                         <div>
                                           <span className="text-gray-600">Success Rate: </span>
-                                          <span className="font-medium">{proposal.freelancer.successRate || 0}%</span>
+                                          <span className="font-medium">{proposal.freelancer?.successRate || 0}%</span>
                                         </div>
                                         <div>
                                           <span className="text-gray-600">Completed Jobs: </span>
-                                          <span className="font-medium">{proposal.freelancer.completedJobs || 0}</span>
+                                          <span className="font-medium">{proposal.freelancer?.completedJobs || 0}</span>
                                         </div>
                                         <div>
                                           <span className="text-gray-600">On Time: </span>
-                                          <span className="font-medium">{proposal.freelancer.onTime || 0}%</span>
+                                          <span className="font-medium">{proposal.freelancer?.onTime || 0}%</span>
                                         </div>
                                         <div>
                                           <span className="text-gray-600">Response Time: </span>
-                                          <span className="font-medium">{proposal.freelancer.responseTime || 'Not specified'}</span>
+                                          <span className="font-medium">{proposal.freelancer?.responseTime || 'Not specified'}</span>
                                         </div>
                                       </div>
                                     </div>
@@ -778,10 +752,10 @@ const ClientJobView = () => {
                                       <span className="text-gray-600">Bid Amount: </span>
                                       <span className="font-semibold text-lg">
                                         ${proposal.bidAmount.toLocaleString()}
-                                        {proposal.bidType === 'hourly' && '/hr'}
+                                        {proposal.bidType === 'HOURLY' && '/hr'}
                                       </span>
                                       <p className="text-xs text-gray-500">
-                                        {proposal.bidType === 'hourly' ? 'Hourly Rate' : 'Fixed Price'}
+                                        {proposal.bidType === 'HOURLY' ? 'Hourly Rate' : 'Fixed Price'}
                                       </p>
                                     </div>
                                     <div>
@@ -799,11 +773,13 @@ const ClientJobView = () => {
                                     <div className="mb-4">
                                       <h4 className="font-medium mb-2">Project Milestones</h4>
                                       <div className="space-y-2">
-                                        {proposal.milestones.map((milestone: { title: string; duration: string; amount: number }, index: number) => (
+                                        {proposal.milestones.map((milestone: any, index: number) => (
                                           <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
                                             <div>
                                               <span className="font-medium">{milestone.title}</span>
-                                              <span className="text-sm text-gray-600 ml-2">({milestone.duration})</span>
+                                              <span className="text-sm text-gray-600 ml-2">
+                                                ({milestone.duration || milestone.dueDate || 'No duration specified'})
+                                              </span>
                                             </div>
                                             <span className="font-medium">${milestone.amount}</span>
                                           </div>
@@ -863,7 +839,7 @@ const ClientJobView = () => {
                                   <div className="border rounded-lg p-4 overflow-hidden">
                                     <h3 className="font-semibold mb-3">Screening Questions</h3>
                                     <div className="space-y-4">
-                                      {proposal.questionResponses.map((qa: { question: string; answer: string }, index: number) => (
+                                      {proposal.questionResponses.map((qa: any, index: number) => (
                                         <div key={index}>
                                           <h4 className="font-medium text-gray-900 mb-2 break-words overflow-wrap-anywhere">Q: {qa.question}</h4>
                                           <p className="text-gray-700 bg-gray-50 p-3 rounded break-words whitespace-pre-wrap overflow-wrap-anywhere overflow-hidden">
@@ -877,7 +853,7 @@ const ClientJobView = () => {
 
                                 {/* Action Buttons */}
                                 <div className="flex justify-end gap-2 pt-4 border-t">
-                                  <Link to={`/freelancer/${proposal.freelancer.id}`}>
+                                  <Link to={`/freelancer/${proposal.freelancer?.id}`}>
                                     <Button variant="outline">
                                       <Eye className="h-4 w-4 mr-2" />
                                       View Profile
@@ -887,7 +863,7 @@ const ClientJobView = () => {
                                     <Button 
                                       variant="outline" 
                                       size="sm"
-                                      onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                      onClick={() => handleMessageFreelancer(proposal.freelancer?.email || '', job?.id || '', job?.title || '')}
                                     >
                                       <MessageCircle className="h-4 w-4 mr-2" />
                                       Message
@@ -906,7 +882,7 @@ const ClientJobView = () => {
                                         Decline
                                       </Button>
                                       <Button 
-                                        onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                        onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer?.email || '', job?.id || '', job?.title || '')}
                                         disabled={acceptingProposalId === proposal.id}
                                       >
                                         {acceptingProposalId === proposal.id ? (
@@ -926,7 +902,7 @@ const ClientJobView = () => {
                                     <Button 
                                       variant="outline" 
                                       size="sm"
-                                      onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                      onClick={() => handleMessageFreelancer(proposal.freelancer?.email || '', job?.id || '', job?.title || '')}
                                     >
                                       <MessageCircle className="h-4 w-4 mr-2" />
                                       Message
@@ -941,7 +917,7 @@ const ClientJobView = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                              onClick={() => handleMessageFreelancer(proposal.freelancer?.email || '', job?.id || '', job?.title || '')}
                             >
                               <MessageCircle className="h-4 w-4 mr-1" />
                               Message
@@ -958,7 +934,7 @@ const ClientJobView = () => {
                               </Button>
                               <Button 
                                 size="sm"
-                                onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer?.email || '', job?.id || '', job?.title || '')}
                                 disabled={acceptingProposalId === proposal.id}
                               >
                                 {acceptingProposalId === proposal.id ? (
@@ -978,7 +954,7 @@ const ClientJobView = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}
+                              onClick={() => handleMessageFreelancer(proposal.freelancer?.email || '', job?.id || '', job?.title || '')}
                             >
                               <MessageCircle className="h-4 w-4 mr-1" />
                               Message
@@ -1001,13 +977,13 @@ const ClientJobView = () => {
                                 Archive
                               </DropdownMenuItem>
                               {proposal.status === "ACCEPTED" ? (
-                                <DropdownMenuItem onClick={() => handleMessageFreelancer(proposal.freelancer.email || '', job.id || '', job.title || '')}>
+                                <DropdownMenuItem onClick={() => handleMessageFreelancer(proposal.freelancer?.email || '', job?.id || '', job?.title || '')}>
                                   <MessageCircle className="h-4 w-4 mr-2" />
                                   Message
                                 </DropdownMenuItem>
                               ) : proposal.status === "PENDING" && (
                                 <DropdownMenuItem 
-                                  onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer.email || '', job.id || '', job.title || '')}
+                                  onClick={() => handleAcceptAndMessage(proposal.id, proposal.freelancer?.email || '', job?.id || '', job?.title || '')}
                                   disabled={acceptingProposalId === proposal.id}
                                   className={acceptingProposalId === proposal.id ? "opacity-50 cursor-not-allowed" : ""}
                                 >
@@ -1364,6 +1340,18 @@ const ClientJobView = () => {
       </div>
 
       <Footer />
+
+      {/* Interview Scheduling Modal */}
+      {selectedProposalForInterview && (
+        <InterviewSchedulingModal
+          isOpen={isInterviewModalOpen}
+          onClose={handleCloseInterviewModal}
+          proposalId={selectedProposalForInterview.id}
+          freelancerName={`${selectedProposalForInterview.freelancer.firstName} ${selectedProposalForInterview.freelancer.lastName}`}
+          jobTitle={job?.title || ''}
+          onInterviewScheduled={handleInterviewScheduled}
+        />
+      )}
     </div>
   );
 };

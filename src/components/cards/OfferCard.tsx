@@ -3,9 +3,9 @@ import { DollarSign, Clock, FileText, Calendar, CheckCircle, XCircle, AlertCircl
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/AuthContext';
+import { offerService } from '../../services/offer.service';
 
 interface Offer {
   id: string;
@@ -94,8 +94,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onStatusChange }) => {
   const handleAccept = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.put(`/offers/${offer.id}/accept`);
-      if (response.data.success) {
+      const response = await offerService.acceptOffer(offer.id);
+      if (response.success) {
         toast.success('Offer accepted successfully!');
         onStatusChange?.();
       }
@@ -110,8 +110,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onStatusChange }) => {
   const handleReject = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.put(`/offers/${offer.id}/reject`);
-      if (response.data.success) {
+      const response = await offerService.rejectOffer(offer.id);
+      if (response.success) {
         toast.success('Offer rejected');
         onStatusChange?.();
       }
@@ -126,8 +126,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onStatusChange }) => {
   const handleWithdraw = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.put(`/offers/${offer.id}/withdraw`);
-      if (response.data.success) {
+      const response = await offerService.withdrawOffer(offer.id);
+      if (response.success) {
         toast.success('Offer withdrawn successfully');
         onStatusChange?.();
       }
