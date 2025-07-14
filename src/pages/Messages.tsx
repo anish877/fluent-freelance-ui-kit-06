@@ -907,7 +907,7 @@ const Messages = () => {
                               }
                             };
  
-                            
+                             
                             return (
                               <div key={message.id} className={`flex ${message.senderEmail === user?.email ? 'justify-end' : 'justify-start'} mb-4`}>
                                 <div className="max-w-sm">
